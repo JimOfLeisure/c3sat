@@ -1,0 +1,208 @@
+#!/usr/bin/env python
+
+# 2013-04-20 Another attempt at reading a save file; this time I'm going
+#   to try extracting just the map data
+
+import struct	# For parsing binary data
+
+class GenericSection:
+    """Base class for reading SAV sections."""
+    def __init__(self, saveStream):
+        buffer = saveStream.read(8)
+        (self.name, self.length,) = struct.unpack_from('4si', buffer)
+        self.offset = saveStream.tell()
+        self.buffer = saveStream.read(self.length)
+
+class Tile:
+    """Class for each logical tile."""
+    def __init__(self, saveStream):
+
+        self.Tile36 = GenericSection(saveStream)
+        self.continent = get_short(self.Tile36.buffer, 0x1a)
+        del self.Tile36.buffer
+
+        self.Tile12 = GenericSection(saveStream)
+        #self.whatsthis = get_byte(self.Tile12.buffer, 0xa)
+        self.whatsthis = get_byte(self.Tile12.buffer, 0x5)
+        self.whatsthis2 = get_byte(self.Tile12.buffer, 0x5)
+        self.whatsthis3 = get_byte(self.Tile12.buffer, 0xa)
+        self.whatsthis4 = get_byte(self.Tile12.buffer, 0xb)
+        self.whatsthis5 = get_int(self.Tile12.buffer, 0x0)
+        #del self.Tile12.buffer
+
+        self.Tile4 = GenericSection(saveStream)
+        del self.Tile4.buffer
+
+        self.Tile128 = GenericSection(saveStream)
+        self.is_visible_to = get_int(self.Tile128.buffer, 0)
+        self.is_visible_now_to = get_int(self.Tile128.buffer, 4)
+        self.is_visible = self.is_visible_to & 0x02
+        #self.is_visible = self.is_visible_to & 0x10
+        self.is_visible_now = self.is_visible_now_to & 0x02
+        del self.Tile128.buffer
+
+class Tiles:
+    """Class to read all tiles"""
+    def __init__(self, saveStream, width, height):
+        self.width = width      # These may eventually be redundant to a parent class
+        self.height = height
+        self.tile = []          # List of individual tiles
+        logical_tiles = width / 2 * height
+        while logical_tiles > 0:
+            self.tile.append(Tile(saveStream))
+            logical_tiles -= 1
+
+    def table_out(self):
+        """Return a string of a simple text table of visible tiles."""
+        table_string = ''
+        for y in range(self.height):
+            if y % 2 == 1:
+                table_string += '  '
+            for x in range(self.width / 2):
+                if self.tile[x + y * self.width / 2].is_visible:
+                    table_string += '#'
+                else:
+                    table_string += '.'
+                table_string += '   '
+            table_string += '\n'
+        return table_string
+
+    def html_out(self):
+        """Return a string of a html table of visible tiles."""
+        table_string = '<div class="map">'
+        for y in range(self.height):
+            table_string += '<div class="maprow">'
+            for x in range(self.width / 2):
+                i = x + y * self.width /2
+                #info = hex(self.tile[i].whatsthis)
+                info = str(i)
+                if 0 <= i < len(self.tile):
+                    if self.tile[i].is_visible_now:
+                        table_string += '<div class="tile visible visiblenow">' + info + '</div>'
+                    elif self.tile[i].is_visible:
+                        table_string += '<div class="tile visible">' + info + '</div>'
+                    else:
+                        table_string += '<div class="tile fog">' + info + '</div>'
+                        pass
+                else:
+                    table_string += '<div class="tile notile">' + info + '</div>'
+            table_string += '</div>'
+            table_string += '\n'
+        table_string += '</div>'
+        return table_string
+
+    def html_fake_iso(self):
+        """Return a string of a html table of visible tiles. Filling with blank table entries to position isometric tiles."""
+        table_string = '<div class="map">'
+        for y in range(self.height):
+            table_string += '<div class="maprow">'
+            if y % 2 == 1:
+                table_string += '<div class="tile notile"></div>'
+            for x in range(self.width / 2):
+                i = x  + y * self.width /2
+                info = hex(self.tile[i].whatsthis)
+                #info = str(i)
+                if 0 <= i < len(self.tile):
+                    if self.tile[i].is_visible_now:
+                        table_string += '<div class="tile visible visiblenow">' + info + '</div>'
+                    elif self.tile[i].is_visible:
+                        table_string += '<div class="tile visible">' + info + '</div>'
+                    else:
+                        table_string += '<div class="tile fog">' + info + '</div>'
+                        pass
+                else:
+                    table_string += '<div class="tile notile">' + info + '</div>'
+                table_string += '<div class="tile notile"></div>'
+            table_string += '</div>'
+            table_string += '\n'
+        table_string += '</div>'
+        return table_string
+
+    def table_out(self):
+        """Return a string of a html table of visible tiles. Trying fake-isometric layout with column spanning"""
+        table_string = '<table>'
+        for y in range(self.height):
+            table_string += '<tr>'
+            if y % 2 == 1:
+                table_string += '<td class="tile notile">.</td>'
+            for x in range(self.width / 2):
+                i = x  + y * self.width /2
+                info = hex(self.tile[i].whatsthis)
+                #info = str(i)
+                cssclass = 'tile '
+                if 0 <= i < len(self.tile):
+                    if self.tile[i].is_visible:
+                        cssclass += 'visible '
+                        if self.tile[i].continent == 6:     # HACK! Hard-coding continent number for ocean on my test save; need to link this to CONT sections in the future
+                            cssclass += 'bigblue '
+                        table_string += '<td colspan="2" class="' + cssclass + '">' + info + '</td>'
+                    else:
+                        table_string += '<td colspan="2" class="tile fog">' + info + '</td>'
+                #else:
+                #    table_string += '<td class="tile notile">' + info + '</td>'
+                #table_string += '<td class="tile notile"></td>'
+            if y % 2 == 0:
+                table_string += '<td class="tile notile">.</td>'
+            table_string += '</tr>'
+            table_string += '\n'
+        table_string += '</table>'
+        return table_string
+
+
+def get_byte(buffer, offset):
+    """Unpack an byte from a buffer at the given offest."""
+    (the_byte,) = struct.unpack('B', buffer[offset:offset+1])
+    return the_byte
+
+def get_short(buffer, offset):
+    """Unpack an int from a buffer at the given offest."""
+    (the_short,) = struct.unpack('H', buffer[offset:offset+2])
+    return the_short
+
+def get_int(buffer, offset):
+    """Unpack an int from a buffer at the given offest."""
+    (the_int,) = struct.unpack('I', buffer[offset:offset+4])
+    return the_int
+
+def parse_save():
+    saveFilePath = "unc-test.sav"
+    saveFile = open(saveFilePath, 'rb')
+    print 'HACK: Skipping to first TILE in my test SAV.'
+    saveFile.seek(0x34a4, 0)
+    print 'HACK: Instantiating the class that reads TILEs with width x height hard-coded to my test SAV.'
+    game = Tiles(saveFile, 60, 60)
+    return game
+
+def hexdump(src, length=16):
+    """Totally yoinked from https://gist.github.com/sbz/1080258"""
+    FILTER = ''.join([(len(repr(chr(x))) == 3) and chr(x) or '.' for x in range(256)])
+    lines = []
+    for c in xrange(0, len(src), length):
+        chars = src[c:c+length]
+        hex = ' '.join(["%02x" % ord(x) for x in chars])
+        printable = ''.join(["%s" % ((ord(x) <= 127 and FILTER[ord(x)]) or '.') for x in chars])
+        #lines.append("%04x  %-*s  %s\n" % (c, length*3, hex, printable))
+        lines.append("%04x  %-*s  %s" % (c, length*3, hex, printable))
+    return ''.join(lines)
+
+def main():
+    game = parse_save()
+    print 'Printing something(s) from the class to ensure I have what I intended'
+    #print game.name, game.length
+    #print game.tile.pop()[1].length
+    #print game.width, game.height
+    #print game.tile[0].Tile128.length
+    #print game.tile[1000].Tile128.length
+    #print game.tile[0].is_visible_to
+    i = 0
+    max = len(game.tile)
+    while i < max:
+        #print i, hex(game.tile[i].Tile36.offset), hex(game.tile[i].whatsthis), hex(game.tile[i].whatsthis2), hex(game.tile[i].whatsthis3), hex(game.tile[i].whatsthis4), hex(game.tile[i].whatsthis5)
+        #print i, hex(game.tile[i].Tile36.offset), hex(game.tile[i].whatsthis2)
+        #print hex(game.tile[i].whatsthis)
+        print hexdump(game.tile[i].Tile12.buffer)
+        i += 1
+    #print game.html_out()
+
+if __name__=="__main__":
+    main()

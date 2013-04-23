@@ -1,0 +1,9 @@
+<!DOCTYPE HTML>
+<html>
+<head>
+<title>Civ3 SAV Parse Map Display Attempt</title>
+<link rel="stylesheet" type="text/css" href="map.css">
+<script src="jquery-1.8.2.min.js"></script> <!-- Using jQuery for altering styles -->
+<script src="map.js"></script>
+</head>
+<body>

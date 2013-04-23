@@ -1,0 +1,10 @@
+#!/bin/sh
+
+# Trying to get all four-caps and "BIC " from strings results
+#strings unc-test.sav | grep -e '[A-Z,\ ]\{4,\}'
+
+# Let's eliminate the TILE$'s and then try uniq
+#strings unc-test.sav | grep -e '[A-Z,\ ]\{4,\}' | grep -v 'TILE\$' | uniq
+
+# Same, but let's add digits in to capture 'CIV3'
+strings unc-test.sav | grep -e '[A-Z,\ ,0-9]\{4,\}' | grep -v 'TILE\$' | uniq

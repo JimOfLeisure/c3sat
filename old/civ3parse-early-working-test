@@ -1,0 +1,26 @@
+#!/usr/bin/env python
+
+# 2013-04-19 Jim Nelson . Start of attempt to parse a decompressed Civ3 save file
+# unc-test.sav
+
+import struct		# For parsing runs of binary data
+
+print "Hello, World"
+
+message = "This is the message"
+
+print message
+
+saveFilePath = "unc-test.sav"
+
+saveFile = open(saveFilePath, 'rb')
+
+print "Skipping first 30 byts because the CIV3 header doesn't seem to be followed by a length"
+saveFile.seek(30,0)
+
+buffer = saveFile.read(8)
+#section = struct.unpack('4s',buffer)
+(section,) = struct.unpack('4s',buffer[0:4])
+(sectionLength,) = struct.unpack('i',buffer[4:8])
+
+print "Section Name:", section, ", Length: ", sectionLength
