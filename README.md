@@ -35,3 +35,17 @@ have been repeatedly altering it and running it directly as I attempt
 to understand the game save data.
 
 html.py calls tileonly.py and writes an html map in ./html/www/map.html .
+
+To Do (short term):
+- Copy map.css and map.js into repo; symlink from my dev web server to repo
+- Figure out what to do about jquery.js; possibly link to Google's hosted jquery.js? Currently I have a copy on my local server
+- Reorganize code so hack code is largely in separate module from the classes
+- Implement debug and spoiler triggers to turn debug prints and game-spoiler info on/off
+- Make tileonly export tile data in JSON and then have jquery build the HTML map table
+- Break out my scant notes on save data into doc folder and organize it
+- Include links to any reference info I've found on save file format
+
+Medium-term goals:
+- Get it to read any C3C save
+- Figure a way to auto-decompress saves. blast()? Currently am using dynamite program to manually decompress save files.
+- Enable with jQuery html map view where I can dynamically select which offset raw data is displayed in tile (to help visually figure out what each value means).
