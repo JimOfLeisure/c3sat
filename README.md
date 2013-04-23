@@ -34,7 +34,4 @@ generate an HTML map. It is hard-coded to read data from my test save. I
 have been repeatedly altering it and running it directly as I attempt
 to understand the game save data.
 
-html.py calls tileonly.py and writes an html map in
-/usr/share/doc/nginx/www/map.html . It's on my list to make everything
-stay in the repository and use a symlink from the web server to any
-desired files..
+html.py calls tileonly.py and writes an html map in ./html/www/map.html .
