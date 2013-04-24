@@ -37,7 +37,7 @@ def main():
     write.write(str(datetime.datetime.now()))
     #write.write(game.html_out())
     #write.write(game.html_fake_iso())
-    write.write(game.table_out())
+    write.write(game.isometbrick_out())
     write.write(tail.read())
 
 main()

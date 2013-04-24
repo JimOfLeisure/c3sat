@@ -21,6 +21,7 @@
 #   to try extracting just the map data
 
 import struct	# For parsing binary data
+import json     # to export JSON for the HTML browser
 
 class GenericSection:
     """Base class for reading SAV sections."""
@@ -34,18 +35,22 @@ class Tile:
     """Class for each logical tile."""
     def __init__(self, saveStream):
 
+        self.info = {}
+
         self.Tile36 = GenericSection(saveStream)
         self.continent = get_short(self.Tile36.buffer, 0x1a)
+        self.info['continent'] = get_short(self.Tile36.buffer, 0x1a)
         del self.Tile36.buffer
 
         self.Tile12 = GenericSection(saveStream)
+        self.info['terrain'] = get_byte(self.Tile12.buffer, 0x5)
         #self.whatsthis = get_byte(self.Tile12.buffer, 0xa)
         self.whatsthis = get_byte(self.Tile12.buffer, 0x5)
         self.whatsthis2 = get_byte(self.Tile12.buffer, 0x5)
         self.whatsthis3 = get_byte(self.Tile12.buffer, 0xa)
         self.whatsthis4 = get_byte(self.Tile12.buffer, 0xb)
         self.whatsthis5 = get_int(self.Tile12.buffer, 0x0)
-        #del self.Tile12.buffer
+        del self.Tile12.buffer
 
         self.Tile4 = GenericSection(saveStream)
         del self.Tile4.buffer
@@ -64,10 +69,29 @@ class Tiles:
         self.width = width      # These may eventually be redundant to a parent class
         self.height = height
         self.tile = []          # List of individual tiles
-        logical_tiles = width / 2 * height
-        while logical_tiles > 0:
-            self.tile.append(Tile(saveStream))
-            logical_tiles -= 1
+        self.tile_matrix = []       # x,y matrix of individual tiles
+        self.tile_iso_matrix = []   # faux isometric padded matrix  of individual tiles
+#        logical_tiles = width / 2 * height
+#        while logical_tiles > 0:
+#            self.tile.append(Tile(saveStream))
+#            logical_tiles -= 1
+        for y in range(height):
+            self.tile_matrix.append([])
+            self.tile_iso_matrix.append([])
+            if y % 2 == 1:
+                self.tile_iso_matrix[y].append(None)
+            for x in range(width / 2):
+                this_tile = Tile(saveStream)
+
+                self.tile.append(this_tile)
+
+                self.tile_matrix[y].append(this_tile)
+
+                self.tile_iso_matrix[y].append(this_tile)
+                self.tile_iso_matrix[y].append(None)
+
+            if y % 2 == 0:
+                self.tile_iso_matrix[y].append(None)
 
     def table_out(self):
         """Return a string of a simple text table of visible tiles."""
@@ -135,7 +159,7 @@ class Tiles:
         table_string += '</div>'
         return table_string
 
-    def table_out(self):
+    def isometbrick_out(self):
         """Return a string of a html table of visible tiles. Trying fake-isometric layout with column spanning"""
         table_string = '<table>'
         for y in range(self.height):
@@ -165,6 +189,17 @@ class Tiles:
         table_string += '</table>'
         return table_string
 
+    def json_out(self):
+        """Return a string of JSON-formatted tile data."""
+        tempmatrix = []
+        for y in range(self.height):
+            tempmatrix.append([])
+            for x in range(self.width / 2):
+                tempmatrix[y].append(self.tile_matrix[y][x].info)
+                
+        json_string = json.dumps(tempmatrix)
+        #json_string = json.JSONEncoder(skipkeys=True).encode(self.tile)
+        return json_string
 
 def get_byte(buffer, offset):
     """Unpack an byte from a buffer at the given offest."""
@@ -203,6 +238,7 @@ def hexdump(src, length=16):
     return ''.join(lines)
 
 def main():
+    print json
     game = parse_save()
     print 'Printing something(s) from the class to ensure I have what I intended'
     #print game.name, game.length
@@ -211,14 +247,14 @@ def main():
     #print game.tile[0].Tile128.length
     #print game.tile[1000].Tile128.length
     #print game.tile[0].is_visible_to
-    i = 0
-    max = len(game.tile)
-    while i < max:
+    #max = len(game.tile)
+    max = 10
+    for i in range(max):
         #print i, hex(game.tile[i].Tile36.offset), hex(game.tile[i].whatsthis), hex(game.tile[i].whatsthis2), hex(game.tile[i].whatsthis3), hex(game.tile[i].whatsthis4), hex(game.tile[i].whatsthis5)
         #print i, hex(game.tile[i].Tile36.offset), hex(game.tile[i].whatsthis2)
         #print hex(game.tile[i].whatsthis)
-        print hexdump(game.tile[i].Tile12.buffer)
-        i += 1
+        #print hexdump(game.tile[i].Tile12.buffer)
+        print game.tile[i].continent
     #print game.html_out()
 
 if __name__=="__main__":

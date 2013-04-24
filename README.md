@@ -37,8 +37,6 @@ to understand the game save data.
 html.py calls tileonly.py and writes an html map in ./html/www/map.html .
 
 To Do (short term):
-- Copy map.css and map.js into repo; symlink from my dev web server to repo
-- Figure out what to do about jquery.js; possibly link to Google's hosted jquery.js? Currently I have a copy on my local server
 - Reorganize code so hack code is largely in separate module from the classes
 - Implement debug and spoiler triggers to turn debug prints and game-spoiler info on/off
 - Make tileonly export tile data in JSON and then have jquery build the HTML map table
