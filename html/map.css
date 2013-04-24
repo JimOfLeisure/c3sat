@@ -1,0 +1,34 @@
+div.tile {
+    display: table-cell;
+    width: 2em;
+    height: 1em;
+}
+
+.notile {
+/*    background-color: yellow; */
+}
+
+.visible {
+    background-color: green;
+}
+
+.visiblenow {
+    -webkit-filter: brightness(150%);
+}
+
+.fog {
+    background-color: black;
+    color: white;
+}
+
+.map {
+    display: table;
+}
+
+.maprow {
+    display: table-row;
+}
+
+.bigblue {
+    background-color: lightblue;
+}
