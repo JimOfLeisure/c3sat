@@ -1,7 +1,8 @@
-div.tile {
+/*div.tile { */
+.maprow > div {
     display: table-cell;
-    width: 2em;
-    height: 1em;
+    width: 120px;
+    height: 20px;
 }
 
 .notile {
@@ -40,4 +41,19 @@ td {
     display: table-cell;
     width: 2em;
     height: 1em;
+    /* The next two items are to enable the SVG positioning and overflow */
+    overflow: visible;
+    position: relative;
+}
+div.isotile {
+    position: relative;
+}
+svg {
+    position:absolute;
+}
+/* .map > polygon { */
+polygon {
+    fill: blue;
+    stroke: black;
+    stroke-width: 1;
 }
