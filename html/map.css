@@ -32,3 +32,12 @@ div.tile {
 .bigblue {
     background-color: lightblue;
 }
+table {
+    /*  border-collapse:separate; */
+    empty-cells: show;
+}
+td {
+    display: table-cell;
+    width: 2em;
+    height: 1em;
+}

@@ -197,7 +197,9 @@ class Tiles:
             for x in range(self.width / 2):
                 tempmatrix[y].append(self.tile_matrix[y][x].info)
                 
-        json_string = json.dumps(tempmatrix)
+        #json_string = json.dumps(tempmatrix)
+        # Let's try pretty printing and compare uncompressed and compressed sizes
+        json_string = json.dumps(tempmatrix, sort_keys=True, indent=4, separators=(',', ': '))
         #json_string = json.JSONEncoder(skipkeys=True).encode(self.tile)
         return json_string
 

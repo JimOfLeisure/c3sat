@@ -10,8 +10,9 @@ var jsonmap = $.getJSON( "map.json", function() {
       $.each( data, function( index, item){
             /* add to html string started above*/
         table+='<tr>';
-        if (index % 2 == 1) {table+='<td>.</td>'}
+        if (index % 2 == 1) {table+='<td></td>'}
         $.each( item, function( index, subitem){
+          // table+='<td></td><td></td>';
           table+='<td continent="' + subitem.continent+'">' + subitem.terrain+'</td><td></td>';
         });
         if (index % 2 == 0) {table+='<td></td>'}
@@ -46,8 +47,12 @@ var jsonmap = $.getJSON( "map.json", function() {
   $("td:contains('98')").css("color", "chocolate");
 
 // replace text with unicode
-  $("td[continent]").html('&diams;');
-  $("td[continent]").css("font-size", "2em");
+//  $("td[continent]").html('&diams;');
+//  $("td[continent]").css("font-size", "2em");
+
+  // hard code land continents green and water continent blue
+  $("td[continent]").css("background-color", "green");
+  $('td[continent="6"]').css("background-color", "blue");
 
   })
   .fail(function() { console.log( "error" ); })
