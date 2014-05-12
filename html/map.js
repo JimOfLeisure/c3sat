@@ -28,4 +28,16 @@ $(document).ready(function() {          // when document ready...
   $("td.visible:contains('0x62')").css("color", "chocolate");
 
   $("td.fog").css("color", "black");
+
+  // SVG selectors. Note that the fill affects the text fields, too. Add '"polygon"' to children to leave the text alone: ...children("polygon").css...
+  // and also delete the folowing line which hides all the text fields
+  $("text").css("display", "none");
+  $("text:contains('0xdd')").parent().children().css("fill", "darkblue");
+  $("text:contains('0xcc')").parent().children().css("fill", "mediumblue");
+  $("text:contains('0xbb')").parent().children().css("fill", "blue");
+  $("text:contains('0x0')").parent().children().css("fill", "cornsilk");
+  $("text:contains('0x33')").parent().children().css("fill", "white");
+  $("text:contains('0x62')").parent().children().css("fill", "chocolate");
+  $("text:contains('0x11')").parent().children().css("fill", "sandybrown");
+
 });

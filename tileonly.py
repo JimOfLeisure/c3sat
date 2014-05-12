@@ -203,6 +203,50 @@ class Tiles:
         #json_string = json.JSONEncoder(skipkeys=True).encode(self.tile)
         return json_string
 
+    def svg_out(self):
+        """Return a string of svg-coded map"""
+        tile_width = 128
+        tile_height = 64
+        map_width = (self.width / 2 * tile_width) + (tile_width / 2)
+        map_height = tile_height * self.height / 2
+        svg_string = '<svg xmlns="http://www.w3.org/2000/svg" version="1.1" viewBox="0 0 ' + str(map_width) + ' ' + str(map_height) + '">'
+        for y in range(self.height):
+            #svg_string += '<tr>'
+            #if y % 2 == 1:
+            #    svg_string += '<td class="tile notile">.</td>'
+            x_indent = (y % 2) * tile_width / 2
+            y_offset = y * tile_height / 2
+            for x in range(self.width / 2):
+                i = x  + y * self.width /2
+                info = hex(self.tile[i].whatsthis)
+                #info = str(i)
+                cssclass = 'tile '
+                if 0 <= i < len(self.tile):
+                    svg_string += '  <g transform="translate(' + str((x * tile_width) + x_indent) + ', ' + str(y_offset) + ')">\n'
+                    #svg_string += '    <polygon points="0,20 24,0 48,20 24,40" transform="translate(' + str((x * tile_width) + x_indent) + ', ' + str(y_offset) + ')" '
+                    svg_string += '    <polygon points="0,32 64,0 128,32 64,64" '
+                    if self.tile[i].is_visible:
+                        cssclass += 'visible '
+                        if self.tile[i].continent == 6:     # HACK! Hard-coding continent number for ocean on my test save; need to link this to CONT sections in the future
+                            cssclass += 'bigblue '
+                        svg_string += 'class="' + cssclass + '" />\n'
+                        svg_string += '    <text text-anchor="middle" alignment-baseline="central" x="' + str(tile_width / 2) + '" y="' + str(tile_height / 2) + '">' + info + '</text>\n'
+                        svg_string += '  </g>\n'
+                    else:
+                        cssclass = 'tile fog'
+                        svg_string += 'class="' + cssclass + '" />\n'
+                        ## spoiler info ### svg_string += '    <text >' + info + '</text>\n'
+                        svg_string += '  </g>\n'
+                #else:
+                #    svg_string += '<td class="tile notile">' + info + '</td>'
+                #svg_string += '<td class="tile notile"></td>'
+            #if y % 2 == 0:
+            #    svg_string += '<td class="tile notile">.</td>'
+            #svg_string += '</tr>'
+            #svg_string += '\n'
+        svg_string += '</svg>'
+        return svg_string
+
 def get_byte(buffer, offset):
     """Unpack an byte from a buffer at the given offest."""
     (the_byte,) = struct.unpack('B', buffer[offset:offset+1])

@@ -20,6 +20,7 @@
 .fog {
     background-color: black;
     color: white;
+    fill: black;    /* for the svg version */
 }
 
 .map {
@@ -32,6 +33,7 @@
 
 .bigblue {
     background-color: lightblue;
+    fill: blue;     /* for the svg version */
 }
 table {
     /*  border-collapse:separate; */
@@ -53,7 +55,9 @@ svg {
 }
 /* .map > polygon { */
 polygon {
-    fill: blue;
+    fill: green;
+    /*
     stroke: black;
     stroke-width: 1;
+    */
 }
