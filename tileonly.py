@@ -244,7 +244,7 @@ class Tiles:
             #    svg_string += '<td class="tile notile">.</td>'
             #svg_string += '</tr>'
             #svg_string += '\n'
-        svg_string += '</svg>'
+        svg_string += '</svg>\n'
         return svg_string
 
 def get_byte(buffer, offset):

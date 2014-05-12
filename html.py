@@ -34,13 +34,13 @@ def main():
     tail = open(htmltail, 'r')
 
     write.write(head.read())
-    write.write('<div>' + str(datetime.datetime.now()) + '</div>')
+    write.write('<div>\n  ' + str(datetime.datetime.now()) + '\n</div>\n')
     #write.write(game.html_out())
     #write.write(game.html_fake_iso())
     #write.write(game.isometbrick_out())
-    write.write('<div id="map">')
+    write.write('<div id="map">\n')
     write.write(game.svg_out())
+    write.write('</div>\n')
     write.write(tail.read())
-    write.write('</div>')
 
 main()
