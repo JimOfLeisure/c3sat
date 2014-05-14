@@ -11,6 +11,7 @@
 
 svg {
     position:absolute;
+    font-size: 2em;
 }
 /* .map > polygon { */
 polygon {

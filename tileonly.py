@@ -225,7 +225,7 @@ class Tiles:
 #            # Left row border
 #            svg_string += '<rect id="leftBorder" class="mapEdge" x="0" y="0" width="' + str(tile_width / 2) + '" height="' + str(map_height) + '" />\n'
 #            svg_string += '<use xlink:href="#leftBorder" transform="translate(' + str(map_width - (tile_width / 2)) + ', 0)" />'
-        svg_string += '<rect class="mapEdge"" x="0" y="0" width="' + str(map_width) + '" height="' + str(map_height) + '" />\n'
+        svg_string += '<rect class="mapEdge" x="0" y="0" width="' + str(map_width) + '" height="' + str(map_height) + '" />\n'
         for y in range(self.height):
             x_indent = (y % 2) * tile_width / 2
             y_offset = y * tile_height / 2
