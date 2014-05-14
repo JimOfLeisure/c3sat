@@ -44,5 +44,25 @@ $(document).ready(function() {          // when document ready...
   $("text:contains('0x62')").parent().children().css("fill", "chocolate");
   $("text:contains('0x11')").parent().children().css("fill", "sandybrown");
 */
+  // Series of buttons to hide various layers / elements
+  $("button#baseter").click(function(){
+      $(".tilebaseterrain").toggle();
+  });
+
+  $("button#ovrter").click(function(){
+      $(".overlayterrain").toggle();
+  });
+
+  $("button#debuginfo").click(function(){
+      $(".whatsthis").toggle();
+  });
+
+  $("button#fogofwar").click(function(){
+      $(".fog").toggle();
+  });
+
+  $("button#bgrect").click(function(){
+      $(".mapEdge").toggle();
+  });
 
 });
