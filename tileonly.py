@@ -1,4 +1,5 @@
 #!/usr/bin/env python
+# -*- coding: latin-1 -*-
 
 #    Copyright 2013 Jim Nelson
 #
@@ -216,15 +217,6 @@ class Tiles:
         map_width = (self.width * tile_width / 2) + (tile_width / 2)
         map_height = (self.height * tile_height / 2) + (tile_height / 2)
         svg_string = '<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" version="1.1" viewBox="0 0 ' + str(map_width) + ' ' + str(map_height) + '">\n'
-        # Well this was dumb. I should just do one big rectangle or change the SVG background
-#        if not y_axis_wrap:
-#            # Top row border
-#            svg_string += '<rect id="topBorder" class="mapEdge" x="0" y="0" width="' + str(map_width) + '" height="' + str(tile_height / 2) + '" />\n'
-#            svg_string += '<use xlink:href="#topBorder" transform="translate(0, ' + str(map_height) + ')" />'
-#        if not x_axis_wrap:
-#            # Left row border
-#            svg_string += '<rect id="leftBorder" class="mapEdge" x="0" y="0" width="' + str(tile_width / 2) + '" height="' + str(map_height) + '" />\n'
-#            svg_string += '<use xlink:href="#leftBorder" transform="translate(' + str(map_width - (tile_width / 2)) + ', 0)" />'
         svg_string += '<rect class="mapEdge" x="0" y="0" width="' + str(map_width) + '" height="' + str(map_height) + '" />\n'
         for y in range(self.height):
             x_indent = (y % 2) * tile_width / 2
@@ -233,24 +225,37 @@ class Tiles:
             for x in range(self.width / 2):
                 i = x  + y * self.width /2
                 info = hex(self.tile[i].whatsthis)
-                cssclass = 'tile '
+                cssclass = 'tile'
                 if 0 <= i < len(self.tile):
-                    #svg_string += '  <g transform="translate(' + str((x * tile_width) + x_indent) + ', 0)">\n'
                     svg_string += '  <g id="' + self.map_id(i) + '" transform="translate(' + str(x * tile_width) + ', 0)">\n'
-                    # svg_string += '  <g transform="translate(' + str((x * tile_width) + x_indent) + ', ' + str((y % 2) * tile_width / 2) + ')">\n'
-                    #svg_string += '    <polygon points="0,20 24,0 48,20 24,40" transform="translate(' + str((x * tile_width) + x_indent) + ', ' + str(y_offset) + ')" '
                     svg_string += '    <polygon points="0,32 64,0 128,32 64,64" '
                     if self.tile[i].is_visible:
-                        cssclass += 'visible '
-                        if self.tile[i].continent == 6:     # HACK! Hard-coding continent number for ocean on my test save; need to link this to CONT sections in the future
-                            cssclass += 'bigblue '
+                        # Get right-nibble of terrain byte
+                        base_terrain = self.tile[i].info['terrain'] & 0x0F
+                        # Get left-nibble of terrain byte: bit-rotate right 4, then mask to be sure it wasn't more than a byte
+                        overlay_terrain = (self.tile[i].info['terrain'] >> 4) & 0x0F
+                        cssclass += 'baseterrain terrbase' + str(base_terrain)
                         svg_string += 'class="' + cssclass + '" />\n'
-                        svg_string += '    <text text-anchor="middle" alignment-baseline="central" x="' + str(tile_width / 2) + '" y="' + str(tile_height / 2) + '">' + info + '</text>\n'
+                        # Not sure I need this comparison; may just be able to key off the nibble value
+                        if overlay_terrain <> base_terrain:
+                            cssclass = 'overlayterrain terroverlay' + str(overlay_terrain)
+                            if overlay_terrain == 0x05:
+                                svg_string += '    <text class="' + cssclass + '" text-anchor="middle" alignment-baseline="central" x="' + str(tile_width / 2) + '" y="' + str(tile_height / 2) + '">○</text>\n'
+                            elif overlay_terrain == 0x06:
+                                svg_string += '    <text class="' + cssclass + '" text-anchor="middle" alignment-baseline="central" x="' + str(tile_width / 2) + '" y="' + str(tile_height / 2) + '">▲</text>\n'
+                            elif overlay_terrain == 0x07:
+                                svg_string += '    <text class="' + cssclass + '" text-anchor="middle" alignment-baseline="central" x="' + str(tile_width / 2) + '" y="' + str(tile_height / 2) + '">↑↑↑</text>\n'
+                            elif overlay_terrain == 0x08:
+                                svg_string += '    <text class="' + cssclass + '" text-anchor="middle" alignment-baseline="central" x="' + str(tile_width / 2) + '" y="' + str(tile_height / 2) + '">Jungle</text>\n'
+                            elif overlay_terrain == 0x09:
+                                svg_string += '    <text class="' + cssclass + '" text-anchor="middle" alignment-baseline="central" x="' + str(tile_width / 2) + '" y="' + str(tile_height / 2) + '">Marsh</text>\n'
+                            else:
+                                svg_string += '    <text class="' + cssclass + '" text-anchor="middle" alignment-baseline="central" x="' + str(tile_width / 2) + '" y="' + str(tile_height / 2) + '">' + info + '</text>\n'
+                        svg_string += '    <text class="whatsthis" text-anchor="middle" alignment-baseline="central" x="' + str(tile_width / 2) + '" y="' + str(tile_height / 2) + '">' + info + '</text>\n'
                         svg_string += '  </g>\n'
                     else:
-                        cssclass = 'tile fog'
+                        cssclass = 'fog'
                         svg_string += 'class="' + cssclass + '" />\n'
-                        ## spoiler info ### svg_string += '    <text >' + info + '</text>\n'
                         svg_string += '  </g>\n'
             # link the first item and place at the end for even rows; link to the last item and place at the first. Will be half-cropped by viewport
             # using math (even lines have 0 remainder, multiplying to cancel out values) instead of if, but it's a little harder to follow
