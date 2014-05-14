@@ -1,55 +1,14 @@
-/*div.tile { */
-.maprow > div {
-    display: table-cell;
-    width: 120px;
-    height: 20px;
-}
-
-.notile {
-/*    background-color: yellow; */
-}
-
-.visible {
-    background-color: green;
-}
-
-.visiblenow {
-    -webkit-filter: brightness(150%);
-}
-
 .fog {
     background-color: black;
     color: white;
     fill: black;    /* for the svg version */
 }
 
-.map {
-    display: table;
-}
-
-.maprow {
-    display: table-row;
-}
-
 .bigblue {
     background-color: lightblue;
     fill: blue;     /* for the svg version */
 }
-table {
-    /*  border-collapse:separate; */
-    empty-cells: show;
-}
-td {
-    display: table-cell;
-    width: 2em;
-    height: 1em;
-    /* The next two items are to enable the SVG positioning and overflow */
-    overflow: visible;
-    position: relative;
-}
-div.isotile {
-    position: relative;
-}
+
 svg {
     position:absolute;
 }
@@ -60,4 +19,13 @@ polygon {
     stroke: black;
     stroke-width: 1;
     */
+    shape-rendering: crispEdges;
+}
+
+/* The map edge rectangle(s) that backdrop the edge tiles */
+.mapEdge {
+    fill: black;
+}
+
+div#map {
 }

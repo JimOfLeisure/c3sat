@@ -203,26 +203,41 @@ class Tiles:
         #json_string = json.JSONEncoder(skipkeys=True).encode(self.tile)
         return json_string
 
+    def map_id(self, i):
+        """Return a string to be used as a CSS ID for the tile group. i is the index of self.tile"""
+        return 'map' + str(i)
+
     def svg_out(self):
         """Return a string of svg-coded map"""
+        x_axis_wrap = True
+        y_axis_wrap = False
         tile_width = 128
         tile_height = 64
-        map_width = (self.width / 2 * tile_width) + (tile_width / 2)
-        map_height = tile_height * self.height / 2
-        svg_string = '<svg xmlns="http://www.w3.org/2000/svg" version="1.1" viewBox="0 0 ' + str(map_width) + ' ' + str(map_height) + '">'
+        map_width = (self.width * tile_width / 2) + (tile_width / 2)
+        map_height = (self.height * tile_height / 2) + (tile_height / 2)
+        svg_string = '<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" version="1.1" viewBox="0 0 ' + str(map_width) + ' ' + str(map_height) + '">\n'
+        # Well this was dumb. I should just do one big rectangle or change the SVG background
+#        if not y_axis_wrap:
+#            # Top row border
+#            svg_string += '<rect id="topBorder" class="mapEdge" x="0" y="0" width="' + str(map_width) + '" height="' + str(tile_height / 2) + '" />\n'
+#            svg_string += '<use xlink:href="#topBorder" transform="translate(0, ' + str(map_height) + ')" />'
+#        if not x_axis_wrap:
+#            # Left row border
+#            svg_string += '<rect id="leftBorder" class="mapEdge" x="0" y="0" width="' + str(tile_width / 2) + '" height="' + str(map_height) + '" />\n'
+#            svg_string += '<use xlink:href="#leftBorder" transform="translate(' + str(map_width - (tile_width / 2)) + ', 0)" />'
+        svg_string += '<rect class="mapEdge"" x="0" y="0" width="' + str(map_width) + '" height="' + str(map_height) + '" />\n'
         for y in range(self.height):
-            #svg_string += '<tr>'
-            #if y % 2 == 1:
-            #    svg_string += '<td class="tile notile">.</td>'
             x_indent = (y % 2) * tile_width / 2
             y_offset = y * tile_height / 2
+            svg_string += '<g row="' + str(y) + '" transform="translate(' + str(x_indent) + ', ' + str(y_offset) + ')">\n'
             for x in range(self.width / 2):
                 i = x  + y * self.width /2
                 info = hex(self.tile[i].whatsthis)
-                #info = str(i)
                 cssclass = 'tile '
                 if 0 <= i < len(self.tile):
-                    svg_string += '  <g transform="translate(' + str((x * tile_width) + x_indent) + ', ' + str(y_offset) + ')">\n'
+                    #svg_string += '  <g transform="translate(' + str((x * tile_width) + x_indent) + ', 0)">\n'
+                    svg_string += '  <g id="' + self.map_id(i) + '" transform="translate(' + str(x * tile_width) + ', 0)">\n'
+                    # svg_string += '  <g transform="translate(' + str((x * tile_width) + x_indent) + ', ' + str((y % 2) * tile_width / 2) + ')">\n'
                     #svg_string += '    <polygon points="0,20 24,0 48,20 24,40" transform="translate(' + str((x * tile_width) + x_indent) + ', ' + str(y_offset) + ')" '
                     svg_string += '    <polygon points="0,32 64,0 128,32 64,64" '
                     if self.tile[i].is_visible:
@@ -237,13 +252,10 @@ class Tiles:
                         svg_string += 'class="' + cssclass + '" />\n'
                         ## spoiler info ### svg_string += '    <text >' + info + '</text>\n'
                         svg_string += '  </g>\n'
-                #else:
-                #    svg_string += '<td class="tile notile">' + info + '</td>'
-                #svg_string += '<td class="tile notile"></td>'
-            #if y % 2 == 0:
-            #    svg_string += '<td class="tile notile">.</td>'
-            #svg_string += '</tr>'
-            #svg_string += '\n'
+            # link the first item and place at the end for even rows; link to the last item and place at the first. Will be half-cropped by viewport
+            # using math (even lines have 0 remainder, multiplying to cancel out values) instead of if, but it's a little harder to follow
+            svg_string += '  <use xlink:href="#' + self.map_id((y * self.width / 2) + (x * (y % 2))) + '" transform="translate(' + str((map_width - tile_width / 2) - (map_width - tile_width / 2) * 2 * (y % 2)) + ', 0)" />\n'
+            svg_string += '</g>\n'
         svg_string += '</svg>\n'
         return svg_string
 
