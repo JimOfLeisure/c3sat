@@ -217,103 +217,7 @@ class Tiles:
         map_width = (self.width * tile_width / 2) + (tile_width / 2)
         map_height = (self.height * tile_height / 2) + (tile_height / 2)
         svg_string = ""
-        #svg_string += '<?xml-stylesheet type="text/css" href="svgmap.css" ?>\n'
-        svg_string += '<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" version="1.1" x="0" y="0" viewBox="0 0 ' + str(map_width) + ' ' + str(map_height) + '" class="panzoom">\n'
-        #svg_string = '<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" version="1.1" x="0" y="0" width = "' + str(map_width) + '" height = "' + str(map_height) + '" viewBox="0 0 ' + str(map_width) + ' ' + str(map_height) + '" class="panzoom">\n'
-        svg_string +="""
-    <style type="text/css" >
-      <![CDATA[
-
-/* "fog of war"; unrevealed tiles */
-.fog {
-    fill: black;
-}
-
-/* "What's This" text elements I use to show given hex tiles per map */
-.whatsthis {
-    display: none;
-}
-
-/* .map > polygon { */
-polygon {
-    fill: red; /* red should stand out if I don't have a polygon otherwise styled */
-    /* for gridlines
-    stroke: black;
-    stroke-width: 1;
-    */
-    shape-rendering: crispEdges;
-}
-
-/* The map edge rectangle(s) that backdrop the edge tiles */
-.mapEdge {
-    fill: black;
-}
-
-/* Overlay Terrain */
-.overlayterrain {
-    /* display: none; */
-}
-
-/* Base Terrain for Desert (?) */
-.terrbase0 {
-    fill: cornsilk;
-}
-
-/* Base Terrain for Plains */
-.terrbase1 {
-    fill: sandybrown;
-}
-
-/* Base Terrain for Grassland */
-.terrbase2 {
-    fill: green;
-}
-
-/* Base Terrain for Tundra */
-.terrbase3 {
-    fill: white;
-}
-
-/* Base Terrain */
-.terrbase4 {
-}
-
-/* Base Terrain for Coast (water tile) */
-.terrbase11 {
-    fill: blue;
-}
-
-/* Base Terrain for Sea */
-.terrbase12 {
-    fill: mediumblue;
-}
-
-/* Base Terrain for Ocean */
-.terrbase13 {
-    fill: darkblue;
-}
-
-/* Overlay Terrain for Forest */
-.terroverlay7 {
-    font-size: 80px;   /* A Forest is currently a string unicode up arrows; let's make it big */
-    /* fill: darkgreen; */
-}
-
-/* Overlay Terrain for Mountain */
-/* Overlay Terrain for Hill */
-.terroverlay5 {
-  font-size: 180px;   /* A hill is currently a unicode circle in a string; let's make it big */
-}
-
-/* Overlay Terrain for Mountain */
-.terroverlay6 {
-  font-size: 180px;   /* A mountain is currently a unicode triangle in a string; let's make it big */
-  fill: saddlebrown;
-}
-      ]]>
-    </style>
-"""
-        #svg_string += '<g class="panzoom">\n'
+        svg_string += '<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" version="1.1" x="0" y="0" viewBox="0 0 ' + str(map_width) + ' ' + str(map_height) + '">\n'
         svg_string += '<rect class="mapEdge" x="0" y="0" width="' + str(map_width) + '" height="' + str(map_height) + '" />\n'
         for y in range(self.height):
             x_indent = (y % 2) * tile_width / 2
@@ -358,7 +262,6 @@ polygon {
             # using math (even lines have 0 remainder, multiplying to cancel out values) instead of if, but it's a little harder to follow
             svg_string += '  <use xlink:href="#' + self.map_id((y * self.width / 2) + (x * (y % 2))) + '" transform="translate(' + str((map_width - tile_width / 2) - (map_width - tile_width / 2) * 2 * (y % 2)) + ', 0)" />\n'
             svg_string += '</g>\n'
-        #svg_string += '</g> <!-- panzoom -->\n'
         svg_string += '</svg>\n'
         return svg_string
 

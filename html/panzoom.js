@@ -1,7 +1,6 @@
 $(document).ready(function() {          // when document ready...
 
   /* js load code yoinked from http://stackoverflow.com/questions/14068031/embedding-external-svg-in-html-for-javascript-manipulation */
-  /*
   xhr = new XMLHttpRequest();
   xhr.open("GET","map.svg",false);
   //xhr.open("GET","Mexican_states_by_population_2013.svg",false);
@@ -13,7 +12,6 @@ $(document).ready(function() {          // when document ready...
   // not working xhr.responseXML.documentElement.className = xhr.responseXML.documentElement.className + "panzoom"
   document.getElementById("map")
     .appendChild(xhr.responseXML.documentElement);
-    */
 
   // add panzoom class to svg
   $("svg").addClass("panzoom");
@@ -54,14 +52,18 @@ $(document).ready(function() {          // when document ready...
             $zoomIn: $section.find(".zoom-in"),
             $zoomOut: $section.find(".zoom-out"),
             $zoomRange: $section.find(".zoom-range"),
-            $reset: $section.find(".reset")
-          });
+            $reset: $section.find(".reset"),
+            //increment: 0.1,
+            minScale: 1,
+            maxScale: 10,
+            contain: 'invert'
+          }).panzoom('zoom');
           $panzoom.parent().on('mousewheel.focal', function( e ) {
             e.preventDefault();
             var delta = e.delta || e.originalEvent.wheelDelta;
             var zoomOut = delta ? delta < 0 : e.originalEvent.deltaY > 0;
             $panzoom.panzoom('zoom', zoomOut, {
-              increment: 0.1,
+              //increment: 0.1,
               animate: false,
               focal: e
             });
