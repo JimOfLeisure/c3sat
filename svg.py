@@ -17,18 +17,28 @@
 #    You should have received a copy of the GNU General Public License
 #    along with Civ3 Show-And-Tell.  If not, see <http://www.gnu.org/licenses/>.
 
-import tileonly
+import wrld
+#import tileonly
 #import datetime
+import sys
 
 
 def main():
-    """This module instantiates tileonly.parse_save() and writes an svg file for the map"""
+    """This module instantiates wrld.parse_save() and writes an svg file for the map"""
     outputsvgpath = 'html/map.svg'
+    if len(sys.argv) < 2:
+        #print "Usage: svg.py <filename>"
+        #sys.exit(-1)
+        saveFile = sys.stdin
+    else:
+        saveFile = open(sys.argv[1], 'rb')
 
-    game = tileonly.parse_save()
+    #game = wrld.parse_save("unc-test.sav")
+    #game = wrld.parse_save("unc-lk151-650ad.sav")
+    game = wrld.parse_save(saveFile)
 
     write = open(outputsvgpath, 'w')
 
-    write.write(game.svg_out())
+    write.write(game.Tiles.svg_out())
 
 main()

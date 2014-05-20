@@ -1,3 +1,8 @@
+/* for IE because it needs hand-holding to make all the divs full-height */
+html, body, div.container-fluid, div.row, div.col-md-10, div.panzoom-parent, div.panzoom {
+    height: 100%;
+}
+
 /* "fog of war"; unrevealed tiles */
 .fog {
     fill: black;
