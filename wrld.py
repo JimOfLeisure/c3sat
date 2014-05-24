@@ -102,7 +102,7 @@ class Tiles:
         """Return a string to be used as a CSS ID for the tile group. i is the index of self.tile"""
         return 'map' + str(i)
 
-    def svg_out(self):
+    def svg_out(self, spoiler=False):
         """Return a string of svg-coded map"""
         x_axis_wrap = True
         y_axis_wrap = False
@@ -272,7 +272,7 @@ class Tiles:
                 cssclass = 'tile'
                 if 0 <= i < len(self.tile):
                     svg_string += '  <g id="' + self.map_id(i) + '" transform="translate(' + str(x * tile_width) + ', 0)">\n'
-                    if self.tile[i].is_visible:
+                    if self.tile[i].is_visible or spoiler:
                         # Get right-nibble of terrain byte
                         base_terrain = self.tile[i].info['terrain'] & 0x0F
                         # Get left-nibble of terrain byte: bit-rotate right 4, then mask to be sure it wasn't more than a byte
