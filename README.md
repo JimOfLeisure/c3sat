@@ -1,6 +1,6 @@
 Civ3 Show-And-Tell
 
-TL;DR: This is an accessory map viewer for Civilization III Conquests save game files.
+TL;DR: This is an accessory map viewer for Civilization III Conquests save game files. Run svg.py and pass it a filename of an uncompressed save (use an autosave or decompress with dynamite) or pipe it an uncompressed save file (autosave or blast) and it will output html/map.svg viewable directly or with html/bootstrap.html .
 
 Status: It makes SVG-based maps from uncompressed save game files and displays them in an HTML page with pan and zoom features provided by jQuery and [timmywil's jquery.panzoom](https://github.com/timmywil/jquery.panzoom) (currently included in my repo, also MIT-licensed) and formatting by [Bootstrap](https://github.com/twbs/bootstrap) obtained via CDN links.
 

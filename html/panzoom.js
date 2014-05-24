@@ -21,9 +21,9 @@ $(document).ready(function() {          // when document ready...
   // Series of buttons to hide various layers / elements
   $("button#kickwebkit").click(function(){
     /*  From http://www.eccesignum.org/blog/solving-display-refreshredrawrepaint-issues-in-webkit-browsers */
-    $('#map').hide();
-    $('#map').get(0).offsetHeight; // no need to store this anywhere, the reference is enough
-    $('#map').show();
+    $('.panzoom').hide();
+    $('.panzoom').get(0).offsetHeight; // no need to store this anywhere, the reference is enough
+    $('.panzoom').show();
   });
 
   $("button#baseter").click(function(){
