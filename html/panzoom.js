@@ -1,6 +1,7 @@
 $(document).ready(function() {          // when document ready...
 
   /* js load code yoinked from http://stackoverflow.com/questions/14068031/embedding-external-svg-in-html-for-javascript-manipulation */
+  /*
   xhr = new XMLHttpRequest();
   xhr.open("GET","map.svg",false);
   //xhr.open("GET","Mexican_states_by_population_2013.svg",false);
@@ -12,9 +13,10 @@ $(document).ready(function() {          // when document ready...
   // not working xhr.responseXML.documentElement.className = xhr.responseXML.documentElement.className + "panzoom"
   document.getElementById("map")
     .appendChild(xhr.responseXML.documentElement);
+    */
 
   // add panzoom class to svg
-  $("svg").addClass("panzoom");
+  // $("svg").addClass("panzoom"); // putting panzoom on svg's parent div
 
   // Series of buttons to hide various layers / elements
   $("button#kickwebkit").click(function(){
@@ -25,7 +27,7 @@ $(document).ready(function() {          // when document ready...
   });
 
   $("button#baseter").click(function(){
-      $(".tilebaseterrain").toggle();
+      $(".baseterrain").toggle();
   });
 
   $("button#ovrter").click(function(){
@@ -62,8 +64,9 @@ $(document).ready(function() {          // when document ready...
             $reset: $section.find(".reset"),
             //increment: 0.1,
             minScale: 1,
-            maxScale: 10,
-            contain: 'invert'
+            maxScale: 20,
+            contain: 'invert',
+            //transition: false
           }).panzoom('zoom');
           $panzoom.parent().on('mousewheel.focal', function( e ) {
             e.preventDefault();

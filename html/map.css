@@ -15,7 +15,7 @@ html, body, div.container-fluid, div.row, div.col-md-10, div.panzoom-parent, div
 
 /* .map > polygon { */
 polygon {
-    fill: red; /* red should stand out if I don't have a polygon otherwise styled */
+/*    fill: red; /* red should stand out if I don't have a polygon otherwise styled */
     /* for gridlines
     stroke: black;
     stroke-width: 1;
@@ -74,8 +74,11 @@ polygon {
 
 /* Overlay Terrain for Forest */
 .terroverlay7 {
-    font-size: 3em;   /* A Forest is currently a string unicode up arrows; let's make it big */
-    /* fill: darkgreen; */
+    fill: red !important
+}
+
+g#myForest g rect {
+    /* fill: red !important */
 }
 
 /* Overlay Terrain for Mountain */
