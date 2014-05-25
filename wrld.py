@@ -25,7 +25,7 @@
 # 2014-05-19 Now I want to skip to the first WRLD section in arbitrary uncompressed SAV files
 
 import struct	# For parsing binary data
-import json     # to export JSON for the HTML browser
+#import json     # to export JSON for the HTML browser
 import horspool    # to seek to first match; from http://inspirated.com/2010/06/19/using-boyer-moore-horspool-algorithm-on-file-streams-in-python
 import sys
 
@@ -99,18 +99,122 @@ class Tiles:
             if y % 2 == 0:
                 self.tile_iso_matrix[y].append(None)
 
-    def map_id(self, i):
-        """Return a string to be used as a CSS ID for the tile group. i is the index of self.tile"""
-        return 'map' + str(i)
+#    def map_id(self, i):
+#        """Return a string to be used as a CSS ID for the tile group. i is the index of self.tile"""
+#        return 'map' + str(i)
+
+    def map_xy(self, i):
+        """Return logical fake-isometric x,y coordinates for tile[i]"""
+        # Due to fake isometric layout, x+2 is one tile East, and there are mapwidth / 2 tiles per row
+        y = i // (self.width // 2)
+        # Odd rows are offset
+        x = 2 * (i % (self.width // 2)) + (y % 2)
+        return (x,y)
+
+    def svg_xy(self, i):
+        """Return x,y position on SVG canvas for tile[i]. May be more than one result to allow for edge tile wrapping"""
+        (x,y) = self.map_xy(i)
+        svg_x = x * self.tile_width / 2
+        svg_y = y * self.tile_height / 2
+        result = ((svg_x,svg_y),)
+        # Add SVG coords for wraparound tiles where appropriate
+        if y % 2 == 0:
+            if x == 0:
+                result += (((self.width / 2) * self.tile_width, svg_y),)
+        else:
+            if x + 1 == self.width:
+                result += ((0 - self.tile_width / 2,svg_y),)
+
+        return result
+
+    def svg_attr_xy(self, (x, y)):
+        """Return string for x and y attributes for SVG shapes for a given tile"""
+        return 'x="' + str(x) + '" y="' + str(y) + '"'
+
+    def test_things(self):
+        """Test function to develop x/y functions"""
+        self.tile_width = 128
+        self.tile_height = 64
+        for i in range(180):
+            print self.map_xy(i)
+            print "     ",  self.svg_xy(i)
+            for (x,y) in self.svg_xy(i):
+                print 'x="' + str(x) + '" y="' + str(y) + '"'
+            #print self.svg_attr_xy(self.svg_xy(i))
+        return "Yay"
+
+    def svg_text(self, text, xypos):
+        return '<text ' + xypos + ' text-anchor="middle" alignment-baseline="central" style="font-size:32px">' + str(text) + '</text>\n'
+        #return '<text ' + xypos + '>' + str(text) + '</text>\n'
+
+    def base_terrain(self, i, x, y):
+        """Return a string for base terrain"""
+        xypos = self.svg_attr_xy((x,y))
+        # Get right-nibble of terrain byte
+        base_terrain = self.tile[i].info['terrain'] & 0x0F
+        if base_terrain == 0:
+            mystring = '<use xlink:href="#desert" ' + xypos +' />\n'
+        elif base_terrain == 1:
+            mystring = '<use xlink:href="#plains" ' + xypos +' />\n'
+        elif base_terrain == 2:
+            mystring = '<use xlink:href="#grassland" ' + xypos +' />\n'
+        elif base_terrain == 3:
+            mystring = '<use xlink:href="#tundra" ' + xypos +' />\n'
+        elif base_terrain == 11:
+            mystring = '<use xlink:href="#coast" ' + xypos +' />\n'
+        elif base_terrain == 12:
+            mystring = '<use xlink:href="#sea" ' + xypos +' />\n'
+        elif base_terrain == 13:
+            mystring = '<use xlink:href="#ocean" ' + xypos +' />\n'
+        else:
+            mystring = '<use xlink:href="#unknown" ' + xypos +' />\n'
+        return mystring
+
+    def overlay_terrain(self, i, x, y):
+      xypos = self.svg_attr_xy((x,y))
+      textxypos = self.svg_attr_xy((x + self.tile_width /2,y + self.tile_height /2))
+      # Get left-nibble of terrain byte: bit-rotate right 4, then mask to be sure it wasn't more than a byte
+      overlay_terrain = (self.tile[i].info['terrain'] >> 4) & 0x0F
+      if overlay_terrain == 0x04:
+          # Flood plain
+          #mystring = '    <text class="' + cssclass + '" text-anchor="middle" alignment-baseline="central" x="' + xypos + '">Flood Plain</text>\n'
+          mystring = self.svg_text("Flood Plain",textxypos)
+      elif overlay_terrain == 0x05:
+          # Hill
+          mystring = '    <use ' + xypos + ' xlink:href = "#myHill" />\n'
+      elif overlay_terrain == 0x06:
+          # Mountain
+          mystring = '    <use ' + xypos + ' xlink:href = "#myMountain" />\n'
+      elif overlay_terrain == 0x07:
+          # Forest
+          mystring = '    <use ' + xypos + ' xlink:href = "#myForest" />\n'
+      elif overlay_terrain == 0x08:
+          # Jungle
+          #mystring = '    <text class="' + cssclass + '" text-anchor="middle" alignment-baseline="central" x="' + xypos + '">Jungle</text>\n'
+          mystring = self.svg_text("Jungle",textxypos)
+      elif overlay_terrain == 0x09:
+          # Marsh
+          #mystring = '    <text class="' + cssclass + '" text-anchor="middle" alignment-baseline="central" x="' + xypos + '">Marsh</text>\n'
+          mystring = self.svg_text("Marsh",textxypos)
+      elif overlay_terrain == 0x0a:
+          # Volcano
+          mystring = '    <use ' + xypos + ' xlink:href = "#myVolcano" />\n'
+      elif overlay_terrain in {0,1,2,3,11,12,13}:
+          mystring = ""
+      else:
+          #mystring = '    <text class="' + cssclass + '" text-anchor="middle" alignment-baseline="central" x="' + xypos + '">' + info + '</text>\n'
+          #mystring = self.svg_text(overlay_terrain,xypos)
+          mystring = self.svg_text("0x%01x" % overlay_terrain,textxypos)
+      return mystring
 
     def svg_out(self, spoiler=False):
         """Return a string of svg-coded map"""
         x_axis_wrap = True
         y_axis_wrap = False
-        tile_width = 128
-        tile_height = 64
-        map_width = (self.width * tile_width / 2) + (tile_width / 2)
-        map_height = (self.height * tile_height / 2) + (tile_height / 2)
+        self.tile_width = 128
+        self.tile_height = 64
+        map_width = (self.width * self.tile_width / 2) + (self.tile_width / 2)
+        map_height = (self.height * self.tile_height / 2) + (self.tile_height / 2)
         svg_string = ""
         svg_string += '<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" version="1.1" x="0" y="0" viewBox="0 0 ' + str(map_width) + ' ' + str(map_height) + '">\n'
         #svg_string += '<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" version="1.1" width="' + str(map_width) + '" height="' + str(map_height) + '">\n'
@@ -119,80 +223,38 @@ class Tiles:
         svg_string += mapDefsFile.read()
         mapDefsFile.close()
         svg_string += "</defs>\n"
-        svg_string += '<rect class="mapEdge" x="0" y="0" width="' + str(map_width) + '" height="' + str(map_height) + '" />\n'
-        for y in range(self.height):
-            x_indent = (y % 2) * tile_width / 2
-            y_offset = y * tile_height / 2
-            svg_string += '<g row="' + str(y) + '" transform="translate(' + str(x_indent) + ', ' + str(y_offset) + ')">\n'
-            for x in range(self.width / 2):
-                i = x  + y * self.width /2
-                info = hex(self.tile[i].whatsthis)
-                cssclass = 'tile'
-                if 0 <= i < len(self.tile):
-                    svg_string += '  <g id="' + self.map_id(i) + '" transform="translate(' + str(x * tile_width) + ', 0)">\n'
-                    if self.tile[i].is_visible or spoiler:
-                        # Get right-nibble of terrain byte
-                        base_terrain = self.tile[i].info['terrain'] & 0x0F
-                        # Get left-nibble of terrain byte: bit-rotate right 4, then mask to be sure it wasn't more than a byte
-                        overlay_terrain = (self.tile[i].info['terrain'] >> 4) & 0x0F
-                        cssclass += ' baseterrain'
-                        if base_terrain == 0:
-                            svg_string += '<use xlink:href="#desert" class="' + cssclass +'" />\n'
-                        elif base_terrain == 1:
-                            svg_string += '<use xlink:href="#plains" class="' + cssclass +'" />\n'
-                        elif base_terrain == 2:
-                            svg_string += '<use xlink:href="#grassland" class="' + cssclass +'" />\n'
-                        elif base_terrain == 3:
-                            svg_string += '<use xlink:href="#tundra" class="' + cssclass +'" />\n'
-                        elif base_terrain == 11:
-                            svg_string += '<use xlink:href="#coast" class="' + cssclass +'" />\n'
-                        elif base_terrain == 12:
-                            svg_string += '<use xlink:href="#sea" class="' + cssclass +'" />\n'
-                        elif base_terrain == 13:
-                            svg_string += '<use xlink:href="#ocean" class="' + cssclass +'" />\n'
+        svg_string += '<use xlink:href="#mybackgroundrectangle" x="0" y="0" transform="scale(' + str(map_width) + ',' + str(map_height) + ')" />\n'
+        for i in range(len(self.tile)):
+          if self.tile[i].is_visible or spoiler:
+            for (x,y) in self.svg_xy(i):
+              #xypos = self.svg_attr_xy((x,y))
+              svg_string += self.base_terrain(i,x,y)
+              svg_string += self.overlay_terrain(i,x,y)
+#        for y in range(self.height):
+#            x_indent = (y % 2) * tile_width / 2
+#            y_offset = y * tile_height / 2
+#            #svg_string += '<g row="' + str(y) + '" transform="translate(' + str(x_indent) + ', ' + str(y_offset) + ')">\n'
+#            for x in range(self.width / 2):
+#                i = x  + y * self.width /2
+#                info = hex(self.tile[i].whatsthis)
+#                cssclass = 'tile'
+#                if 0 <= i < len(self.tile):
+#                    #svg_string += '  <g id="' + self.map_id(i) + '" transform="translate(' + str(x * tile_width) + ', 0)">\n'
 
-                        # Not sure I need this comparison; may just be able to key off the nibble value
-                        if overlay_terrain <> base_terrain:
-                            cssclass = 'overlayterrain terroverlay' + str(overlay_terrain)
-                            if overlay_terrain == 0x04:
-                                # Flood plain
-                                svg_string += '    <text class="' + cssclass + '" text-anchor="middle" alignment-baseline="central" x="' + str(tile_width / 2) + '" y="' + str(tile_height / 2) + '">Flood Plain</text>\n'
-                            elif overlay_terrain == 0x05:
-                                # Hill
-                                #svg_string += '    <text class="' + cssclass + '" text-anchor="middle" alignment-baseline="central" x="' + str(tile_width / 2) + '" y="' + str(tile_height / 2) + '">○</text>\n'
-                                svg_string += '    <use class="' + cssclass + '" x="' + str(tile_width / 2) + '" y="' + str(tile_height / 2) + '" xlink:href = "#myHill" />\n'
-                            elif overlay_terrain == 0x06:
-                                # Mountain
-                                #svg_string += '    <text class="' + cssclass + '" text-anchor="middle" alignment-baseline="central" x="' + str(tile_width / 2) + '" y="' + str(tile_height / 2) + '">▲</text>\n'
-                                svg_string += '    <use class="' + cssclass + '" x="' + str(tile_width / 2) + '" y="' + str(tile_height / 2) + '" xlink:href = "#myMountain" />\n'
-                            elif overlay_terrain == 0x07:
-                                # Forest
-                                #svg_string += '    <text class="' + cssclass + '" text-anchor="middle" alignment-baseline="central" x="' + str(tile_width / 2) + '" y="' + str(tile_height / 2) + '">↑↑↑</text>\n'
-                                #svg_string += '    <use class="' + cssclass + '" x="' + str(tile_width / 2) + '" y="' + str(tile_height / 2) + '" xlink:href = "#myTree" />\n'
-                                svg_string += '    <use class="' + cssclass + '" x="' + str(tile_width / 2) + '" y="' + str(tile_height / 2) + '" xlink:href = "#myForest" />\n'
-                            elif overlay_terrain == 0x08:
-                                # Jungle
-                                svg_string += '    <text class="' + cssclass + '" text-anchor="middle" alignment-baseline="central" x="' + str(tile_width / 2) + '" y="' + str(tile_height / 2) + '">Jungle</text>\n'
-                            elif overlay_terrain == 0x09:
-                                # Marsh
-                                svg_string += '    <text class="' + cssclass + '" text-anchor="middle" alignment-baseline="central" x="' + str(tile_width / 2) + '" y="' + str(tile_height / 2) + '">Marsh</text>\n'
-                            elif overlay_terrain == 0x0a:
-                                # Volcano
-                                #svg_string += '    <text class="' + cssclass + '" text-anchor="middle" alignment-baseline="central" x="' + str(tile_width / 2) + '" y="' + str(tile_height / 2) + '">Volcano</text>\n'
-                                svg_string += '    <use class="' + cssclass + '" x="' + str(tile_width / 2) + '" y="' + str(tile_height / 2) + '" xlink:href = "#myVolcano" />\n'
-                            else:
-                                svg_string += '    <text class="' + cssclass + '" text-anchor="middle" alignment-baseline="central" x="' + str(tile_width / 2) + '" y="' + str(tile_height / 2) + '">' + info + '</text>\n'
-                        svg_string += '    <text class="whatsthis" style="display:none" text-anchor="middle" alignment-baseline="central" x="' + str(tile_width / 2) + '" y="' + str(tile_height / 2) + '">' + info + '</text>\n'
-                        #svg_string += '  </g>\n'
-                    else:
-                        cssclass = 'fog'
-                        svg_string += '<use xlink:href="#fog" class="' + cssclass +'" />\n'
-                        #svg_string += '  </g>\n'
-                    svg_string += '  </g>\n'
-            # link the first item and place at the end for even rows; link to the last item and place at the first. Will be half-cropped by viewport
-            # using math (even lines have 0 remainder, multiplying to cancel out values) instead of if, but it's a little harder to follow
-            svg_string += '  <use xlink:href="#' + self.map_id((y * self.width / 2) + (x * (y % 2))) + '" transform="translate(' + str((map_width - tile_width / 2) - (map_width - tile_width / 2) * 2 * (y % 2)) + ', 0)" />\n'
-            svg_string += '</g>\n'
+#                        # Not sure I need this comparison; may just be able to key off the nibble value
+#                        if overlay_terrain <> base_terrain:
+#                            cssclass = 'overlayterrain terroverlay' + str(overlay_terrain)
+#                        svg_string += '    <text class="whatsthis" style="display:none" text-anchor="middle" alignment-baseline="central" x="' + str(tile_width / 2) + '" y="' + str(tile_height / 2) + '">' + info + '</text>\n'
+#                        #svg_string += '  </g>\n'
+#                    else:
+#                        cssclass = 'fog'
+#                        svg_string += '<use xlink:href="#fog" class="' + cssclass +'" />\n'
+#                        #svg_string += '  </g>\n'
+#                    svg_string += '  </g>\n'
+#            # link the first item and place at the end for even rows; link to the last item and place at the first. Will be half-cropped by viewport
+#            # using math (even lines have 0 remainder, multiplying to cancel out values) instead of if, but it's a little harder to follow
+#            svg_string += '  <use xlink:href="#' + self.map_id((y * self.width / 2) + (x * (y % 2))) + '" transform="translate(' + str((map_width - tile_width / 2) - (map_width - tile_width / 2) * 2 * (y % 2)) + ', 0)" />\n'
+#            svg_string += '</g>\n'
         svg_string += '</svg>\n'
         return svg_string
 
@@ -299,6 +361,7 @@ def main():
     max = 10
     for i in range(max):
         print game.Tiles.tile[i].continent
+    game.Tiles.test_things()
 
 if __name__=="__main__":
     main()

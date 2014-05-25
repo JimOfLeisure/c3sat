@@ -43,6 +43,7 @@ def main():
 
     write = open(outputsvgpath, 'w')
 
-    write.write(game.Tiles.svg_out(True))
+    #write.write(game.Tiles.svg_out(True))
+    write.write(game.Tiles.svg_out())
 
 main()
