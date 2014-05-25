@@ -177,7 +177,7 @@ class Tiles:
       overlay_terrain = (self.tile[i].info['terrain'] >> 4) & 0x0F
       if overlay_terrain == 0x04:
           # Flood plain
-          mystring = self.svg_text("Flood Plain",textxypos)
+          mystring = self.svg_text("FP",textxypos)
       elif overlay_terrain == 0x05:
           # Hill
           mystring = '<use ' + xypos + ' xlink:href = "#myHill" />\n'
@@ -193,13 +193,16 @@ class Tiles:
           mystring = '<use ' + xypos + ' xlink:href = "#myJungle" />\n'
       elif overlay_terrain == 0x09:
           # Marsh
-          mystring = self.svg_text("Marsh",textxypos)
+          #mystring = self.svg_text("Marsh",textxypos)
+          mystring = '<use ' + xypos + ' xlink:href = "#myMarsh" />\n'
       elif overlay_terrain == 0x0a:
           # Volcano
           mystring = '<use ' + xypos + ' xlink:href = "#myVolcano" />\n'
-      elif overlay_terrain in {0,1,2,3,11,12,13}:
+      elif overlay_terrain in {0,1,2,3,0xb,0xc,0xd}:
+          # It appears if there is no overlay, the nybble matches the base tile nybble. Return nothing for known base tile values
           mystring = ""
       else:
+          # If something unexpected, put the nybble value in text on the map
           mystring = self.svg_text("0x%01x" % overlay_terrain,textxypos)
       return mystring
 
@@ -222,10 +225,14 @@ class Tiles:
         svg_string += '<use xlink:href="#mybackgroundrectangle" x="0" y="0" transform="scale(' + str(map_width) + ',' + str(map_height) + ')" />\n'
         for i in range(len(self.tile)):
           if self.tile[i].is_visible or spoiler:
+            # May have more than one to paint wrap-around tiles
             for (x,y) in self.svg_xy(i):
-              #xypos = self.svg_attr_xy((x,y))
               svg_string += self.base_terrain(i,x,y)
               svg_string += self.overlay_terrain(i,x,y)
+          #else: # I used to place a fog tile, but why not just let the background rectangle be the fog?
+          #  for (x,y) in self.svg_xy(i):
+          #    svg_string += '<use xlink:href="#fog" ' + self.svg_attr_xy((x,y)) +' />\n'
+
 #        for y in range(self.height):
 #            x_indent = (y % 2) * tile_width / 2
 #            y_offset = y * tile_height / 2
