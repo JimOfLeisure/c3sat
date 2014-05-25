@@ -1,0 +1,71 @@
+<!DOCTYPE HTML>
+<html>
+<head>
+  <title>Civ3 Show-and-Tell SVG Map</title>
+  <script src="//ajax.googleapis.com/ajax/libs/jquery/2.0.0/jquery.min.js"></script> <!-- Using jQuery for altering styles -->
+  <script>
+    $(document).ready(function() {          // when document ready...
+      /* js load code yoinked from http://stackoverflow.com/questions/14068031/embedding-external-svg-in-html-for-javascript-manipulation */
+      xhr = new XMLHttpRequest();
+      xhr.open("GET","civmap.svg",false);
+      // Following line is just to be on the safe side;
+      // not needed if your server delivers SVG with correct MIME type
+      xhr.overrideMimeType("image/svg+xml");
+      xhr.send("");
+      document.getElementById("map")
+        .appendChild(xhr.responseXML.documentElement);
+    });
+  </script>
+  <script src="jquery.panzoom.min.js"></script>
+  <!-- Bootstrap -->
+  <!-- Latest compiled and minified CSS -->
+  <link rel="stylesheet" href="//netdna.bootstrapcdn.com/bootstrap/3.1.1/css/bootstrap.min.css">
+  
+  <!-- Optional theme -->
+  <link rel="stylesheet" href="//netdna.bootstrapcdn.com/bootstrap/3.1.1/css/bootstrap-theme.min.css">
+  
+  <!-- Latest compiled and minified JavaScript -->
+  <script src="//netdna.bootstrapcdn.com/bootstrap/3.1.1/js/bootstrap.min.js"></script>
+  
+  <script src="civmap.js"></script>
+  <style>
+    /* for IE because it needs hand-holding to make all the divs full-height */
+    html, body, div.container-fluid, div.row, div.col-md-10, div.panzoom-parent, div.panzoom, div.panzoom img, div.panzoom svg {
+        height: 100%;
+        }
+  </style>
+</head>
+<body>
+  <div class="container-fluid">
+    <div class="row">
+      <div class="col-md-2">
+        <div>
+          Try the mousewheel on PC or pinch zoom on mobile!
+        </div>
+        <div id="controls">
+          <button id="kickwebkit">Webkit Redraw</button>
+          <button id="baseter">Toggle Base Terrain</button>
+          <button id="ovrter">Toggle Overlay Terrain</button>
+          <button id="debuginfo">Toggle Debug Info</button>
+          <button id="fogofwar">Toggle Fog of War</button>
+          <button id="bgrect">Toggle Background Rectangle</button>
+        </div>
+          <div class="buttons">
+            <button class="zoom-in">Zoom In</button>
+            <button class="zoom-out">Zoom Out</button>
+            <input type="range" class="zoom-range">
+            <button class="reset">Reset Pan/Zoom</button>
+          </div>
+        <div id="timestamp">
+        </div>
+    </div>
+    <div class="col-md-10">
+        <div class="panzoom-parent">
+          <div id="map" class="panzoom">
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</body>
+</html>

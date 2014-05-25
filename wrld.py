@@ -27,6 +27,7 @@
 import struct	# For parsing binary data
 import json     # to export JSON for the HTML browser
 import horspool    # to seek to first match; from http://inspirated.com/2010/06/19/using-boyer-moore-horspool-algorithm-on-file-streams-in-python
+import sys
 
 class GenericSection:
     """Base class for reading SAV sections."""
@@ -345,28 +346,27 @@ class Wrld:
         self.name = "WRLD"
         buffer = saveStream.read(4)
         (self.length,) = struct.unpack_from('i', buffer)
-        print self.length
-        #self.offset = saveStream.tell()
+        #print self.length
         self.buffer = saveStream.read(self.length)
         # Extract any data here, but I think it's only 2 bytes
-        print self.name
-        print hexdump(self.buffer)
+        #print self.name
+        #print hexdump(self.buffer)
         del self.buffer
 
         self.Wrld2 = GenericSection(saveStream)
-        print self.Wrld2.name
+        #print self.Wrld2.name
         self.values = struct.unpack_from('41i', self.Wrld2.buffer)
         self.height = self.values[1]
         self.width = self.values[6]
-        print self.height
-        print self.width
-        print self.values
-        print hexdump(self.Wrld2.buffer)
+        #print self.height
+        #print self.width
+        #print self.values
+        #print hexdump(self.Wrld2.buffer)
         del self.Wrld2.buffer
 
         self.Wrld3 = GenericSection(saveStream)
-        print self.Wrld3.name
-        print hexdump(self.Wrld3.buffer)
+        #print self.Wrld3.name
+        #print hexdump(self.Wrld3.buffer)
         del self.Wrld3.buffer
 
         self.Tiles = Tiles(saveStream, self.width, self.height)
@@ -401,20 +401,15 @@ def get_int(buffer, offset):
 #    #response += process.communicate(saveStream)
 #    #return outputStream
 
-def parse_save(saveFile, compressed=False):
-#FAIL
-#    buffer = saveFile.read(4)
-#    if buffer <> 'CIV3':
-#        if not compressed:
-#            print "wah wah wah wahhhhhhhh."
-#            print "Stub. Here is where I'll retry with blast"
-#            #parse_save(decompress(buffer, saveFile),True)
-#            decompress(buffer, saveFile)
-#        else:
-#            print "Tried decompressing and it still doesn't look right"
-#            return -1
-    print 'Using Horspool search to go to first WRLD section'
-    print horspool.boyermoore_horspool(saveFile, "WRLD")
+def parse_save(saveFile):
+    buffer = saveFile.read(4)
+    if buffer <> 'CIV3':
+        print "wah wah wah wahhhhhhhh."
+        print "Stub. Provided stream not decompressed C3C save"
+        return -1
+    #print 'Using Horspool search to go to first WRLD section'
+    wrldOffset = horspool.boyermoore_horspool(saveFile, "WRLD")
+    #print wrldOffset
     game = Wrld(saveFile)
     saveFile.close()
     return game
@@ -432,25 +427,21 @@ def hexdump(src, length=16):
     return '\n'.join(lines)
 
 def main():
-    print json
-    game = parse_save("unc-test.sav")
-    game = parse_save("unc-lk151-650ad.sav")
+    saveFile = open("gamesaves/unc-test.sav", 'rb')
+    #saveFile = open("gamesaves/unc-lk151-650ad.sav", 'rb')
+    game = parse_save(saveFile)
+
     print 'Printing something(s) from the class to ensure I have what I intended'
     #print game.name, game.length
     #print game.tile.pop()[1].length
-    #print game.width, game.height
-    #print game.tile[0].Tile128.length
-    #print game.tile[1000].Tile128.length
+    print "Map width:",game.width,"Map height:", game.height
+    print game.Tiles.tile[0].info['terrain']
+    print game.Tiles.tile[1000].info['terrain']
     #print game.tile[0].is_visible_to
     #max = len(game.tile)
     max = 10
     for i in range(max):
-        #print i, hex(game.tile[i].Tile36.offset), hex(game.tile[i].whatsthis), hex(game.tile[i].whatsthis2), hex(game.tile[i].whatsthis3), hex(game.tile[i].whatsthis4), hex(game.tile[i].whatsthis5)
-        #print i, hex(game.tile[i].Tile36.offset), hex(game.tile[i].whatsthis2)
-        #print hex(game.tile[i].whatsthis)
-        #print hexdump(game.tile[i].Tile12.buffer)
         print game.Tiles.tile[i].continent
-    #print game.html_out()
 
 if __name__=="__main__":
     main()

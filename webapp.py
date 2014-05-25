@@ -25,73 +25,50 @@ import wrld
 import urllib
 import subprocess
 import os
+import urlparse
 
 def application(env, start_response):
     """This module instantiates wrld.parse_save() and returns an svg file for the map"""
     #start_response('200 OK', [('Content-Type','text/html')])
     #return "Hello World From Python"
-    testInputFile = "gamesaves/unc-test.sav"
-    #saveFile = open(testInputFile, 'rb')
 
-    #testInputUrl = 'http://lib.bigmoneyjim.com/civfan/c3sat/civsav.gz'
-    #testInputUrl = "file:civsav.gz"
-    testInputUrl = "http://lib.bigmoneyjim.com/civfan/Mao%20of%20the%20Chinese,%20130%20AD.SAV"
-    #testInputUrl = "http://lib.bigmoneyjim.com/civfan/Puppeteer-joinworker-Mongols-Reroll-as-Regent-4000%20BC.SAV"
-    #testInputUrl = "file:gamesaves/unc-test.sav"
-    #testInputUrl = "file:Saves/end turn conquest English, 1340 AD.SAV"
-    #testInputUrl = "file:Puppeteer-joinworker-Mongols-Reroll-as-Regent-4000 BC.SAV"
+    #InputUrl = "http://lib.bigmoneyjim.com/civfan/Mao%20of%20the%20Chinese,%20130%20AD.SAV"
+    #InputUrl = "http://lib.bigmoneyjim.com/civfan/Puppeteer-joinworker-Mongols-Reroll-as-Regent-4000%20BC.SAV"
+    #InputUrl = "http://lib.bigmoneyjim.com/civfan/c3sat/unc-test.sav"   # uncompressed save
+    #InputUrl = "http://lib.bigmoneyjim.com/civfan/" # intentional non-save url
+
+    myargs =  urlparse.parse_qs(env["QUERY_STRING"])
+    #print myargs
+    InputUrl = myargs["url"][0]
+    #print InputUrl
 
     # If first 4 bytes aren't "CIV3" then we should decompress
-#    saveFile = urllib.urlopen(testInputUrl)
-#    buffer = saveFile.read(4)
-#    saveFile.close()
-    #if buffer == 'CIV3':
-    if False:
-        saveFile = urllib.urlopen(testInputUrl)
-        game = wrld.parse_save(saveFile)
+    saveFile = urllib.urlopen(InputUrl)
+    buffer = saveFile.read(4)
+    saveFile.close()
+    #print buffer
+
+    if buffer == 'CIV3':
+        #print "Uncompressed file"
+        saveFile = urllib.urlopen(InputUrl)
     else:
-        print "Stub. Put decompress code here"
-        myCompressedFile = urllib.urlopen(testInputUrl)
-        print myCompressedFile.getcode()
-        print myCompressedFile.geturl()
-        print myCompressedFile.info()
-        #process = subprocess.Popen(['./blast'], stdin=myCompressedFile, stdout=subprocess.PIPE,stderr=subprocess.PIPE, shell=True)
+        #print "Decompress"
+        myCompressedFile = urllib.urlopen(InputUrl)
+        #print myCompressedFile.getcode()
+        #print myCompressedFile.geturl()
+        #print myCompressedFile.info()
 
         process = subprocess.Popen(['./blast'], stdin=myCompressedFile, stdout=subprocess.PIPE,stderr=subprocess.PIPE)
-        #process = subprocess.Popen(['/bin/gzip','-dc'], stdin=myCompressedFile, stdout=subprocess.PIPE,stderr=subprocess.PIPE)
-        #process = subprocess.Popen(['xxd'], stdin=myCompressedFile, stdout=subprocess.PIPE,stderr=subprocess.PIPE)
-        #process = subprocess.Popen(['xxd'], stdin=urllib.urlopen(testInputUrl), stdout=subprocess.PIPE,stderr=subprocess.PIPE)
-        #process = subprocess.Popen(['xxd'], stdin=urllib.urlopen(testInputUrl), stdout=subprocess.PIPE,stderr=subprocess.PIPE,close_fds=True)
 
-        #(pOut, myerr) = process = subprocess.Popen(['./blast'], stdin=myCompressedFile, stdout=subprocess.PIPE,stderr=subprocess.PIPE).communicate()
-        #print myerr
         #print process.stderr.read()
         #print process.stdout.read()
+        saveFile = process.stdout
         
-        #process = subprocess.Popen(['./blast'], stdin=subprocess.PIPE, stdout=subprocess.PIPE,stderr=subprocess.PIPE)
-        #process.stdin.write(myCompressedFile.read())
-        #process.stdin.write(myCompressedFile)
-        print "Hi"
-        #process.stdin.close()
-        #myCompressedFile.close()
-        #buffer = process.stdout.read(4)
-        #print buffer
-#        out = process.communicate(myCompressedFile.read())
-        #out = process.communicate()
-        #print len(out[0])
-#        print out[0][0]
-#        print out[0][1]
-#        print out[0][2]
-#        print out[0][3]
-        #print out[1]
-        #saveFile = process.stdout
-        game = wrld.parse_save(process.stdout)
-        #game = wrld.parse_save(pOut)
-        #game = wrld.parse_save(process.communicate()[0])
+#    for k in env:
+#        print k, env[k]
 
-
-
-    start_response('200 OK', [('Content-Type','image/svg+xml')])
-    return game.Tiles.svg_out(True)
-
+    game = wrld.parse_save(saveFile)
     saveFile.close()
+    start_response('200 OK', [('Content-Type','image/svg+xml')])
+    return game.Tiles.svg_out()
+
