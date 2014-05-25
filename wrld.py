@@ -177,33 +177,29 @@ class Tiles:
       overlay_terrain = (self.tile[i].info['terrain'] >> 4) & 0x0F
       if overlay_terrain == 0x04:
           # Flood plain
-          #mystring = '    <text class="' + cssclass + '" text-anchor="middle" alignment-baseline="central" x="' + xypos + '">Flood Plain</text>\n'
           mystring = self.svg_text("Flood Plain",textxypos)
       elif overlay_terrain == 0x05:
           # Hill
-          mystring = '    <use ' + xypos + ' xlink:href = "#myHill" />\n'
+          mystring = '<use ' + xypos + ' xlink:href = "#myHill" />\n'
       elif overlay_terrain == 0x06:
           # Mountain
-          mystring = '    <use ' + xypos + ' xlink:href = "#myMountain" />\n'
+          mystring = '<use ' + xypos + ' xlink:href = "#myMountain" />\n'
       elif overlay_terrain == 0x07:
           # Forest
-          mystring = '    <use ' + xypos + ' xlink:href = "#myForest" />\n'
+          mystring = '<use ' + xypos + ' xlink:href = "#myForest" />\n'
       elif overlay_terrain == 0x08:
           # Jungle
-          #mystring = '    <text class="' + cssclass + '" text-anchor="middle" alignment-baseline="central" x="' + xypos + '">Jungle</text>\n'
-          mystring = self.svg_text("Jungle",textxypos)
+          #mystring = self.svg_text("Jungle",textxypos)
+          mystring = '<use ' + xypos + ' xlink:href = "#myJungle" />\n'
       elif overlay_terrain == 0x09:
           # Marsh
-          #mystring = '    <text class="' + cssclass + '" text-anchor="middle" alignment-baseline="central" x="' + xypos + '">Marsh</text>\n'
           mystring = self.svg_text("Marsh",textxypos)
       elif overlay_terrain == 0x0a:
           # Volcano
-          mystring = '    <use ' + xypos + ' xlink:href = "#myVolcano" />\n'
+          mystring = '<use ' + xypos + ' xlink:href = "#myVolcano" />\n'
       elif overlay_terrain in {0,1,2,3,11,12,13}:
           mystring = ""
       else:
-          #mystring = '    <text class="' + cssclass + '" text-anchor="middle" alignment-baseline="central" x="' + xypos + '">' + info + '</text>\n'
-          #mystring = self.svg_text(overlay_terrain,xypos)
           mystring = self.svg_text("0x%01x" % overlay_terrain,textxypos)
       return mystring
 
