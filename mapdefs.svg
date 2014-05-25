@@ -1,0 +1,146 @@
+<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" version="1.1">
+  <g transform="scale(0.1) translate(-355,-450)" id="myTree">
+    <rect
+       style="fill:#502d16"
+       id="rect3755"
+       width="38.385796"
+       height="135.36044"
+       x="333.35034"
+       y="412.93561" />
+    <path
+       style="fill:#003e00;stroke:#000000;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1"
+       d="m 350.52294,162.41779 c 45.35523,49.58592 68.30881,76.28117 137.38074,106.06602 -49.49747,3.16986 -65.65992,7.45477 -115.15739,-8.08122 37.19346,33.65589 79.36925,63.67564 136.3706,89.90357 -29.52448,8.86132 -77.90225,-10.22203 -126.26907,-20.20305 31.03325,29.4296 63.72488,75.96279 115.15739,105.05586 -84.46056,-24.01069 -184.4487,-22.38115 -314.15745,10e-6 40.71838,-21.12578 104.53494,-63.53265 141.42137,-105.05587 -33.89684,20.76304 -87.0985,20.089 -133.34014,16.16243 54.92101,-23.31175 90.86412,-44.06567 135.36045,-83.84266 -20.68253,3.88388 -77.82911,7.71658 -107.07619,10.10154 26.31048,-5.29696 125.20682,-84.59227 130.30969,-110.10663 z" />
+  </g>    
+  <g id="myForest">    
+    <use xlink:href = "#myTree" x="-10" y="-2" />
+    <use xlink:href = "#myTree" x="10" y="2" />
+    <use xlink:href = "#myTree" x="-40" y="7" />
+    <use xlink:href = "#myTree" x="32" y="7" />
+  </g>    
+    <linearGradient
+       id="linearGradient5227">
+      <stop
+         id="stop5229"
+         style="stop-color:#008000;stop-opacity:1"
+         offset="0" />
+      <stop
+         id="stop5235"
+         style="stop-color:#006700;stop-opacity:1"
+         offset="0.84402692" />
+      <stop
+         id="stop5231"
+         style="stop-color:#008000;stop-opacity:1"
+         offset="1" />
+    </linearGradient>
+    <linearGradient
+       id="linearGradient5222">
+      <stop
+         id="stop5224"
+         style="stop-color:#000000;stop-opacity:1"
+         offset="0" />
+      <stop
+         id="stop5226"
+         style="stop-color:#008000;stop-opacity:1"
+         offset="1" />
+    </linearGradient>
+    <linearGradient
+       id="linearGradient5212">
+      <stop
+         id="stop5214"
+         style="stop-color:#000000;stop-opacity:1"
+         offset="0" />
+    </linearGradient>
+    <radialGradient
+       cx="76.143784"
+       cy="962.11768"
+       r="60.366074"
+       fx="76.143784"
+       fy="962.11768"
+       id="radialGradient5233"
+       xlink:href="#linearGradient5227"
+       gradientUnits="userSpaceOnUse"
+       gradientTransform="matrix(-0.98699431,0.64563536,-0.46697231,-0.71386896,600.28401,1624.7186)" />
+    <linearGradient
+       x1="64.732147"
+       y1="985.2901"
+       x2="64.107155"
+       y2="1018.683"
+       id="linearGradient5247"
+       xlink:href="#linearGradient5222"
+       gradientUnits="userSpaceOnUse" />
+
+  <path
+     d="m 10.446429,1019.0586 c 4.044564,-11.572 19.854103,-23.29369 38.482142,-30.35713 14.155388,-5.36749 22.120429,-2.86384 30.178573,-0.17856 10.868126,3.62166 25.732176,13.89989 36.964296,32.67849 -16.238763,11.6432 -32.832015,22.8648 -51.250011,21.6072 -31.562398,-2.1549 -44.640301,-15.9149 -54.375,-23.75 z"
+     id="myHill"
+     transform="translate(-64,-1020.36218)"
+     style="fill:url(#radialGradient5233);fill-opacity:1;stroke:url(#linearGradient5247)" />
+  <path
+     d="M 8.0812204,31.603036 C 13.324636,11.111392 18.747476,3.5155048 30.557114,-16.37921 38.411455,-5.9814302 37.263782,-7.4855782 41.92133,2.2728428 52.678471,-10.824571 51.489681,-14.65148 57.831233,-34.056879 57.039687,-34.848425 68.6306,-19.150733 71.468292,-18.399515 74.682439,-17.548638 90.655911,-37.909406 89.903576,-38.09749 96.851004,-2.0203051 103.6441,0 116.42008,31.09796 c -10.80604,5.157699 -20.7117,11.108946 -36.112953,13.889597 -9.313114,1.681455 -18.393434,2.222457 -33.082496,0 C 32.44483,42.751372 20.311577,37.290714 8.0812204,31.603036 z"
+     id="myMountain"
+     transform="translate(-64,-32)"
+     style="fill:#803300;stroke:#000000;stroke-width:1px" />
+    <linearGradient
+       id="linearGradient4298">
+      <stop
+         id="stop4300"
+         style="stop-color:#000000;stop-opacity:1"
+         offset="0" />
+      <stop
+         id="stop4302"
+         style="stop-color:#803300;stop-opacity:1"
+         offset="1" />
+    </linearGradient>
+    <linearGradient
+       id="linearGradient4288">
+      <stop
+         id="stop4290"
+         style="stop-color:#000000;stop-opacity:1"
+         offset="0" />
+      <stop
+         id="stop4292"
+         style="stop-color:#803300;stop-opacity:1"
+         offset="1" />
+    </linearGradient>
+    <radialGradient
+       cx="59.122124"
+       cy="-28.951275"
+       r="54.66943"
+       fx="59.122124"
+       fy="-28.951275"
+       id="radialGradient4294"
+       xlink:href="#linearGradient4288"
+       gradientUnits="userSpaceOnUse"
+       gradientTransform="matrix(-0.75311906,1.0400717,-0.84152356,-0.60934973,84.43377,-111.3177)" />
+    <radialGradient
+       cx="69.945213"
+       cy="-45.220779"
+       r="23.48097"
+       fx="69.945213"
+       fy="-45.220779"
+       id="radialGradient4304"
+       xlink:href="#linearGradient4298"
+       gradientUnits="userSpaceOnUse"
+       gradientTransform="matrix(-0.87568994,1.0988247,-1.1618204,-0.92589342,85.736026,-154.75086)" />
+<g id="myVolcano" transform="translate(-64,-32)">
+  <path
+     d="m 44.547527,-33.20506 c 8.275665,-5.039021 10.202241,-7.763882 19.68397,-8.625252 8.990378,-0.841691 16.716875,0.02087 25.117641,3.049646 L 67.427682,-15.36905 z"
+     id="path4296"
+     style="fill:url(#radialGradient4304);fill-opacity:1;stroke:#000000;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1" />
+  <path
+     d="M 8.0812204,31.603036 C 19.380724,0 32.777118,0 43.941636,-32.54165 c 2.199525,1.105775 11.580429,9.211579 18.940359,9.848987 7.111092,0.615856 27.021581,-15.404827 27.021581,-15.404827 C 96.851004,-2.0203051 103.6441,0 116.42008,31.09796 c -10.80604,5.157699 -20.7117,11.108946 -36.112953,13.889597 -9.313114,1.681455 -18.393434,2.222457 -33.082496,0 C 32.44483,42.751372 20.311577,37.290714 8.0812204,31.603036 z"
+     id="path2984"
+     style="fill:url(#radialGradient4294);fill-opacity:1;stroke:#000000;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1" />
+
+</g>
+<polygon id="isometbrick" points="0,16 128,16 128,48 0,48" />
+<polygon id="isotile" points="0,32 64,0 128,32 64,64" />
+<use id="maptileshape" xlink:href = "#isotile" />
+<use id="desert" xlink:href="#maptileshape" style="fill:cornsilk" />
+<use id="plains" xlink:href="#maptileshape" style="fill:sandybrown" />
+<use id="grassland" xlink:href="#maptileshape" style="fill:green" />
+<use id="tundra" xlink:href="#maptileshape" style="fill:white" />
+<use id="coast" xlink:href="#maptileshape" style="fill:blue" />
+<use id="sea" xlink:href="#maptileshape" style="fill:mediumblue" />
+<use id="ocean" xlink:href="#maptileshape" style="fill:darkblue" />
+<use id="fog" xlink:href="#maptileshape" style="fill:black" />
+</svg>
