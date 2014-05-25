@@ -387,20 +387,36 @@ def get_int(buffer, offset):
     (the_int,) = struct.unpack('I', buffer[offset:offset+4])
     return the_int
 
-def parse_save(saveFile):
-    #saveFilePath = "unc-test.sav"
-    #saveFilePath = "unc-lk151-650ad.sav"
-    #saveFile = open(saveFilePath, 'rb')
-    #print 'HACK: Skipping to first TILE in my test SAV.'
+#FAIL
+#def decompress(firstbytes, saveStream):
+#    """Decompress the presumed save file stream. First 4 bytes are already consumed, so we take those in as firstbytes parameter"""
+#    #inputStream = StringIO.StringIO()
+#    #outputStream = StringIO.StringIO()
+#    #inputStream, outputStream = os.pipe()
+#    #process = subprocess.Popen(['./blast'], stdin=inputStream,stdout=outputStream, shell=True)
+#    process = subprocess.Popen(['./blast'], stdin=subprocess.PIPE,stdout=saveStream, shell=True)
+#    process.communicate(firstbytes)
+#    process.communicate(saveStream)
+#    #response = process.communicate(firstbytes)
+#    #response += process.communicate(saveStream)
+#    #return outputStream
+
+def parse_save(saveFile, compressed=False):
+#FAIL
+#    buffer = saveFile.read(4)
+#    if buffer <> 'CIV3':
+#        if not compressed:
+#            print "wah wah wah wahhhhhhhh."
+#            print "Stub. Here is where I'll retry with blast"
+#            #parse_save(decompress(buffer, saveFile),True)
+#            decompress(buffer, saveFile)
+#        else:
+#            print "Tried decompressing and it still doesn't look right"
+#            return -1
     print 'Using Horspool search to go to first WRLD section'
     print horspool.boyermoore_horspool(saveFile, "WRLD")
-    #print saveFile.tell()
-    #saveFile.seek(0x34a4, 0)
-    #saveFile.seek(0x2b7dc, 0)
     game = Wrld(saveFile)
-    print 'HACK: Instantiating the class that reads TILEs with width x height hard-coded to my test SAV.'
-    #game = Tiles(saveFile, 60, 60)
-    #game = Tiles(saveFile, 256, 204)
+    saveFile.close()
     return game
 
 def hexdump(src, length=16):

@@ -1,3 +1,6 @@
 #!/bin/sh
 
-uwsgi --ini webapp.ini
+# Location of uwsgi executable
+UWSGI=/usr/bin/uwsgi
+
+$UWSGI --ini webapp.ini
