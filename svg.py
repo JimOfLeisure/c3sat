@@ -29,6 +29,8 @@ import sys
 
 def main():
     """This module instantiates wrld.parse_save() and writes an svg file for the map"""
+    spoiler = True
+    debug = True
     outputsvgpath = 'html/civmap.svg'
     if len(sys.argv) < 2:
         #print "Usage: svg.py <filename>"
@@ -39,11 +41,11 @@ def main():
 
     #game = wrld.parse_save("unc-test.sav")
     #game = wrld.parse_save("unc-lk151-650ad.sav")
-    game = wrld.parse_save(saveFile)
+    game = wrld.parse_save(saveFile, debug)
 
     write = open(outputsvgpath, 'w')
 
     #write.write(game.Tiles.svg_out(True))
-    write.write(game.Tiles.svg_out())
+    write.write(game.Tiles.svg_out(spoiler, debug))
 
 main()

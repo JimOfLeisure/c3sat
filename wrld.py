@@ -39,19 +39,35 @@ class GenericSection:
 
 class Tile:
     """Class for each logical tile."""
-    def __init__(self, saveStream):
+    def __init__(self, saveStream, debug=False):
 
         self.info = {}
 
         self.Tile36 = GenericSection(saveStream)
-        self.continent = get_short(self.Tile36.buffer, 0x1a)
-        self.info['continent'] = get_short(self.Tile36.buffer, 0x1a)
-        del self.Tile36.buffer
+        #self.continent = get_short(self.Tile36.buffer, 0x1a)
+        #self.info['continent'] = get_short(self.Tile36.buffer, 0x1a)
+        self.Tile36.values = struct.unpack_from('2h3i2c9h', self.Tile36.buffer)
+        self.continent = self.Tile36.values[11]
+        self.info['continent'] = self.Tile36.values[11]
+        self.top_unit_id = self.Tile36.values[3]
+        self.resource = self.Tile36.values[2]
+        self.barb_info = self.Tile36.values[8]
+        self.city_id = self.Tile36.values[9]
+        self.colony = self.Tile36.values[10]
+        #self.whatsthis = self.Tile36.values[18]
+        self.whatsthis = self.colony
+#        if debug:
+#            print "Tile36"
+            #print self.Tile36.values
+#        else:
+        if not debug:
+            del self.Tile36.values
+            del self.Tile36.buffer
 
         self.Tile12 = GenericSection(saveStream)
         self.info['terrain'] = get_byte(self.Tile12.buffer, 0x5)
         #self.whatsthis = get_byte(self.Tile12.buffer, 0xa)
-        self.whatsthis = get_byte(self.Tile12.buffer, 0x5)
+        #self.whatsthis = get_byte(self.Tile12.buffer, 0x5)
         self.whatsthis2 = get_byte(self.Tile12.buffer, 0x5)
         self.whatsthis3 = get_byte(self.Tile12.buffer, 0xa)
         self.whatsthis4 = get_byte(self.Tile12.buffer, 0xb)
@@ -71,7 +87,7 @@ class Tile:
 
 class Tiles:
     """Class to read all tiles"""
-    def __init__(self, saveStream, width, height):
+    def __init__(self, saveStream, width, height, debug=False):
         self.width = width      # These may eventually be redundant to a parent class
         self.height = height
         self.tile = []          # List of individual tiles
@@ -87,7 +103,7 @@ class Tiles:
             if y % 2 == 1:
                 self.tile_iso_matrix[y].append(None)
             for x in range(width / 2):
-                this_tile = Tile(saveStream)
+                this_tile = Tile(saveStream, debug)
 
                 self.tile.append(this_tile)
 
@@ -206,7 +222,34 @@ class Tiles:
           mystring = self.svg_text("0x%01x" % overlay_terrain,textxypos)
       return mystring
 
-    def svg_out(self, spoiler=False):
+    def debug_text(self,i,x,y):
+        xypos = self.svg_attr_xy((x + self.tile_width /2,y + self.tile_height /2))
+        (mapx,mapy) = self.map_xy(i)
+
+        # x,y in hex:
+        #mystring = self.svg_text("%02x" % mapx + ',' + "%02x" % mapy, xypos)
+
+        # "(x,y)" in decimal:
+        #mystring = self.svg_text(str(self.map_xy(i)), xypos)
+
+        # i in decimal:
+        #mystring = self.svg_text(str(i), xypos)
+
+        # continent ID
+        #mystring = self.svg_text(str(self.tile[i].continent), xypos)
+
+        #
+        #subject = self.tile[i].Tile36.values[6]
+        subject = self.tile[i].whatsthis
+        if subject <> -1:
+            mystring = self.svg_text("%04x" % subject, xypos)
+        else:
+            mystring = ""
+
+
+        return mystring
+
+    def svg_out(self, spoiler=False, debug=False):
         """Return a string of svg-coded map"""
         x_axis_wrap = True
         y_axis_wrap = False
@@ -216,7 +259,6 @@ class Tiles:
         map_height = (self.height * self.tile_height / 2) + (self.tile_height / 2)
         svg_string = ""
         svg_string += '<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" version="1.1" x="0" y="0" viewBox="0 0 ' + str(map_width) + ' ' + str(map_height) + '">\n'
-        #svg_string += '<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" version="1.1" width="' + str(map_width) + '" height="' + str(map_height) + '">\n'
         svg_string += "<defs>\n"
         mapDefsFile = open("mapdefs.svg","r")
         svg_string += mapDefsFile.read()
@@ -229,41 +271,24 @@ class Tiles:
             for (x,y) in self.svg_xy(i):
               svg_string += self.base_terrain(i,x,y)
               svg_string += self.overlay_terrain(i,x,y)
+              #if debug: svg_string += self.svg_text(str(self.map_xy(i)),self.svg_attr_xy((x + self.tile_width /2,y + self.tile_height /2)))
+              if debug: svg_string += self.debug_text(i,x,y)
           #else: # I used to place a fog tile, but why not just let the background rectangle be the fog?
           #  for (x,y) in self.svg_xy(i):
           #    svg_string += '<use xlink:href="#fog" ' + self.svg_attr_xy((x,y)) +' />\n'
-
-#        for y in range(self.height):
-#            x_indent = (y % 2) * tile_width / 2
-#            y_offset = y * tile_height / 2
-#            #svg_string += '<g row="' + str(y) + '" transform="translate(' + str(x_indent) + ', ' + str(y_offset) + ')">\n'
-#            for x in range(self.width / 2):
-#                i = x  + y * self.width /2
-#                info = hex(self.tile[i].whatsthis)
-#                cssclass = 'tile'
-#                if 0 <= i < len(self.tile):
-#                    #svg_string += '  <g id="' + self.map_id(i) + '" transform="translate(' + str(x * tile_width) + ', 0)">\n'
-
-#                        # Not sure I need this comparison; may just be able to key off the nibble value
-#                        if overlay_terrain <> base_terrain:
-#                            cssclass = 'overlayterrain terroverlay' + str(overlay_terrain)
-#                        svg_string += '    <text class="whatsthis" style="display:none" text-anchor="middle" alignment-baseline="central" x="' + str(tile_width / 2) + '" y="' + str(tile_height / 2) + '">' + info + '</text>\n'
-#                        #svg_string += '  </g>\n'
-#                    else:
-#                        cssclass = 'fog'
-#                        svg_string += '<use xlink:href="#fog" class="' + cssclass +'" />\n'
-#                        #svg_string += '  </g>\n'
-#                    svg_string += '  </g>\n'
-#            # link the first item and place at the end for even rows; link to the last item and place at the first. Will be half-cropped by viewport
-#            # using math (even lines have 0 remainder, multiplying to cancel out values) instead of if, but it's a little harder to follow
-#            svg_string += '  <use xlink:href="#' + self.map_id((y * self.width / 2) + (x * (y % 2))) + '" transform="translate(' + str((map_width - tile_width / 2) - (map_width - tile_width / 2) * 2 * (y % 2)) + ', 0)" />\n'
-#            svg_string += '</g>\n'
+        if spoiler:
+            for civ in range(len(self.start_loc)):
+                i = self.start_loc[civ]
+                if i <> -1:
+                    for (x,y) in self.svg_xy(i):
+                        xypos = self.svg_attr_xy((x + self.tile_width /2,y + self.tile_height /2))
+                        svg_string += self.svg_text('Player ' + str(civ) + ' Start', xypos)
         svg_string += '</svg>\n'
         return svg_string
 
 class Wrld:
     """Class for 3 WRLD sections"""
-    def __init__(self, saveStream):
+    def __init__(self, saveStream, debug=False):
         """Currently calling this from the horspool seek, so WRLD is already consumed from the stream. Read the length first."""
         self.name = "WRLD"
         buffer = saveStream.read(4)
@@ -273,25 +298,41 @@ class Wrld:
         # Extract any data here, but I think it's only 2 bytes
         #print self.name
         #print hexdump(self.buffer)
-        del self.buffer
+        if not debug:
+            del self.buffer
 
         self.Wrld2 = GenericSection(saveStream)
         #print self.Wrld2.name
-        self.values = struct.unpack_from('41i', self.Wrld2.buffer)
-        self.height = self.values[1]
-        self.width = self.values[6]
+        self.Wrld2.values = struct.unpack_from('41i', self.Wrld2.buffer)
+        self.height = self.Wrld2.values[1]
+        self.width = self.Wrld2.values[6]
+        # Civ start locations in the form of map tile index numbers
+        self.start_loc = []
+        for myindex in range(7,39):
+            self.start_loc.append(self.Wrld2.values[myindex])
+        self.world_seed = self.Wrld2.values[39]
+        self.ocean_continent_id = self.Wrld2.values[0]
+            
         #print self.height
         #print self.width
         #print self.values
         #print hexdump(self.Wrld2.buffer)
-        del self.Wrld2.buffer
+        if not debug:
+            del self.Wrld2.buffer
+            del self.Wrld2.values
 
         self.Wrld3 = GenericSection(saveStream)
+        self.Wrld3.values = struct.unpack_from('13i', self.Wrld3.buffer)
         #print self.Wrld3.name
         #print hexdump(self.Wrld3.buffer)
-        del self.Wrld3.buffer
+        if not debug:
+            del self.Wrld3.buffer
+            del self.Wrld3.values
 
-        self.Tiles = Tiles(saveStream, self.width, self.height)
+        self.Tiles = Tiles(saveStream, self.width, self.height, debug)
+
+        # Total hack; I want this info in svg_out, so I'm stuffing it into Tiles rather than refactor
+        self.Tiles.start_loc = self.start_loc
 
 
 def get_byte(buffer, offset):
@@ -323,7 +364,7 @@ def get_int(buffer, offset):
 #    #response += process.communicate(saveStream)
 #    #return outputStream
 
-def parse_save(saveFile):
+def parse_save(saveFile, debug=False):
     buffer = saveFile.read(4)
     if buffer <> 'CIV3':
         print "wah wah wah wahhhhhhhh."
@@ -332,7 +373,7 @@ def parse_save(saveFile):
     #print 'Using Horspool search to go to first WRLD section'
     wrldOffset = horspool.boyermoore_horspool(saveFile, "WRLD")
     #print wrldOffset
-    game = Wrld(saveFile)
+    game = Wrld(saveFile, debug)
     saveFile.close()
     return game
 
@@ -364,7 +405,9 @@ def main():
     max = 10
     for i in range(max):
         print game.Tiles.tile[i].continent
-    game.Tiles.test_things()
+    #game.Tiles.test_things()
+    print game.start_loc
+        
 
 if __name__=="__main__":
     main()
