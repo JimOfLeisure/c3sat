@@ -30,7 +30,9 @@ import sys
 def main():
     """This module instantiates wrld.parse_save() and writes an svg file for the map"""
     spoiler = True
+    spoiler = False
     debug = True
+    debug = False
     outputsvgpath = 'html/civmap.svg'
     if len(sys.argv) < 2:
         #print "Usage: svg.py <filename>"

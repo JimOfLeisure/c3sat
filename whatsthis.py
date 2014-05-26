@@ -50,11 +50,13 @@ def main():
 #        infile = open("html/debug/tail.html","r")
 #        svg_out.write(infile.read())
 #        svg_out.close()
-        subject = game.Tiles.tile[685].Tile36
-        values = struct.unpack_from("18h", subject.buffer)
+        subject = game.Tiles.tile[685].Tile4
+        values = struct.unpack_from("i", subject.buffer)
         print wrld.hexdump(subject.buffer);
         print values
-#        pprint (vars(game))
+        #print game.Tiles.tile[621].improvements_known_to_civ
+        #pprint (vars(subject.is_visible_to))
+        #pprint (vars(subject))
 
 #    for n in range(len(game)):
         #print game[n].__dict__

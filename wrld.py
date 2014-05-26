@@ -29,6 +29,11 @@ import struct	# For parsing binary data
 import horspool    # to seek to first match; from http://inspirated.com/2010/06/19/using-boyer-moore-horspool-algorithm-on-file-streams-in-python
 import sys
 
+# for debug; I am using this to change which civ visible_to I'm viewing
+myglobalciv = 1
+#myglobalcompare = 0xffff
+myglobalcompare = 0
+
 class GenericSection:
     """Base class for reading SAV sections."""
     def __init__(self, saveStream):
@@ -54,36 +59,66 @@ class Tile:
         self.barb_info = self.Tile36.values[8]
         self.city_id = self.Tile36.values[9]
         self.colony = self.Tile36.values[10]
-        #self.whatsthis = self.Tile36.values[18]
-        self.whatsthis = self.colony
-#        if debug:
-#            print "Tile36"
-            #print self.Tile36.values
-#        else:
         if not debug:
             del self.Tile36.values
             del self.Tile36.buffer
 
         self.Tile12 = GenericSection(saveStream)
+        self.Tile12.values = struct.unpack_from('iihh', self.Tile12.buffer)
         self.info['terrain'] = get_byte(self.Tile12.buffer, 0x5)
-        #self.whatsthis = get_byte(self.Tile12.buffer, 0xa)
-        #self.whatsthis = get_byte(self.Tile12.buffer, 0x5)
-        self.whatsthis2 = get_byte(self.Tile12.buffer, 0x5)
-        self.whatsthis3 = get_byte(self.Tile12.buffer, 0xa)
-        self.whatsthis4 = get_byte(self.Tile12.buffer, 0xb)
-        self.whatsthis5 = get_int(self.Tile12.buffer, 0x0)
-        del self.Tile12.buffer
+        self.improvements = self.Tile12.values[0]
+        if not debug:
+            del self.Tile12.values
+            del self.Tile12.buffer
 
         self.Tile4 = GenericSection(saveStream)
-        del self.Tile4.buffer
+        self.Tile4.values = struct.unpack_from('i', self.Tile4.buffer)
+        self.whatsthis = self.Tile4.values[0]
+        #self.whatsthis = get_int(self.Tile4.buffer, 0x0)
+        if not debug:
+            del self.Tile4.values
+            del self.Tile4.buffer
 
         self.Tile128 = GenericSection(saveStream)
-        self.is_visible_to = get_int(self.Tile128.buffer, 0)
-        self.is_visible_now_to = get_int(self.Tile128.buffer, 4)
-        self.is_visible = self.is_visible_to & 0x02
+        self.Tile128.values = struct.unpack_from('4i96b', self.Tile128.buffer)
+        #self.is_visible_to = get_int(self.Tile128.buffer, 0)
+        #self.is_visible = self.is_visible_to & 0x02
         #self.is_visible = self.is_visible_to & 0x10
-        self.is_visible_now = self.is_visible_now_to & 0x02
-        del self.Tile128.buffer
+        #self.is_visible_now = self.is_visible_now_to & 0x02
+        #self.is_visible_now_to = get_int(self.Tile128.buffer, 4)
+
+        self.is_visible_to_flags = self.Tile128.values[0]
+        self.is_visible_to = []
+        mytemp = self.is_visible_to_flags
+        for civ in range(32):
+            self.is_visible_to.append(mytemp & 0x01 == 1)
+            mytemp = mytemp >> 1
+
+        self.is_visible_now_to_flags = self.Tile128.values[1]
+        self.is_visible_now_to = []
+        mytemp = self.is_visible_now_to_flags
+        for civ in range(32):
+            self.is_visible_now_to.append(mytemp & 0x01 == 1)
+            mytemp = mytemp >> 1
+
+        self.worked_by_city_id = get_short(self.Tile128.buffer, 0x14)
+
+        mytemp = 0x16
+        self.land_trade_network_id = []
+        for civ in range(32):
+            self.land_trade_network_id.append(get_short(self.Tile128.buffer, mytemp))
+            mytemp += 2
+
+        mytemp = 0x56
+        self.improvements_known_to_civ = []
+        for civ in range(32):
+            self.improvements_known_to_civ.append(get_byte(self.Tile128.buffer, mytemp))
+            mytemp += 1
+
+        if not debug:
+            del self.Tile128.values
+            del self.Tile128.buffer
+
 
 class Tiles:
     """Class to read all tiles"""
@@ -222,6 +257,47 @@ class Tiles:
           mystring = self.svg_text("0x%01x" % overlay_terrain,textxypos)
       return mystring
 
+    def resource(self, i, x, y):
+      xypos = self.svg_attr_xy((x,y))
+      textxypos = self.svg_attr_xy((x + self.tile_width /2,y + self.tile_height /2))
+      resource = self.tile[i].resource
+      if resource == 0x08: mystring = self.svg_text("Wines",textxypos)
+      elif resource == 0x09: mystring = self.svg_text("Furs",textxypos)
+      elif resource == 0x0c: mystring = self.svg_text("Spices",textxypos)
+      elif resource == 0x0d: mystring = self.svg_text("Ivory",textxypos)
+      elif resource == 0x0a: mystring = self.svg_text("Dyes",textxypos)
+      elif resource == 0x0b: mystring = self.svg_text("Incense",textxypos)
+      elif resource == 0x0e: mystring = self.svg_text("Silks",textxypos)
+      elif resource == 0x0f: mystring = self.svg_text("Gems",textxypos)
+      elif resource == 0x10: mystring = self.svg_text("Whales",textxypos)
+      elif resource == 0x11: mystring = self.svg_text("Deer",textxypos)
+      elif resource == 0x12: mystring = self.svg_text("Fish",textxypos)
+      elif resource == 0x13: mystring = self.svg_text("Cow",textxypos)
+      elif resource == 0x14: mystring = self.svg_text("Wheat",textxypos)
+      elif resource == 0x15: mystring = self.svg_text("Gold",textxypos)
+      elif resource == 0x16: mystring = self.svg_text("Sugar",textxypos)
+      elif resource == 0x17: mystring = self.svg_text("Trop.Fruit",textxypos)
+      elif resource == 0x18: mystring = self.svg_text("Oasis",textxypos)
+      elif resource == 0x19: mystring = self.svg_text("Tobacco",textxypos)
+      elif resource in {-1,0,1,2,3,4,5,6,7}:
+          # Treating all strategic resources as spoiler info
+          # Also no string for -1, no resource
+          mystring = ""
+      else:
+          # If something unexpected, put the value in text on the map
+          mystring = self.svg_text("0x%01x" % resource,textxypos)
+      return mystring
+
+    def city(self, i, x, y):
+      xypos = self.svg_attr_xy((x,y))
+      textxypos = self.svg_attr_xy((x + self.tile_width /2,y + self.tile_height /2))
+      city = self.tile[i].city_id
+      if city <> -1:
+        mystring = self.svg_text("CITY",textxypos) 
+      else:
+        mystring = ""
+      return mystring
+
     def debug_text(self,i,x,y):
         xypos = self.svg_attr_xy((x + self.tile_width /2,y + self.tile_height /2))
         (mapx,mapy) = self.map_xy(i)
@@ -241,7 +317,11 @@ class Tiles:
         #
         #subject = self.tile[i].Tile36.values[6]
         subject = self.tile[i].whatsthis
-        if subject <> -1:
+        #if subject <> -1:
+        #if subject <> 0:
+        if subject <> myglobalcompare:
+        #if subject <> self.tile[i].improvements:
+        #if subject & 0x20 <> 0:
             mystring = self.svg_text("%04x" % subject, xypos)
         else:
             mystring = ""
@@ -266,11 +346,14 @@ class Tiles:
         svg_string += "</defs>\n"
         svg_string += '<use xlink:href="#mybackgroundrectangle" x="0" y="0" transform="scale(' + str(map_width) + ',' + str(map_height) + ')" />\n'
         for i in range(len(self.tile)):
-          if self.tile[i].is_visible or spoiler:
+          #if self.tile[i].is_visible_to[myglobalciv] or spoiler:
+          if self.tile[i].is_visible_to[myglobalciv] or spoiler:
             # May have more than one to paint wrap-around tiles
             for (x,y) in self.svg_xy(i):
               svg_string += self.base_terrain(i,x,y)
               svg_string += self.overlay_terrain(i,x,y)
+              svg_string += self.resource(i,x,y)
+              svg_string += self.city(i,x,y)
               #if debug: svg_string += self.svg_text(str(self.map_xy(i)),self.svg_attr_xy((x + self.tile_width /2,y + self.tile_height /2)))
               if debug: svg_string += self.debug_text(i,x,y)
           #else: # I used to place a fog tile, but why not just let the background rectangle be the fog?
