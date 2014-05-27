@@ -261,7 +261,7 @@ class Tiles:
       xypos = self.svg_attr_xy((x,y))
       textxypos = self.svg_attr_xy((x + self.tile_width /2,y + self.tile_height /2))
       resource = self.tile[i].resource
-      if resource == 0x08: mystring = self.svg_text("Wines",textxypos)
+      if resource == 0x08: mystring = '<use ' + xypos + ' xlink:href = "#myWines" />\n'
       elif resource == 0x09: mystring = self.svg_text("Furs",textxypos)
       elif resource == 0x0c: mystring = self.svg_text("Spices",textxypos)
       elif resource == 0x0d: mystring = self.svg_text("Ivory",textxypos)
@@ -271,8 +271,9 @@ class Tiles:
       elif resource == 0x0f: mystring = self.svg_text("Gems",textxypos)
       elif resource == 0x10: mystring = self.svg_text("Whales",textxypos)
       elif resource == 0x11: mystring = self.svg_text("Deer",textxypos)
-      elif resource == 0x12: mystring = self.svg_text("Fish",textxypos)
-      elif resource == 0x13: mystring = self.svg_text("Cow",textxypos)
+      elif resource == 0x12: mystring = '<use ' + xypos + ' xlink:href = "#myFish" />\n'
+      #elif resource == 0x13: mystring = self.svg_text("Cow",textxypos)
+      elif resource == 0x13: mystring = '<use ' + xypos + ' xlink:href = "#myCow" />\n'
       elif resource == 0x14: mystring = self.svg_text("Wheat",textxypos)
       elif resource == 0x15: mystring = self.svg_text("Gold",textxypos)
       elif resource == 0x16: mystring = self.svg_text("Sugar",textxypos)
@@ -293,7 +294,7 @@ class Tiles:
       textxypos = self.svg_attr_xy((x + self.tile_width /2,y + self.tile_height /2))
       city = self.tile[i].city_id
       if city <> -1:
-        mystring = self.svg_text("CITY",textxypos) 
+        mystring = '<use ' + xypos + ' xlink:href = "#myCity" />\n'
       else:
         mystring = ""
       return mystring
@@ -343,6 +344,11 @@ class Tiles:
         mapDefsFile = open("mapdefs.svg","r")
         svg_string += mapDefsFile.read()
         mapDefsFile.close()
+        svg_string += '<g id="myCow" transform="scale(0.12) translate(320,117)">\n'
+        mapDefsFile = open("svg/Cow_cartoon_04.svg","r")
+        svg_string += mapDefsFile.read()
+        mapDefsFile.close()
+        svg_string += '</g>\n'
         svg_string += "</defs>\n"
         svg_string += '<use xlink:href="#mybackgroundrectangle" x="0" y="0" transform="scale(' + str(map_width) + ',' + str(map_height) + ')" />\n'
         for i in range(len(self.tile)):
