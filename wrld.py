@@ -33,6 +33,9 @@ import sys
 myglobalciv = 1
 #myglobalcompare = 0xffff
 myglobalcompare = 0
+#myglobalbitmask = 0xefc0
+#myglobalbitmask = 0xff2c
+myglobalbitmask = 0x00ff
 
 class GenericSection:
     """Base class for reading SAV sections."""
@@ -51,6 +54,7 @@ class Tile:
         self.Tile36 = GenericSection(saveStream)
         #self.continent = get_short(self.Tile36.buffer, 0x1a)
         #self.info['continent'] = get_short(self.Tile36.buffer, 0x1a)
+        self.rivers = get_byte(self.Tile36.buffer, 0x00)
         self.Tile36.values = struct.unpack_from('2h3i2c9h', self.Tile36.buffer)
         self.continent = self.Tile36.values[11]
         self.info['continent'] = self.Tile36.values[11]
@@ -59,6 +63,8 @@ class Tile:
         self.barb_info = self.Tile36.values[8]
         self.city_id = self.Tile36.values[9]
         self.colony = self.Tile36.values[10]
+        #self.whatsthis = self.Tile4.values[0]
+        self.whatsthis = get_short(self.Tile36.buffer, 0x00) & myglobalbitmask
         if not debug:
             del self.Tile36.values
             del self.Tile36.buffer
@@ -67,14 +73,26 @@ class Tile:
         self.Tile12.values = struct.unpack_from('iihh', self.Tile12.buffer)
         self.info['terrain'] = get_byte(self.Tile12.buffer, 0x5)
         self.improvements = self.Tile12.values[0]
+        self.terrain_features = get_short(self.Tile12.buffer, 0x0a)
+        # Mask 0x0001 is *** Bonus Grassland *** . Interesting, some hills and mountains have it (base tile is grassland)
+        # Mask 0x0002 is the "fat x" around each city whether or not it has the culture to work it
+        # Mask 0x0004 - Can't find any
+        # Mask 0x0008 - Player start location
+        # Mask 0x0010 - Snow-caps for mountains
+        # Mask 0x0020 - Unsure. Only on land, seems clumped. Seems to be all tundra on generated maps and all forest tundra on LK's WM. Have not seen it on jungle tiles.
+        # Other nybble masks 0x00c0 - nothing I can find
+        # Mask 0x1000 - This looks like a likely candidate for "forest already chopped here"
+        # Other nybble masks 0xe000 - nothing I can find ***  (found some of these on LK's WM)
+        # Mask 0x0100 - river N corner? or NW?
+        # Mask 0x0200 - river W corner?
+        # Mask 0x0400 - river E corner? or SE?
+        # Mask 0x0800 - river S corner?
         if not debug:
             del self.Tile12.values
             del self.Tile12.buffer
 
         self.Tile4 = GenericSection(saveStream)
         self.Tile4.values = struct.unpack_from('i', self.Tile4.buffer)
-        self.whatsthis = self.Tile4.values[0]
-        #self.whatsthis = get_int(self.Tile4.buffer, 0x0)
         if not debug:
             del self.Tile4.values
             del self.Tile4.buffer
@@ -204,22 +222,43 @@ class Tiles:
         # Get right-nibble of terrain byte
         base_terrain = self.tile[i].info['terrain'] & 0x0F
         if base_terrain == 0:
-            mystring = '<use xlink:href="#desert" ' + xypos +' />\n'
-        elif base_terrain == 1:
-            mystring = '<use xlink:href="#plains" ' + xypos +' />\n'
+          mystring = '<use xlink:href="#desert" ' + xypos +' />\n'
+          myriver = self.tile[i].rivers
+          if myriver <> 0:
+		      if myriver & 0x80 <> 0: mystring += '<use xlink:href="#floodplain-nw" ' + xypos +' />\n'
+		      if myriver & 0x02 <> 0: mystring += '<use xlink:href="#floodplain-ne" ' + xypos +' />\n'
+		      if myriver & 0x08 <> 0: mystring += '<use xlink:href="#floodplain-se" ' + xypos +' />\n'
+		      if myriver & 0x20 <> 0: mystring += '<use xlink:href="#floodplain-sw" ' + xypos +' />\n'
+		      if myriver == 0x01: mystring += '<use xlink:href="#floodplain-n-corner" ' + xypos +' />\n'
+        elif base_terrain == 1: mystring = '<use xlink:href="#plains" ' + xypos +' />\n'
         elif base_terrain == 2:
             mystring = '<use xlink:href="#grassland" ' + xypos +' />\n'
-        elif base_terrain == 3:
-            mystring = '<use xlink:href="#tundra" ' + xypos +' />\n'
-        elif base_terrain == 11:
-            mystring = '<use xlink:href="#coast" ' + xypos +' />\n'
-        elif base_terrain == 12:
-            mystring = '<use xlink:href="#sea" ' + xypos +' />\n'
-        elif base_terrain == 13:
-            mystring = '<use xlink:href="#ocean" ' + xypos +' />\n'
-        else:
-            mystring = '<use xlink:href="#unknown" ' + xypos +' />\n'
+            if self.tile[i].terrain_features & 0x0001 == 1:
+                mystring += '<use xlink:href="#bonusgrassland" ' + xypos +' />\n'
+        elif base_terrain == 3: mystring = '<use xlink:href="#tundra" ' + xypos +' />\n'
+        elif base_terrain == 11: mystring = '<use xlink:href="#coast" ' + xypos +' />\n'
+        elif base_terrain == 12: mystring = '<use xlink:href="#sea" ' + xypos +' />\n'
+        elif base_terrain == 13: mystring = '<use xlink:href="#ocean" ' + xypos +' />\n'
+        else: mystring = '<use xlink:href="#unknown" ' + xypos +' />\n'
         return mystring
+
+    def andeq(self,a,b):
+        return a & b == b
+
+    def rivers(self, i, x, y):
+      xypos = self.svg_attr_xy((x,y))
+      myriver = self.tile[i].rivers
+      mystring = ""
+      if myriver & 0x80 <> 0: mystring += '<use xlink:href="#river-nw" ' + xypos +' />\n'
+      if myriver & 0x02 <> 0: mystring += '<use xlink:href="#river-ne" ' + xypos +' />\n'
+      if myriver & 0x08 <> 0: mystring += '<use xlink:href="#river-se" ' + xypos +' />\n'
+      if myriver & 0x20 <> 0: mystring += '<use xlink:href="#river-sw" ' + xypos +' />\n'
+      if myriver == 0x01: mystring += '<use xlink:href="#river-n-corner" ' + xypos +' />\n'
+#      if self.andeq(myriver,0xc0): mystring += '<use xlink:href="#river-nw" ' + xypos +' />\n'
+#      if self.andeq(myriver,0x06): mystring += '<use xlink:href="#river-ne" ' + xypos +' />\n'
+#      if self.andeq(myriver,0x1c): mystring += '<use xlink:href="#river-se" ' + xypos +' />\n'
+#      if self.andeq(myriver,0x20): mystring += '<use xlink:href="#river-sw" ' + xypos +' />\n'
+      return mystring
 
     def overlay_terrain(self, i, x, y):
       xypos = self.svg_attr_xy((x,y))
@@ -229,6 +268,8 @@ class Tiles:
       if overlay_terrain == 0x04:
           # Flood plain
           mystring = self.svg_text("FP",textxypos)
+          mystring = ""
+
       elif overlay_terrain == 0x05:
           # Hill
           mystring = '<use ' + xypos + ' xlink:href = "#myHill" />\n'
@@ -357,6 +398,7 @@ class Tiles:
             # May have more than one to paint wrap-around tiles
             for (x,y) in self.svg_xy(i):
               svg_string += self.base_terrain(i,x,y)
+              svg_string += self.rivers(i,x,y)
               svg_string += self.overlay_terrain(i,x,y)
               svg_string += self.resource(i,x,y)
               svg_string += self.city(i,x,y)
@@ -385,6 +427,7 @@ class Wrld:
         #print self.length
         self.buffer = saveStream.read(self.length)
         # Extract any data here, but I think it's only 2 bytes
+        (self.num_continents,) = struct.unpack_from('h', self.buffer)
         #print self.name
         #print hexdump(self.buffer)
         if not debug:
@@ -422,6 +465,23 @@ class Wrld:
 
         # Total hack; I want this info in svg_out, so I'm stuffing it into Tiles rather than refactor
         self.Tiles.start_loc = self.start_loc
+
+        # CONT sections
+        self.continents = []
+        for i in range(self.num_continents):
+            # First integer is 0 if water, 1 if land
+            # Second integer is number of tiles on the continent
+            # index is the continent ID (0..num_continents-1)
+#        my_name = 'CONT'
+#        my_count = 0
+#        while my_name == 'CONT':
+#            my_temp = GenericSection(saveStream)
+#            my_name = my_temp.name
+#            print my_count, my_temp.name, my_temp.length
+#            print hexdump(my_temp.buffer)
+#            my_count +=1
+            self.continents.append(struct.unpack_from('ii',(GenericSection(saveStream).buffer)))
+
 
 
 def get_byte(buffer, offset):

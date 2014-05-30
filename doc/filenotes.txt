@@ -33,7 +33,7 @@ CNSL - Based on some I/O errors referring to this, I now wonder if this
       CTZN - repeated for each citizen? Each one has description e.g. "Happy Laborer (England)"
       CTZN
       CTZN
-    BINF - Bin full?
+    BINF - Bin full? .. Duh, probably Bin Food
     BITM
     DATE - Date city founded?
 ? CITY

@@ -995,6 +995,35 @@
     </g>
   </g>
 </g>
+<g id="floodplain-nw">
+    <linearGradient
+       id="linearGradient3754">
+      <stop
+         id="stop3756"
+         style="stop-color:#008000;stop-opacity:1"
+         offset="0" />
+      <stop
+         id="stop3758"
+         style="stop-color:#008000;stop-opacity:0"
+         offset="1" />
+    </linearGradient>
+    <linearGradient
+       x1="34.382202"
+       y1="14.808899"
+       x2="42.556957"
+       y2="30.875399"
+       id="linearGradient3760"
+       xlink:href="#linearGradient3754"
+       gradientUnits="userSpaceOnUse" />
+  <path
+     d="M 0.0735493,32.036775 64.081552,0 83.232041,9.616021 20.650357,42.325178 z"
+     id="path2984"
+     style="fill:url(#linearGradient3760);fill-opacity:1;stroke:none" />
+</g>
+  <path
+     d="M 0,32.183873 64.104803,0.05240144 64.085776,0.00212653"
+     id="river-nw"
+     style="fill:none;stroke:#0000ff;stroke-width:10;stroke-linecap:round;stroke-linejoin:miter;stroke-miterlimit:4;stroke-opacity:1;stroke-dasharray:none" />
 <polygon id="isometbrick" points="0,16 128,16 128,48 0,48" />
 <polygon id="isotile" points="0,32 64,0 128,32 64,64" />
 <polygon id="isotilestroke" points="0,32 64,0 128,32 64,64" style="stroke-width:1px;" />
@@ -1011,4 +1040,13 @@
 <use id="ocean" xlink:href="#maptileshape" style="fill:darkblue" />
 <use id="fog" xlink:href="#maptileshape" style="fill:black" />
 <use id="unknown" xlink:href="#maptileshape" style="fill:red" />
+<use id="floodplain-ne" xlink:href="#floodplain-nw" transform="translate(128,0) scale(-1,1)" />
+<use id="floodplain-sw" xlink:href="#floodplain-nw" transform="translate(0,64) scale(1,-1)" />
+<use id="floodplain-se" xlink:href="#floodplain-nw" transform="translate(128,64) scale(-1,-1)" />
+<use id="river-sw" xlink:href="#river-nw" transform="translate(0,64) scale(1,-1)" />
+<use id="river-se" xlink:href="#river-nw" transform="translate(128,64) scale(-1,-1)" />
+<use id="river-ne" xlink:href="#river-nw" transform="translate(128,0) scale(-1,1)" />
+<circle id="river-n-corner" cx="64" cy="0" r="5" fill="blue" />
+<circle id="bonusgrassland" cx="64" cy="32" r="3" fill="lightgray" />
+
 </svg>

@@ -50,13 +50,25 @@ def main():
 #        infile = open("html/debug/tail.html","r")
 #        svg_out.write(infile.read())
 #        svg_out.close()
-        subject = game.Tiles.tile[685].Tile4
-        values = struct.unpack_from("i", subject.buffer)
-        print wrld.hexdump(subject.buffer);
-        print values
+        #subject = game.Tiles.tile[685].Tile4
+        #values = struct.unpack_from("i", subject.buffer)
+        #print wrld.hexdump(subject.buffer);
+        #print values
         #print game.Tiles.tile[621].improvements_known_to_civ
         #pprint (vars(subject.is_visible_to))
         #pprint (vars(subject))
+
+        # Repeatedly bit-AND against known river tiles to look for bitmaks
+        mytemp = 0xffffffff
+        #for i in range(len(game.Tiles.tile)):
+        #for i in [1426,1456,1457,1485,1486,1515,1516,1544,1545,1575]:
+        for i in [1486,1516,1545]:
+        #for i in [1426,1456,1485,1515]:
+            mytemp = mytemp & game.Tiles.tile[i].whatsthis
+            #print "%04x" % mytemp
+            print "%08x" % game.Tiles.tile[i].whatsthis 
+            #if 0x00ff & game.Tiles.tile[i].whatsthis <> 0x06: print i
+        print "%08x" % mytemp
 
 #    for n in range(len(game)):
         #print game[n].__dict__
