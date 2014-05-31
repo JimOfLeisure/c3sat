@@ -231,10 +231,7 @@ class Tiles:
 		      if myriver & 0x20 <> 0: mystring += '<use xlink:href="#floodplain-sw" ' + xypos +' />\n'
 		      if myriver == 0x01: mystring += '<use xlink:href="#floodplain-n-corner" ' + xypos +' />\n'
         elif base_terrain == 1: mystring = '<use xlink:href="#plains" ' + xypos +' />\n'
-        elif base_terrain == 2:
-            mystring = '<use xlink:href="#grassland" ' + xypos +' />\n'
-            if self.tile[i].terrain_features & 0x0001 == 1:
-                mystring += '<use xlink:href="#bonusgrassland" ' + xypos +' />\n'
+        elif base_terrain == 2: mystring = '<use xlink:href="#grassland" ' + xypos +' />\n'
         elif base_terrain == 3: mystring = '<use xlink:href="#tundra" ' + xypos +' />\n'
         elif base_terrain == 11: mystring = '<use xlink:href="#coast" ' + xypos +' />\n'
         elif base_terrain == 12: mystring = '<use xlink:href="#sea" ' + xypos +' />\n'
@@ -270,26 +267,15 @@ class Tiles:
           mystring = self.svg_text("FP",textxypos)
           mystring = ""
 
-      elif overlay_terrain == 0x05:
-          # Hill
-          mystring = '<use ' + xypos + ' xlink:href = "#myHill" />\n'
-      elif overlay_terrain == 0x06:
-          # Mountain
-          mystring = '<use ' + xypos + ' xlink:href = "#myMountain" />\n'
-      elif overlay_terrain == 0x07:
-          # Forest
-          mystring = '<use ' + xypos + ' xlink:href = "#myForest" />\n'
-      elif overlay_terrain == 0x08:
-          # Jungle
-          #mystring = self.svg_text("Jungle",textxypos)
-          mystring = '<use ' + xypos + ' xlink:href = "#myJungle" />\n'
-      elif overlay_terrain == 0x09:
-          # Marsh
-          #mystring = self.svg_text("Marsh",textxypos)
-          mystring = '<use ' + xypos + ' xlink:href = "#myMarsh" />\n'
-      elif overlay_terrain == 0x0a:
-          # Volcano
-          mystring = '<use ' + xypos + ' xlink:href = "#myVolcano" />\n'
+      elif overlay_terrain == 0x05: mystring = '<use ' + xypos + ' xlink:href = "#myHill" />\n'
+      elif overlay_terrain == 0x06: mystring = '<use ' + xypos + ' xlink:href = "#myMountain" />\n'
+      elif overlay_terrain == 0x07: mystring = '<use ' + xypos + ' xlink:href = "#myForest" />\n'
+      elif overlay_terrain == 0x08: mystring = '<use ' + xypos + ' xlink:href = "#myJungle" />\n'
+      elif overlay_terrain == 0x09: mystring = '<use ' + xypos + ' xlink:href = "#myMarsh" />\n'
+      elif overlay_terrain == 0x0a: mystring = '<use ' + xypos + ' xlink:href = "#myVolcano" />\n'
+      elif overlay_terrain == 0x02:
+          if self.tile[i].terrain_features & 0x0001 == 1: mystring = '<use xlink:href="#bonusgrassland" ' + xypos +' />\n'
+          else: mystring = ""
       elif overlay_terrain in {0,1,2,3,0xb,0xc,0xd}:
           # It appears if there is no overlay, the nybble matches the base tile nybble. Return nothing for known base tile values
           mystring = ""

@@ -996,29 +996,15 @@
   </g>
 </g>
 <g id="floodplain-nw">
-    <linearGradient
-       id="linearGradient3754">
-      <stop
-         id="stop3756"
-         style="stop-color:#008000;stop-opacity:1"
-         offset="0" />
-      <stop
-         id="stop3758"
-         style="stop-color:#008000;stop-opacity:0"
-         offset="1" />
+    <linearGradient id="floodplaingradient" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="40%" style="stop-color:rgb(0,128,0);stop-opacity:1" />
+      <stop offset="60%" style="stop-color:rgb(0,128,0);stop-opacity:0" />
     </linearGradient>
-    <linearGradient
-       x1="34.382202"
-       y1="14.808899"
-       x2="42.556957"
-       y2="30.875399"
-       id="linearGradient3760"
-       xlink:href="#linearGradient3754"
-       gradientUnits="userSpaceOnUse" />
-  <path
-     d="M 0.0735493,32.036775 64.081552,0 83.232041,9.616021 20.650357,42.325178 z"
-     id="path2984"
-     style="fill:url(#linearGradient3760);fill-opacity:1;stroke:none" />
+    <path
+        d="M 63.96875 -0.96875 L -1 32 L 23.09375 44.21875 L 88.0625 11.25 L 63.96875 -0.96875 z "
+        id="polygon3792"
+        fill = "url(#floodplaingradient)"
+        />
 </g>
   <path
      d="M 0,32.183873 64.104803,0.05240144 64.085776,0.00212653"
