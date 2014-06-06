@@ -995,17 +995,26 @@
     </g>
   </g>
 </g>
-<g id="floodplain-nw">
     <linearGradient id="floodplaingradient" x1="0%" y1="0%" x2="100%" y2="100%">
-      <stop offset="40%" style="stop-color:rgb(0,128,0);stop-opacity:1" />
-      <stop offset="60%" style="stop-color:rgb(0,128,0);stop-opacity:0" />
+      <stop offset="30%" style="stop-color:rgb(0,128,0);stop-opacity:1" />
+      <stop offset="40%" style="stop-color:rgb(0,128,0);stop-opacity:0" />
     </linearGradient>
-    <path
-        d="M 63.96875 -0.96875 L -1 32 L 23.09375 44.21875 L 88.0625 11.25 L 63.96875 -0.96875 z "
-        id="polygon3792"
-        fill = "url(#floodplaingradient)"
-        />
-</g>
+    <radialGradient id="floodplaincorner" cx="50%" cy="0%" r="100%" fx="50%" fy="0%">
+      <stop offset="7.07%" style="stop-color:rgb(0,128,0);stop-opacity:1" />
+      <stop offset="21.21%" style="stop-color:rgb(0,128,0);stop-opacity:0" />
+    </radialGradient>
+
+  <polygon
+    fill = "url(#floodplaincorner)"
+     points="-0.5,32 32,-1 64.5,32 32,65"
+     id="floodplain-n-corner-halftile" />
+
+  <polygon
+    transform="scale(2,1)"
+    fill = "url(#floodplaingradient)"
+     points="-0.5,32 32,-1 64.5,32 32,65"
+     id="floodplain-nw" />
+
   <path
      d="M 0,32.183873 64.104803,0.05240144 64.085776,0.00212653"
      id="river-nw"
@@ -1029,6 +1038,10 @@
 <use id="floodplain-ne" xlink:href="#floodplain-nw" transform="translate(128,0) scale(-1,1)" />
 <use id="floodplain-sw" xlink:href="#floodplain-nw" transform="translate(0,64) scale(1,-1)" />
 <use id="floodplain-se" xlink:href="#floodplain-nw" transform="translate(128,64) scale(-1,-1)" />
+<use id="floodplain-n-corner" xlink:href="#floodplain-n-corner-halftile" transform="scale(2,1)" />
+<use id="floodplain-s-corner" xlink:href="#floodplain-n-corner" transform="translate(0,64) scale(1,-1)" />
+<use id="floodplain-e-corner" xlink:href="#floodplain-n-corner-halftile" transform="rotate(90 32 32) translate(0,-64) scale(1,2)" />
+<use id="floodplain-w-corner" xlink:href="#floodplain-n-corner-halftile" transform="rotate(-90 32 32) scale(1,2)" />
 <use id="river-sw" xlink:href="#river-nw" transform="translate(0,64) scale(1,-1)" />
 <use id="river-se" xlink:href="#river-nw" transform="translate(128,64) scale(-1,-1)" />
 <use id="river-ne" xlink:href="#river-nw" transform="translate(128,0) scale(-1,1)" />

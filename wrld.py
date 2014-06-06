@@ -26,7 +26,7 @@
 
 import struct	# For parsing binary data
 #import json     # to export JSON for the HTML browser
-import horspool    # to seek to first match; from http://inspirated.com/2010/06/19/using-boyer-moore-horspool-algorithm-on-file-streams-in-python
+from horspool import horspool    # to seek to first match; from http://inspirated.com/2010/06/19/using-boyer-moore-horspool-algorithm-on-file-streams-in-python
 import sys
 
 # for debug; I am using this to change which civ visible_to I'm viewing
@@ -230,6 +230,9 @@ class Tiles:
 		      if myriver & 0x08 <> 0: mystring += '<use xlink:href="#floodplain-se" ' + xypos +' />\n'
 		      if myriver & 0x20 <> 0: mystring += '<use xlink:href="#floodplain-sw" ' + xypos +' />\n'
 		      if myriver == 0x01: mystring += '<use xlink:href="#floodplain-n-corner" ' + xypos +' />\n'
+		      if myriver == 0x10: mystring += '<use xlink:href="#floodplain-s-corner" ' + xypos +' />\n'
+		      if myriver == 0x04: mystring += '<use xlink:href="#floodplain-e-corner" ' + xypos +' />\n'
+		      if myriver == 0x40: mystring += '<use xlink:href="#floodplain-w-corner" ' + xypos +' />\n'
         elif base_terrain == 1: mystring = '<use xlink:href="#plains" ' + xypos +' />\n'
         elif base_terrain == 2: mystring = '<use xlink:href="#grassland" ' + xypos +' />\n'
         elif base_terrain == 3: mystring = '<use xlink:href="#tundra" ' + xypos +' />\n'
