@@ -374,11 +374,11 @@ class Tiles:
         mapDefsFile = open("mapdefs.svg","r")
         svg_string += mapDefsFile.read()
         mapDefsFile.close()
-        svg_string += '<g id="myCow" transform="scale(0.12) translate(320,117)">\n'
-        mapDefsFile = open("svg/Cow_cartoon_04.svg","r")
-        svg_string += mapDefsFile.read()
-        mapDefsFile.close()
-        svg_string += '</g>\n'
+        #svg_string += '<g id="myCow" transform="scale(0.12) translate(320,117)">\n'
+        #mapDefsFile = open("svg/Cow_cartoon_04.svg","r")
+        #svg_string += mapDefsFile.read()
+        #mapDefsFile.close()
+        #svg_string += '</g>\n'
         svg_string += "</defs>\n"
         svg_string += '<use xlink:href="#mybackgroundrectangle" x="0" y="0" transform="scale(' + str(map_width) + ',' + str(map_height) + ')" />\n'
         for i in range(len(self.tile)):

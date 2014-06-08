@@ -34,6 +34,7 @@ def main():
     debug = True
     debug = False
     outputsvgpath = 'html/civmap.svg'
+    #outputsvgpath = 'civmap.svg'
     if len(sys.argv) < 2:
         #print "Usage: svg.py <filename>"
         #sys.exit(-1)
