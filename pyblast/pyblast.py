@@ -62,10 +62,36 @@
 # My aim is not for a general-purpose decoder. My aim is to decompress a
 # stream from a file or url
 
+import StringIO
+
+def pyblast(infile):
+    """Will eventually blast-decompress a file stream. Currently just spits the input back out"""
+    outputStream = StringIO.StringIO()
+    outputStream.write(infile.read())
+    # Ohhhhhhhhhhhh....have to seek back to 0 before reading!
+    outputStream.seek(0)
+    return outputStream
+
+#def robotchicken():
+#    """Just messing around. Fine, you think of a better name"""
+#    #print 'This does not work. This totally sucks'
+#    # Ohhhhhhhhhhhh....have to seek back to 0 before reading!
+#    outputStream = StringIO.StringIO()
+#    #outputStream = StringIO.StringIO('what if I start with a buffer?')
+#    outputStream.write('Hi there!!!')
+#    outputStream.seek(0)
+#    print outputStream.read()
 
 def main():
     print "hi"
+    compressedFile = open('test.pk','rb')
+    outFile = open('output','wb')
+    unc_stream = pyblast(compressedFile)
+    outFile.write(unc_stream.read())
+    outFile.close()
+    unc_stream.close()
 
 if __name__=="__main__":
     main()
+    #robotchicken()
 
