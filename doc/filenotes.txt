@@ -1,39 +1,52 @@
 While dividing this it occurs to me that since GAME is used in different contexts/scopes that other terms may be reused in different scopes, so for example repeats of WRLD and CITY may be in different levels of the hierarchy
 
+2015-01-01: I now believe that the save file is a dump of C++ data structures, and the reason there is this 4-byte header--sometimes with repeats--is that most of the structures are child classes of a parent class with this structure. Repeated instances with different data of the same "header" I think are subclasses of an earlier version. i.e. maybe vanilla civ3 had one TILE and one WRLD, but as later versions added features they made new classes with the new features that inherited the old class. However not all data structures are necessarily children of that base object. (Or maybe they are.)
+
 CIV3 - This may be the parent for the entire file, or maybe it's just
    a file header. The difference probably isn't important. If it's a
    parent of only part of the file it could be challenging to figure
    out where the demarc is.
-BIC  - Top tier parent?
+
+BIC  - I think this is the relevant BICx file in its entirety
   BICQ
-  GAME
-GAME - Guessing 2nd appearance of GAME is top-tier parent -- OR -- maybe it is settings
-  DATE
-  PLGI
-  DATE - this instance had a length that fell just short of CNSL
--- suspected data padding here length 8 bytes, or perhaps a simple data member of parent --
+    GAME
+      GAME - Now think 2nd GAME must be child class inheriting its parent class members
+    DATE - guessing hierarchy; have not yet analyzed
+      PLGI
+        PLGI
+      DATE
+        DATE - this instance had a length that fell just short of CNSL
+-- suspected data padding here length 8 bytes, or perhaps a simple data member of parent -- (Probably end of BIC )
+
 CNSL - Based on some I/O errors referring to this, I now wonder if this
    is a parent container that includes buildings, meaning it would be
    the parent of the map and much else, too
   WRLD
-  WRLD
-  TILE - Tons of these; map data
-  CONT - continents, I presume, several occur
--- suspected padding or simple data here --
-  LEAD - LEAD, CULT and 2x ESPN cycle many times
-    CULT
-    ESPN 
-    ESPN 
-  UNIT - many UNIT, IDLS cycling
+    WRLD
+      WRLD
+    TILE - One group for each tile
+      TILE
+        TILE
+          TILE
+    CONT - Continent info. One secion for each continent. Oceans are water continents. Fresh water is part of its land continent.
+-- suspected padding or simple data here -- (presume end of WRLD)
+
+  LEAD - Leader? 32 of these, even in a game with 4 civs.
+    CULT - Culture?
+    ESPN - Espionage?
+      ESPN 
+  UNIT - Presume one per unit? Not sure, based on strings I wonder if these are unit types and not instances?
     IDLS
+
   CITY - repetition of this term makes me wonder if there could be e.g. a CITY/CITY hierarchy with different scopes having differen meanings
-  CITY
-  CITY - City name is under this instance
-    POPD
-      CTZN - repeated for each citizen? Each one has description e.g. "Happy Laborer (England)"
-      CTZN
-      CTZN
-    BINF - Bin full? .. Duh, probably Bin Food
+    CITY
+      CITY$ ('$' can be seen in strings output)
+        CITY
+          CITY - City name is under this instance. City name, POPD and CTZNs are missing presumably if city doesn't exist.
+            POPD - Pop data? Presuming CTZNs are children
+              CTZN - repeated for each citizen? Each one has description e.g. "Happy Laborer (England)"
+    unsure if the following are children of top CITY, last CITY or POPD. Maybe POPD
+    BINF - Food bin?
     BITM
     DATE - Date city founded?
 ? CITY
@@ -41,11 +54,11 @@ CNSL - Based on some I/O errors referring to this, I now wonder if this
 ? CITY
 ? CITY Lots of repeated CITY's without the other sections
   CLNY - presumed colony info, only one CLNY in my sample file
-  PALV - ? repeated
+  PALV - repeated 32 times
   HIST - ? not repeated
   TUTR - ? Suggests tutorial info; not repeated
   FAXXX - Not sure if this is a FAXX section or random data that looks like a string
-  RPLS - not repeated, clearly a parent item
+  RPLS - not repeated, clearly a parent item. Replay?
     RPLT - repeated
     RPLE - repeated, occasionally city names associated in runs of RPLE's; sometimes RPLT's resume after city name, sometimes not ; saw one great wonder name among the RPLE's to my surprise
   RPLT
