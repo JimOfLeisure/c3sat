@@ -24,6 +24,7 @@
 # 2013-04-19 Start of attempt to parse a decompressed Civ3 save file
 # unc-test.sav
 
+import re		# Regular Expression comparison
 import struct		# For parsing runs of binary data
 import sys		# for exiting program during development/debugging
 import inspect		# for listing calling function name in debug prints
@@ -68,11 +69,6 @@ def sectionSubRecord(saveStream, sectionName):		# Reads length in subrecords the
 		numSubRecords -= 1
 
 
-# Replacing with generic skip function
-#def sectionCIV3(saveStream):	# I don't know much about this section yet
-#	print "Skipping 26 bytes because the CIV3 header doesn't seem to be followed by a length"
-#	saveStream.seek(26,1)
-
 def sectionBICQ(saveStream):	# This section needs slightly different handling; read the "VER#" then iterate subrecords
 	buffer = saveStream.read(4)
 	(thisSaysVerNum,) = struct.unpack('4s', buffer[0:4])
@@ -92,7 +88,7 @@ def sectionGAME(saveStream):	# A more complex system of subrecords
 
 
 def parseSave():
-	saveFilePath = "unc-test.sav"
+	saveFilePath = "gamesaves/unc-test.sav"
 	
 	saveFile = open(saveFilePath, 'rb')
 
@@ -101,11 +97,8 @@ def parseSave():
 	# way to loop until EOF adapted from http://stackoverflow.com/questions/1752107/how-to-loop-until-eof-in-python
 	for buffer in iter(lambda: saveFile.read(4), ''):
 		(sectionName,) = struct.unpack('4s',buffer[0:4])
-		#printDebug(saveFile, 'just read name')
-		# Ensure sectionName is ASCII, taken from http://stackoverflow.com/questions/196345/how-to-check-if-a-string-in-python-is-in-ascii
-		try:
-			sectionName.decode('ascii')
-		except UnicodeDecodeError:
+		match = re.match('[A-Z, ]',sectionName)
+		if match is None:
 			readPosition = saveFile.tell()
 			errorMessage = 'ERROR: parseSave(): sectionName is not an ASCII string. Offset:' + str(readPosition) + ' Hex: ' + hex(readPosition)
 			sys.exit(errorMessage)
