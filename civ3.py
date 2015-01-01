@@ -22,7 +22,6 @@
 # OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION
 # WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
-# 2014-05-19 Now I want to skip to the first WRLD section in arbitrary uncompressed SAV files
 # 2015-01-01 Now I want to parse all of any arbitraty game save. Copied from wrld.py. Will probably take spoiler and SVG logic out of this file, too, and put it in the output code
 
 import re	# Regular expressions
@@ -474,6 +473,16 @@ class Wrld:
 #            my_count +=1
             self.continents.append(struct.unpack_from('ii',(GenericSection(saveStream).buffer)))
 
+class Bic:
+    """Class for the embedded BIC"""
+    def __init__(self, saveStream, debug=False):
+        self.name = saveStream.read(4)
+        # Reading an arbitray # of bytes until I figure out the format
+        self.buffer = saveStream.read(400)
+        self.hexdump = hexdump(self.buffer)
+        if not debug:
+          del self.buffer
+
 class Civ3:
     """Class for entire save game"""
     def __init__(self, saveStream, debug=False):
@@ -486,6 +495,7 @@ class Civ3:
         self.hexdump = hexdump(self.buffer, 26)
         if not debug:
           del self.buffer
+        self.Bic = Bic(saveStream, debug)
         #print 'Using Horspool search to go to first WRLD section'
         wrldOffset = horspool.boyermoore_horspool(saveStream, "WRLD")
         #print wrldOffset
@@ -507,20 +517,6 @@ def get_int(buffer, offset):
     """Unpack an int from a buffer at the given offest."""
     (the_int,) = struct.unpack('I', buffer[offset:offset+4])
     return the_int
-
-#FAIL
-#def decompress(firstbytes, saveStream):
-#    """Decompress the presumed save file stream. First 4 bytes are already consumed, so we take those in as firstbytes parameter"""
-#    #inputStream = StringIO.StringIO()
-#    #outputStream = StringIO.StringIO()
-#    #inputStream, outputStream = os.pipe()
-#    #process = subprocess.Popen(['./blast'], stdin=inputStream,stdout=outputStream, shell=True)
-#    process = subprocess.Popen(['./blast'], stdin=subprocess.PIPE,stdout=saveStream, shell=True)
-#    process.communicate(firstbytes)
-#    process.communicate(saveStream)
-#    #response = process.communicate(firstbytes)
-#    #response += process.communicate(saveStream)
-#    #return outputStream
 
 def parse_save(saveFile, debug=False):
     game = Civ3(saveFile, debug)
