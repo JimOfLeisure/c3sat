@@ -412,6 +412,7 @@ class Wrld:
     """Class for 3 WRLD sections"""
     def __init__(self, saveStream, debug=False):
         """Currently calling this from the horspool seek, so WRLD is already consumed from the stream. Read the length first."""
+        self.offset = saveStream.tell() - 4
         self.name = "WRLD"
         buffer = saveStream.read(4)
         (self.length,) = struct.unpack_from('i', buffer)
@@ -476,16 +477,23 @@ class Wrld:
 class Bic:
     """Class for the embedded BIC"""
     def __init__(self, saveStream, debug=False):
-        self.name = saveStream.read(4)
-        # Reading an arbitray # of bytes until I figure out the format
-        self.buffer = saveStream.read(400)
+        self.offset = saveStream.tell()
+        (self.name, self.verNumText, self.verNum, self.length,) = struct.unpack_from('4s4sii', saveStream.read(16))
+        #self.name = saveStream.read(4)
+        #self.verNumText = saveStream.read(4)
+        #self.verNum = saveStream.read(4)
+#        # Reading an arbitray # of bytes until I figure out the format
+        self.buffer = saveStream.read(self.length)
         self.hexdump = hexdump(self.buffer)
+        #self.whatsThis = GenericSection(saveStream)
         if not debug:
           del self.buffer
+          #del self.whatsThis.buffer
 
 class Civ3:
     """Class for entire save game"""
     def __init__(self, saveStream, debug=False):
+        self.offset = saveStream.tell()
         self.name = saveStream.read(4)
         if self.name <> 'CIV3':
             print "wah wah wah wahhhhhhhh."
@@ -493,13 +501,20 @@ class Civ3:
             return -1
         self.buffer = saveStream.read(26)
         self.hexdump = hexdump(self.buffer, 26)
-        if not debug:
-          del self.buffer
-        self.Bic = Bic(saveStream, debug)
+        # This Bic appears to be a save game class that contains a copy of a BIx file
+        self.Bic = GenericSection(saveStream)
+        self.Bic.Bic = Bic(saveStream, debug)
+        #self.whatsNext = GenericSection(saveStream)
+        self.whatsNext = hexdump(saveStream.read(400))
+        #self.whatsNext = GenericSection(saveStream)
         #print 'Using Horspool search to go to first WRLD section'
         wrldOffset = horspool.boyermoore_horspool(saveStream, "WRLD")
         #print wrldOffset
         self.Wrld = Wrld(saveStream, debug)
+        if not debug:
+          del self.buffer
+          del self.Bic.buffer
+          #del self.whatsNext.buffer
         saveStream.close()
 
 
