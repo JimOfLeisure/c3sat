@@ -59,7 +59,7 @@ CNSL - Based on some I/O errors referring to this, I now wonder if this
   TUTR - ? Suggests tutorial info; not repeated
   FAXXX - Not sure if this is a FAXX section or random data that looks like a string
   RPLS - not repeated, clearly a parent item. Replay?
-    RPLT - repeated
-    RPLE - repeated, occasionally city names associated in runs of RPLE's; sometimes RPLT's resume after city name, sometimes not ; saw one great wonder name among the RPLE's to my surprise
+    RPLT - repeated. Replay Turn?
+    RPLE - repeated, occasionally city names associated in runs of RPLE's; sometimes RPLT's resume after city name, sometimes not ; saw one great wonder name among the RPLE's to my surprise. Replay Event? City names from all civs are represented. Leaders are in here.
   RPLT
 ?  PEER - not repeated ; multiplayer-related?
