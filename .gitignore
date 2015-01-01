@@ -2,6 +2,7 @@ blast
 gamesaves/
 out/
 tools/
+bic/
 *~
 # From https://github.com/github/gitignore/blob/master/Python.gitignore :
 # Byte-compiled / optimized / DLL files

@@ -41,9 +41,7 @@ def printDebug(saveStream, debugInfo):
 	+ ' ' \
 	+ debugInfo \
 	+ ' hex offset ' \
-	+ hex(readPosition) \
-	+ ' ' \
-	+ ' ' \
+	+ hex(readPosition)
 
 def skipBytes(saveStream, skipNum):
 	printDebug(saveStream, 'Skipping ' + hex(skipNum) + ' bytes')
@@ -96,19 +94,22 @@ def parseSave():
 
 	# way to loop until EOF adapted from http://stackoverflow.com/questions/1752107/how-to-loop-until-eof-in-python
 	for buffer in iter(lambda: saveFile.read(4), ''):
+		readPosition = saveFile.tell()
 		(sectionName,) = struct.unpack('4s',buffer[0:4])
-		match = re.match('[A-Z, ]',sectionName)
+		match = re.match('[A-Z0-9# ]{4}',sectionName)
 		if match is None:
-			readPosition = saveFile.tell()
 			errorMessage = 'ERROR: parseSave(): sectionName is not an ASCII string. Offset:' + str(readPosition) + ' Hex: ' + hex(readPosition)
 			sys.exit(errorMessage)
 		# Apparently I need to learn polymorphism but for now I can make it work with chained if-then-else
 		if sectionName == 'CIV3':
+			printDebug(saveFile, sectionName)
 			#sectionCIV3(saveFile)
 			skipBytes(saveFile, 26)
 		elif sectionName == 'BICQ':
+			printDebug(saveFile, sectionName)
 			sectionBICQ(saveFile)
 		elif sectionName == 'GAME':
+			printDebug(saveFile, sectionName)
 			#sectionGAME(saveFile)
 			if gameSectionsRead > 0:
 				sectionGeneric(saveFile, sectionName)

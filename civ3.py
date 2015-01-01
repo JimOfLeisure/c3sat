@@ -23,11 +23,11 @@
 # WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
 # 2014-05-19 Now I want to skip to the first WRLD section in arbitrary uncompressed SAV files
-# 2015-01-01 Now I want to parse all of any arbitraty game save. Copied from wrld.py
+# 2015-01-01 Now I want to parse all of any arbitraty game save. Copied from wrld.py. Will probably take spoiler and SVG logic out of this file, too, and put it in the output code
 
 import re	# Regular expressions
 import struct	# For parsing binary data
-#import json     # to export JSON for the HTML browser
+import json     # to export JSON
 from horspool import horspool    # to seek to first match; from http://inspirated.com/2010/06/19/using-boyer-moore-horspool-algorithm-on-file-streams-in-python
 import sys
 
@@ -46,97 +46,98 @@ class GenericSection:
         buffer = saveStream.read(8)
         (self.name, self.length,) = struct.unpack_from('4si', buffer)
         self.buffer = saveStream.read(self.length)
+        self.hexdump = hexdump(self.buffer)
 
 class Tile:
     """Class for each logical tile."""
     def __init__(self, saveStream, debug=False):
 
-        self.info = {}
+#        self.info = {}
 
         self.Tile36 = GenericSection(saveStream)
-        #self.continent = get_short(self.Tile36.buffer, 0x1a)
-        #self.info['continent'] = get_short(self.Tile36.buffer, 0x1a)
-        self.rivers = get_byte(self.Tile36.buffer, 0x00)
-        self.Tile36.values = struct.unpack_from('2h3i2c9h', self.Tile36.buffer)
-        self.continent = self.Tile36.values[11]
-        self.info['continent'] = self.Tile36.values[11]
-        self.top_unit_id = self.Tile36.values[3]
-        self.resource = self.Tile36.values[2]
-        self.barb_info = self.Tile36.values[8]
-        self.city_id = self.Tile36.values[9]
-        self.colony = self.Tile36.values[10]
-        #self.whatsthis = self.Tile4.values[0]
-        self.whatsthis = get_short(self.Tile36.buffer, 0x00) & myglobalbitmask
+#        #self.continent = get_short(self.Tile36.buffer, 0x1a)
+#        #self.info['continent'] = get_short(self.Tile36.buffer, 0x1a)
+#        self.rivers = get_byte(self.Tile36.buffer, 0x00)
+#        self.Tile36.values = struct.unpack_from('2h3i2c9h', self.Tile36.buffer)
+#        self.continent = self.Tile36.values[11]
+#        self.info['continent'] = self.Tile36.values[11]
+#        self.top_unit_id = self.Tile36.values[3]
+#        self.resource = self.Tile36.values[2]
+#        self.barb_info = self.Tile36.values[8]
+#        self.city_id = self.Tile36.values[9]
+#        self.colony = self.Tile36.values[10]
+#        #self.whatsthis = self.Tile4.values[0]
+#        self.whatsthis = get_short(self.Tile36.buffer, 0x00) & myglobalbitmask
         if not debug:
-            del self.Tile36.values
+#            del self.Tile36.values
             del self.Tile36.buffer
 
         self.Tile12 = GenericSection(saveStream)
-        self.Tile12.values = struct.unpack_from('iihh', self.Tile12.buffer)
-        self.info['terrain'] = get_byte(self.Tile12.buffer, 0x5)
-        self.improvements = self.Tile12.values[0]
-        self.terrain_features = get_short(self.Tile12.buffer, 0x0a)
-        # Mask 0x0001 is *** Bonus Grassland *** . Interesting, some hills and mountains have it (base tile is grassland)
-        # Mask 0x0002 is the "fat x" around each city whether or not it has the culture to work it
-        # Mask 0x0004 - Can't find any
-        # Mask 0x0008 - Player start location
-        # Mask 0x0010 - Snow-caps for mountains
-        # Mask 0x0020 - Unsure. Only on land, seems clumped. Seems to be all tundra on generated maps and all forest tundra on LK's WM. Have not seen it on jungle tiles.
-        # Other nybble masks 0x00c0 - nothing I can find
-        # Mask 0x1000 - This looks like a likely candidate for "forest already chopped here"
-        # Other nybble masks 0xe000 - nothing I can find ***  (found some of these on LK's WM)
-        # Mask 0x0100 - river N corner? or NW?
-        # Mask 0x0200 - river W corner?
-        # Mask 0x0400 - river E corner? or SE?
-        # Mask 0x0800 - river S corner?
+#        self.Tile12.values = struct.unpack_from('iihh', self.Tile12.buffer)
+#        self.info['terrain'] = get_byte(self.Tile12.buffer, 0x5)
+#        self.improvements = self.Tile12.values[0]
+#        self.terrain_features = get_short(self.Tile12.buffer, 0x0a)
+#        # Mask 0x0001 is *** Bonus Grassland *** . Interesting, some hills and mountains have it (base tile is grassland)
+#        # Mask 0x0002 is the "fat x" around each city whether or not it has the culture to work it
+#        # Mask 0x0004 - Can't find any
+#        # Mask 0x0008 - Player start location
+#        # Mask 0x0010 - Snow-caps for mountains
+#        # Mask 0x0020 - Unsure. Only on land, seems clumped. Seems to be all tundra on generated maps and all forest tundra on LK's WM. Have not seen it on jungle tiles.
+#        # Other nybble masks 0x00c0 - nothing I can find
+#        # Mask 0x1000 - This looks like a likely candidate for "forest already chopped here"
+#        # Other nybble masks 0xe000 - nothing I can find ***  (found some of these on LK's WM)
+#        # Mask 0x0100 - river N corner? or NW?
+#        # Mask 0x0200 - river W corner?
+#        # Mask 0x0400 - river E corner? or SE?
+#        # Mask 0x0800 - river S corner?
         if not debug:
-            del self.Tile12.values
+#            del self.Tile12.values
             del self.Tile12.buffer
 
         self.Tile4 = GenericSection(saveStream)
-        self.Tile4.values = struct.unpack_from('i', self.Tile4.buffer)
+#        self.Tile4.values = struct.unpack_from('i', self.Tile4.buffer)
         if not debug:
-            del self.Tile4.values
+#            del self.Tile4.values
             del self.Tile4.buffer
 
         self.Tile128 = GenericSection(saveStream)
-        self.Tile128.values = struct.unpack_from('4i96b', self.Tile128.buffer)
-        #self.is_visible_to = get_int(self.Tile128.buffer, 0)
-        #self.is_visible = self.is_visible_to & 0x02
-        #self.is_visible = self.is_visible_to & 0x10
-        #self.is_visible_now = self.is_visible_now_to & 0x02
-        #self.is_visible_now_to = get_int(self.Tile128.buffer, 4)
-
-        self.is_visible_to_flags = self.Tile128.values[0]
-        self.is_visible_to = []
-        mytemp = self.is_visible_to_flags
-        for civ in range(32):
-            self.is_visible_to.append(mytemp & 0x01 == 1)
-            mytemp = mytemp >> 1
-
-        self.is_visible_now_to_flags = self.Tile128.values[1]
-        self.is_visible_now_to = []
-        mytemp = self.is_visible_now_to_flags
-        for civ in range(32):
-            self.is_visible_now_to.append(mytemp & 0x01 == 1)
-            mytemp = mytemp >> 1
-
-        self.worked_by_city_id = get_short(self.Tile128.buffer, 0x14)
-
-        mytemp = 0x16
-        self.land_trade_network_id = []
-        for civ in range(32):
-            self.land_trade_network_id.append(get_short(self.Tile128.buffer, mytemp))
-            mytemp += 2
-
-        mytemp = 0x56
-        self.improvements_known_to_civ = []
-        for civ in range(32):
-            self.improvements_known_to_civ.append(get_byte(self.Tile128.buffer, mytemp))
-            mytemp += 1
-
+#        self.Tile128.values = struct.unpack_from('4i96b', self.Tile128.buffer)
+#        #self.is_visible_to = get_int(self.Tile128.buffer, 0)
+#        #self.is_visible = self.is_visible_to & 0x02
+#        #self.is_visible = self.is_visible_to & 0x10
+#        #self.is_visible_now = self.is_visible_now_to & 0x02
+#        #self.is_visible_now_to = get_int(self.Tile128.buffer, 4)
+#
+#        self.is_visible_to_flags = self.Tile128.values[0]
+#        self.is_visible_to = []
+#        mytemp = self.is_visible_to_flags
+#        for civ in range(32):
+#            self.is_visible_to.append(mytemp & 0x01 == 1)
+#            mytemp = mytemp >> 1
+#
+#        self.is_visible_now_to_flags = self.Tile128.values[1]
+#        self.is_visible_now_to = []
+#        mytemp = self.is_visible_now_to_flags
+#        for civ in range(32):
+#            self.is_visible_now_to.append(mytemp & 0x01 == 1)
+#            mytemp = mytemp >> 1
+#
+#        self.worked_by_city_id = get_short(self.Tile128.buffer, 0x14)
+#
+#        mytemp = 0x16
+#        self.land_trade_network_id = []
+#        for civ in range(32):
+#            self.land_trade_network_id.append(get_short(self.Tile128.buffer, mytemp))
+#            mytemp += 2
+#
+#        mytemp = 0x56
+#        self.improvements_known_to_civ = []
+#        for civ in range(32):
+#            self.improvements_known_to_civ.append(get_byte(self.Tile128.buffer, mytemp))
+#            mytemp += 1
+#
         if not debug:
-            del self.Tile128.values
+#            del self.Tile128.values
             del self.Tile128.buffer
 
 
@@ -473,6 +474,23 @@ class Wrld:
 #            my_count +=1
             self.continents.append(struct.unpack_from('ii',(GenericSection(saveStream).buffer)))
 
+class Civ3:
+    """Class for entire save game"""
+    def __init__(self, saveStream, debug=False):
+        self.name = saveStream.read(4)
+        if self.name <> 'CIV3':
+            print "wah wah wah wahhhhhhhh."
+            print "Stub. Provided stream not decompressed C3C save"
+            return -1
+        self.buffer = saveStream.read(26)
+        self.hexdump = hexdump(self.buffer, 26)
+        if not debug:
+          del self.buffer
+        #print 'Using Horspool search to go to first WRLD section'
+        wrldOffset = horspool.boyermoore_horspool(saveStream, "WRLD")
+        #print wrldOffset
+        self.Wrld = Wrld(saveStream, debug)
+        saveStream.close()
 
 
 def get_byte(buffer, offset):
@@ -505,16 +523,7 @@ def get_int(buffer, offset):
 #    #return outputStream
 
 def parse_save(saveFile, debug=False):
-    buffer = saveFile.read(4)
-    if buffer <> 'CIV3':
-        print "wah wah wah wahhhhhhhh."
-        print "Stub. Provided stream not decompressed C3C save"
-        return -1
-    #print 'Using Horspool search to go to first WRLD section'
-    wrldOffset = horspool.boyermoore_horspool(saveFile, "WRLD")
-    #print wrldOffset
-    game = Wrld(saveFile, debug)
-    saveFile.close()
+    game = Civ3(saveFile, debug)
     return game
 
 def hexdump(src, length=16):
@@ -529,25 +538,26 @@ def hexdump(src, length=16):
         lines.append("%04x  %-*s  %s" % (c, length*3, hex, printable))
     return '\n'.join(lines)
 
-def main():
-    saveFile = open("gamesaves/unc-test.sav", 'rb')
-    #saveFile = open("gamesaves/unc-lk151-650ad.sav", 'rb')
-    game = parse_save(saveFile)
+def jsonDefault(o):
+    """Trying to make json.dumps() work on all my data"""
+    return o.__dict__
 
-    print 'Printing something(s) from the class to ensure I have what I intended'
-    #print game.name, game.length
-    #print game.tile.pop()[1].length
-    print "Map width:",game.width,"Map height:", game.height
-    print game.Tiles.tile[0].info['terrain']
-    print game.Tiles.tile[1000].info['terrain']
-    #print game.tile[0].is_visible_to
-    #max = len(game.tile)
-    max = 10
-    for i in range(max):
-        print game.Tiles.tile[i].continent
-    #game.Tiles.test_things()
-    print game.start_loc
-        
+def main():
+    """If run directly, parse save from argument or stdin and print out hex dumps"""
+    spoiler = True
+    spoiler = False
+    debug = True
+    debug = False
+    if len(sys.argv) < 2:
+        #print "Usage: svg.py <filename>"
+        #sys.exit(-1)
+        saveFile = sys.stdin
+    else:
+        saveFile = open(sys.argv[1], 'rb')
+    game = parse_save(saveFile, debug)
+    print "Output should go here"
+    print json.dumps(game, default=jsonDefault, indent=4)
+    # Maybe I should just dump new things since I have WRLD and TILE more or less figured out
 
 if __name__=="__main__":
     main()
