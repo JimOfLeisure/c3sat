@@ -148,10 +148,22 @@ class Tiles:
         self.tile = []          # List of individual tiles
         self.tile_matrix = []       # x,y matrix of individual tiles
         self.tile_iso_matrix = []   # faux isometric padded matrix  of individual tiles
+
+        # Tiles is pretty good, but time-consuming. Let's skip most of them while figuring out the rest of the file
+        numTilesMinusTwo = (width / 2 * height) - 2
+        # size of the tile sections for each tile in bytes
+        myTileSize = 128 + 36 + 4 + 12 + (4*8)
+        self.firstTile = Tile(saveStream, debug)
+        # skip over most of the tiles
+        saveStream.seek((numTilesMinusTwo * myTileSize), 1)
+        self.lastTile = Tile(saveStream, debug)
+        return
+
 #        logical_tiles = width / 2 * height
 #        while logical_tiles > 0:
 #            self.tile.append(Tile(saveStream))
 #            logical_tiles -= 1
+
         for y in range(height):
             self.tile_matrix.append([])
             self.tile_iso_matrix.append([])
