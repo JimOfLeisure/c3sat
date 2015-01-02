@@ -1,6 +1,16 @@
 #!/bin/sh
 
 strings | \
+  # Subshell loop to omit everything before CNSL
+  # Because sometimes LEAD and other values are in BIC and throw my analysis off
+  # Wow, this really, really slows this script down
+  (
+    while read line
+    do
+      #printf "%s\n" $line
+      echo $line
+    done
+  ) | \
   # Omit strings 9 chars or longer
   grep -vE '.{9}' | \
   # Match headers, return only matched characters (so e.g. TILE$ isn't separate from TILE)
