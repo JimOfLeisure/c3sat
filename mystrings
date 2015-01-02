@@ -1,4 +1,13 @@
 #!/bin/sh
 
-# Omit strings 9 chars or longer, than match headers returing only the match chars, sort and count
-strings | grep -vE '.{9}' | grep -oE '^[A-Z ]{3}[A-Z0-9# ]' | sort | uniq -c | sort
+strings | \
+  # Omit strings 9 chars or longer
+  grep -vE '.{9}' | \
+  # Match headers, return only matched characters (so e.g. TILE$ isn't separate from TILE)
+  grep -oE '^[A-Z ]{3}[A-Z0-9# ]' | \
+  # Need to sort before uniq
+  sort | \
+  # Show counts of uniqe values
+  uniq -c | \
+  # Sort the results, largest counts last
+  sort
