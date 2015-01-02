@@ -1,16 +1,8 @@
 #!/bin/sh
 
 strings | \
-  # Subshell loop to omit everything before CNSL
-  # Because sometimes LEAD and other values are in BIC and throw my analysis off
-  # Wow, this really, really slows this script down
-  (
-    while read line
-    do
-      #printf "%s\n" $line
-      echo $line
-    done
-  ) | \
+  # Omit everything before CNSL. Using grep with first match and an "after" context large enough to hopefully get the rest of any stream it encounters
+  grep -m 1 -A 999999 CNSL | \
   # Omit strings 9 chars or longer
   grep -vE '.{9}' | \
   # Match headers, return only matched characters (so e.g. TILE$ isn't separate from TILE)
