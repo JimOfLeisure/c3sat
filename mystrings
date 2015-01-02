@@ -1,0 +1,4 @@
+#!/bin/sh
+
+# Omit strings 9 chars or longer, than match headers returing only the match chars, sort and count
+strings | grep -vE '.{9}' | grep -oE '^[A-Z ]{3}[A-Z0-9# ]' | sort | uniq -c | sort

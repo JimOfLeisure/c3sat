@@ -1,0 +1,26 @@
+#!/bin/sh
+
+myProg=./mystrings
+inFolder=gamesaves
+outFolder=out
+deCompress=tools/blast
+
+cd "$inFolder"
+myFiles=(*)
+cd -
+
+for file in "${myFiles[@]}"; do
+  # Read the first 4 bytes, use od to ensure string output
+  fingerprint=$(od -N 4 -x "$inFolder/$file" | head -n 1)
+  if [ "$fingerprint" = "0000000 4943 3356" ]; then
+    # Uncompressed save file
+    printf "$file starts with CIV3; uncompressed save\n"
+    cat "$inFolder/$file" | $myProg > "$outFolder/$file.out"
+  elif  [ "$fingerprint" = "0000000 0600 2486" ]; then
+    # Compressed save file
+    printf "$file starts with data matching compressed save\n"
+    cat "$inFolder/$file" | $deCompress | $myProg > "$outFolder/$file.out"
+  else
+    printf "$file is not recognized as a Civ3 save file\n"
+  fi
+done
