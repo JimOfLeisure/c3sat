@@ -40,10 +40,15 @@ myglobalbitmask = 0x00ff
 
 class GenericSection:
     """Base class for reading SAV sections."""
-    def __init__(self, saveStream):
+    def __init__(self, saveStream, name = None):
+        """In cases where I've used horspool to find the section name, it is already consumed in the stream, so allow name to be passed as a parameter"""
         self.offset = saveStream.tell()
-        buffer = saveStream.read(8)
-        (self.name, self.length,) = struct.unpack_from('4si', buffer)
+        if name:
+          self.name = name
+          self.offset = self.offset - 4
+        else:
+          (self.name,) = struct.unpack_from('4s', saveStream.read(4))
+        (self.length,) = struct.unpack_from('i', saveStream.read(4))
         self.buffer = saveStream.read(self.length)
         self.hexdump = hexdump(self.buffer)
 
@@ -515,21 +520,28 @@ class Civ3:
 
         ### Skipping 2nd GAME section as I can't figure out what it is. Think I'm also skipping a couple of DATEs and a PLGI
 
-        self.horspoolCnslOffset = horspool.boyermoore_horspool(saveStream, "CNSL")
-        self.cnslOffset = saveStream.tell() - 4 
-        self.cnslLength = get_int(saveStream.read(4), 0)
-        self.cnslHexdump = hexdump(saveStream.read(self.cnslLength))
+        horspoolOffset = horspool.boyermoore_horspool(saveStream, "CNSL")
+        self.Cnsl = GenericSection(saveStream, "CNSL")
+        self.Cnsl.horspoolOffset = horspoolOffset 
 
         self.Wrld = Wrld(saveStream, debug)
 
+        ### Skipping some padding or other unknown data
+
+        horspoolOffset = horspool.boyermoore_horspool(saveStream, "LEAD")
+        self.Lead1 = GenericSection(saveStream, "LEAD")
+        self.Lead1.horspoolOffset = horspoolOffset 
+
         #self.whatsNext = GenericSection(saveStream)
         self.whatsNextOffset = saveStream.tell()
-        self.whatsNext = hexdump(saveStream.read(400))
+        self.whatsNext = hexdump(saveStream.read(40000))
         #self.whatsNext = GenericSection(saveStream)
 
         if not debug:
           del self.buffer
           del self.Bic.buffer
+          del self.Cnsl.buffer
+          del self.Lead1.buffer
           #del self.whatsNext.buffer
         saveStream.close()
 
@@ -583,12 +595,12 @@ def main():
         saveFile = open(sys.argv[1], 'rb')
     game = parse_save(saveFile, debug)
     print "Output should go here"
+    # If this errors out, I probably forgot to delete a buffer from a section
     print json.dumps(game, default=jsonDefault, indent=4)
-    #print game.Bic.Bic.GameHexdump
-    #print "-----------------------"
-    #print game.whatsNext
-    print "-----------------------"
-    print "distance from last BIC data collected to CNSL start: " + str(game.horspoolCnslOffset)
+    print "-------------------"
+    print game.Lead1.hexdump
+    print "-------------------"
+    print game.whatsNext
 
 if __name__=="__main__":
     main()
