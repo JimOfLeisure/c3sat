@@ -423,19 +423,11 @@ class Tiles:
 class Wrld:
     """Class for 3 WRLD sections"""
     def __init__(self, saveStream, debug=False):
-        """Currently calling this from the horspool seek, so WRLD is already consumed from the stream. Read the length first."""
-        self.offset = saveStream.tell() - 4
-        self.name = "WRLD"
-        buffer = saveStream.read(4)
-        (self.length,) = struct.unpack_from('i', buffer)
-        #print self.length
-        self.buffer = saveStream.read(self.length)
+        self.Wrld1 = GenericSection(saveStream)
         # Extract any data here, but I think it's only 2 bytes
-        (self.num_continents,) = struct.unpack_from('h', self.buffer)
-        #print self.name
-        #print hexdump(self.buffer)
+        (self.num_continents,) = struct.unpack_from('h', self.Wrld1.buffer)
         if not debug:
-            del self.buffer
+            del self.Wrld1.buffer
 
         self.Wrld2 = GenericSection(saveStream)
         #print self.Wrld2.name
@@ -491,13 +483,17 @@ class Bic:
     def __init__(self, saveStream, debug=False):
         self.offset = saveStream.tell()
         (self.name, self.verNumText, self.verNum, self.length,) = struct.unpack_from('4s4sii', saveStream.read(16))
-        #self.name = saveStream.read(4)
-        #self.verNumText = saveStream.read(4)
-        #self.verNum = saveStream.read(4)
-#        # Reading an arbitray # of bytes until I figure out the format
         self.buffer = saveStream.read(self.length)
         self.hexdump = hexdump(self.buffer)
-        #self.whatsThis = GenericSection(saveStream)
+
+        #self.Game = GenericSection(saveStream)
+        (self.GameName, self.GameVerNum, self.GameLength,) = struct.unpack_from('4sii', saveStream.read(12))
+        self.GameHexdump = hexdump(saveStream.read(self.GameLength))
+
+        #self.Game2 = GenericSection(saveStream)
+        #(self.Game2Name, self.Game2VerNum, self.Game2Length,) = struct.unpack_from('4sii', saveStream.read(12))
+        #self.Game2Hexdump = hexdump(saveStream.read(self.Game2Length))
+
         if not debug:
           del self.buffer
           #del self.whatsThis.buffer
@@ -516,13 +512,21 @@ class Civ3:
         # This Bic appears to be a save game class that contains a copy of a BIx file
         self.Bic = GenericSection(saveStream)
         self.Bic.Bic = Bic(saveStream, debug)
+
+        ### Skipping 2nd GAME section as I can't figure out what it is. Think I'm also skipping a couple of DATEs and a PLGI
+
+        self.horspoolCnslOffset = horspool.boyermoore_horspool(saveStream, "CNSL")
+        self.cnslOffset = saveStream.tell() - 4 
+        self.cnslLength = get_int(saveStream.read(4), 0)
+        self.cnslHexdump = hexdump(saveStream.read(self.cnslLength))
+
+        self.Wrld = Wrld(saveStream, debug)
+
         #self.whatsNext = GenericSection(saveStream)
+        self.whatsNextOffset = saveStream.tell()
         self.whatsNext = hexdump(saveStream.read(400))
         #self.whatsNext = GenericSection(saveStream)
-        #print 'Using Horspool search to go to first WRLD section'
-        wrldOffset = horspool.boyermoore_horspool(saveStream, "WRLD")
-        #print wrldOffset
-        self.Wrld = Wrld(saveStream, debug)
+
         if not debug:
           del self.buffer
           del self.Bic.buffer
@@ -580,7 +584,11 @@ def main():
     game = parse_save(saveFile, debug)
     print "Output should go here"
     print json.dumps(game, default=jsonDefault, indent=4)
-    # Maybe I should just dump new things since I have WRLD and TILE more or less figured out
+    #print game.Bic.Bic.GameHexdump
+    #print "-----------------------"
+    #print game.whatsNext
+    print "-----------------------"
+    print "distance from last BIC data collected to CNSL start: " + str(game.horspoolCnslOffset)
 
 if __name__=="__main__":
     main()
