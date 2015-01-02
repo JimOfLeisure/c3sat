@@ -21,6 +21,7 @@ BIC  - I think this is the relevant BICx file in its entirety
 CNSL - Based on some I/O errors referring to this, I now wonder if this
    is a parent container that includes buildings, meaning it would be
    the parent of the map and much else, too
+   Update: No, I now think the BLDG errors are in the BIC prior to this
   WRLD
     WRLD
       WRLD

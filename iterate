@@ -1,6 +1,7 @@
 #!/bin/sh
 
-myProg=./mystrings
+#myProg=./mystrings
+myProg=./offsets.py
 inFolder=gamesaves
 outFolder=out
 deCompress=tools/blast
