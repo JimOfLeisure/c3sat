@@ -101,64 +101,64 @@ class Civ3:
         saveStream.close()
 
 class newParse:
-  """Starting over with parsing strategy. Will read in chunks as I see fit."""
-  def __init__(self, saveStream):
-    self.civ3 = hexdump(saveStream.read(30),30)
-    #print self.civ3
+    """Starting over with parsing strategy. Will read in chunks as I see fit."""
+    def __init__(self, saveStream):
+        self.civ3 = hexdump(saveStream.read(30),30)
+        #print self.civ3
 
-    self.bic = hexdump(saveStream.read(532))
-    #print self.bic
+        self.bic = hexdump(saveStream.read(532))
+        #print self.bic
 
-    self.bicq = hexdump(saveStream.read(736))
-    print self.bicq
+        self.bicq = hexdump(saveStream.read(736))
+        print self.bicq
 
-    # Plan to read array of arrays until the GAME array is read
-    name = ""
-    self.bicarray = []
-    while name <> "GAME":
-      (name, count,) = struct.unpack('4si', saveStream.read(8))
-      print name
-      print count
-      for i in range(count):
-        array = []
-        (len,) = struct.unpack('i', saveStream.read(4))
-        print len
-        array.append(hexdump(saveStream.read(len)))
-      self.bicarray.append(array)
+        # Plan to read array of arrays until the GAME array is read
+        name = ""
+        self.bicarray = []
+        while name <> "GAME":
+            (name, count,) = struct.unpack('4si', saveStream.read(8))
+            print name
+            print count
+            for i in range(count):
+                array = []
+                (len,) = struct.unpack('i', saveStream.read(4))
+                print len
+                array.append(hexdump(saveStream.read(len)))
+            self.bicarray.append(array)
 
-#    # This isn't always GAME...sometimes it's BLDG
-#    #self.game = hexdump(saveStream.read(7593))
-#    #print self.game
+#        # This isn't always GAME...sometimes it's BLDG
+#        #self.game = hexdump(saveStream.read(7593))
+#        #print self.game
 #
-#    # Hmm, this seems to work so far
-#    (self.arrayname, self.arraylen,) = struct.unpack('4si', saveStream.read(8))
-#    print self.arrayname
-#    print self.arraylen
-#    self.array = []
-#    for i in range(self.arraylen):
-#      (len,) = struct.unpack('i', saveStream.read(4))
-#      print len
-#      self.array.append(hexdump(saveStream.read(len)))
-#    print json.dumps(self.array)
+#        # Hmm, this seems to work so far
+#        (self.arrayname, self.arraylen,) = struct.unpack('4si', saveStream.read(8))
+#        print self.arrayname
+#        print self.arraylen
+#        self.array = []
+#        for i in range(self.arraylen):
+#            (len,) = struct.unpack('i', saveStream.read(4))
+#            print len
+#            self.array.append(hexdump(saveStream.read(len)))
+#        print json.dumps(self.array)
 #
-#    # so let's try it again
-#    # Hmm, works on the custom biqs but not the standard ones
-#    # Maybe look for GAME and stop
-#    (self.array2name, self.array2len,) = struct.unpack('4si', saveStream.read(8))
-#    print self.array2name
-#    print self.array2len
-#    self.array2 = []
-#    if self.array2name <> 'GAME':
-#      for i in range(self.array2len):
-#        (len,) = struct.unpack('i', saveStream.read(4))
-#        print len
-#        data = hexdump(saveStream.read(len))
-#        print data
-#        self.array2.append(data)
-#    #print json.dumps(self.array2)
+#        # so let's try it again
+#        # Hmm, works on the custom biqs but not the standard ones
+#        # Maybe look for GAME and stop
+#        (self.array2name, self.array2len,) = struct.unpack('4si', saveStream.read(8))
+#        print self.array2name
+#        print self.array2len
+#        self.array2 = []
+#        if self.array2name <> 'GAME':
+#            for i in range(self.array2len):
+#                (len,) = struct.unpack('i', saveStream.read(4))
+#                print len
+#                data = hexdump(saveStream.read(len))
+#                print data
+#                self.array2.append(data)
+#        #print json.dumps(self.array2)
 
-    self.whatsnext = hexdump(saveStream.read(40))
-    print self.whatsnext
+        self.whatsnext = hexdump(saveStream.read(40))
+        print self.whatsnext
 
 
 def get_byte(buffer, offset):
