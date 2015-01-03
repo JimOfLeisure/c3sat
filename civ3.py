@@ -22,112 +22,22 @@
 # OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION
 # WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
+# 2014-01-03 I'm in the middle of a major overhaul, and now I'm going to
+#  overhaul again. I'm going to try class initiators to read in the
+#  file again now that I think I see a more apt class inheritance
+#  hierarchy. But I fully realize now there is no "save format" per se.
+#  The save is a dump of C++ structures, many of which are descendant
+#  classes of a class that writes to disk as a 4-char string followed
+#  usually by a data length or an array count. There may or may not be
+#  data in the file from other data structures.
+
 import re	# Regular expressions
 import struct	# For parsing binary data
 import json     # to export JSON
 from horspool import horspool    # to seek to first match; from http://inspirated.com/2010/06/19/using-boyer-moore-horspool-algorithm-on-file-streams-in-python
 import sys
 
-class Tiles:
-    """Class to read all tiles"""
-    def __init__(self, saveStream, width, height, debug=False):
-        self.width = width      # These may eventually be redundant to a parent class
-        self.height = height
-        self.tile = []          # List of individual tiles
-        self.tile_matrix = []       # x,y matrix of individual tiles
-        self.tile_iso_matrix = []   # faux isometric padded matrix  of individual tiles
-
-        # Tiles is pretty good, but time-consuming. Let's skip most of them while figuring out the rest of the file
-        numTilesMinusTwo = (width / 2 * height) - 2
-        # size of the tile sections for each tile in bytes
-        myTileSize = 128 + 36 + 4 + 12 + (4*8)
-        self.firstTile = Tile(saveStream, debug)
-        # skip over most of the tiles
-        saveStream.seek((numTilesMinusTwo * myTileSize), 1)
-        self.lastTile = Tile(saveStream, debug)
-        return
-
-#        logical_tiles = width / 2 * height
-#        while logical_tiles > 0:
-#            self.tile.append(Tile(saveStream))
-#            logical_tiles -= 1
-
-        for y in range(height):
-            self.tile_matrix.append([])
-            self.tile_iso_matrix.append([])
-            if y % 2 == 1:
-                self.tile_iso_matrix[y].append(None)
-            for x in range(width / 2):
-                this_tile = Tile(saveStream, debug)
-
-                self.tile.append(this_tile)
-
-                self.tile_matrix[y].append(this_tile)
-
-                self.tile_iso_matrix[y].append(this_tile)
-                self.tile_iso_matrix[y].append(None)
-
-            if y % 2 == 0:
-                self.tile_iso_matrix[y].append(None)
-
-class Wrld:
-    """Class for 3 WRLD sections"""
-    def __init__(self, saveStream, debug=False):
-        self.Wrld1 = GenericSection(saveStream)
-        # Extract any data here, but I think it's only 2 bytes
-        (self.num_continents,) = struct.unpack_from('h', self.Wrld1.buffer)
-        if not debug:
-            del self.Wrld1.buffer
-
-        self.Wrld2 = GenericSection(saveStream)
-        #print self.Wrld2.name
-        self.Wrld2.values = struct.unpack_from('41i', self.Wrld2.buffer)
-        self.height = self.Wrld2.values[1]
-        self.width = self.Wrld2.values[6]
-        # Civ start locations in the form of map tile index numbers
-        self.start_loc = []
-        for myindex in range(7,39):
-            self.start_loc.append(self.Wrld2.values[myindex])
-        self.world_seed = self.Wrld2.values[39]
-        self.ocean_continent_id = self.Wrld2.values[0]
-            
-        #print self.height
-        #print self.width
-        #print self.values
-        #print hexdump(self.Wrld2.buffer)
-        if not debug:
-            del self.Wrld2.buffer
-            del self.Wrld2.values
-
-        self.Wrld3 = GenericSection(saveStream)
-        self.Wrld3.values = struct.unpack_from('13i', self.Wrld3.buffer)
-        #print self.Wrld3.name
-        #print hexdump(self.Wrld3.buffer)
-        if not debug:
-            del self.Wrld3.buffer
-            del self.Wrld3.values
-
-        self.Tiles = Tiles(saveStream, self.width, self.height, debug)
-
-        # Total hack; I want this info in svg_out, so I'm stuffing it into Tiles rather than refactor
-        self.Tiles.start_loc = self.start_loc
-
-        # CONT sections
-        self.continents = []
-        for i in range(self.num_continents):
-            # First integer is 0 if water, 1 if land
-            # Second integer is number of tiles on the continent
-            # index is the continent ID (0..num_continents-1)
-#        my_name = 'CONT'
-#        my_count = 0
-#        while my_name == 'CONT':
-#            my_temp = GenericSection(saveStream)
-#            my_name = my_temp.name
-#            print my_count, my_temp.name, my_temp.length
-#            print hexdump(my_temp.buffer)
-#            my_count +=1
-            self.continents.append(struct.unpack_from('ii',(GenericSection(saveStream).buffer)))
-
+#class SectionParent:
 class Bic:
     """Class for the embedded BIC"""
     def __init__(self, saveStream, debug=False):
