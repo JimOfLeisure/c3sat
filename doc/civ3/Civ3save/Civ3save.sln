@@ -1,0 +1,26 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 10.00
+# Visual Studio 2008
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Civ3format", "Civ3format\Civ3format.vcproj", "{4ACE6DF4-CD1E-446F-86AC-601489A33247}"
+EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Civ3sav", "Civ3sav\Civ3sav.vcproj", "{8D0BFB3E-7851-4BC7-9DE6-36A32A765A2A}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Win32 = Debug|Win32
+		Release|Win32 = Release|Win32
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{4ACE6DF4-CD1E-446F-86AC-601489A33247}.Debug|Win32.ActiveCfg = Debug|Win32
+		{4ACE6DF4-CD1E-446F-86AC-601489A33247}.Debug|Win32.Build.0 = Debug|Win32
+		{4ACE6DF4-CD1E-446F-86AC-601489A33247}.Release|Win32.ActiveCfg = Release|Win32
+		{4ACE6DF4-CD1E-446F-86AC-601489A33247}.Release|Win32.Build.0 = Release|Win32
+		{8D0BFB3E-7851-4BC7-9DE6-36A32A765A2A}.Debug|Win32.ActiveCfg = Debug|Win32
+		{8D0BFB3E-7851-4BC7-9DE6-36A32A765A2A}.Debug|Win32.Build.0 = Debug|Win32
+		{8D0BFB3E-7851-4BC7-9DE6-36A32A765A2A}.Release|Win32.ActiveCfg = Release|Win32
+		{8D0BFB3E-7851-4BC7-9DE6-36A32A765A2A}.Release|Win32.Build.0 = Release|Win32
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+EndGlobal

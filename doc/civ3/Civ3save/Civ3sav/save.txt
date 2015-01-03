@@ -1,0 +1,166 @@
+Tiny World:	60x60	4 Civs
+Small World:	80x80	6 Civs
+Standard World:	100x100	8 Civs
+Large World:	140x140	12 Civs
+Huge World:	160x160	16 Civs
+
+Pos Len
+0: 4: "WRLD" packet ID
+4: 4: data-length of packet (always $0002?)
+8: 2: unknown
+10: 4: "WRLD" packet ID (but I continue to count from the 1st)
+14: 4: data-length of packet
+22: 4: Y-size of world
+42: 4: X-size of world
+
+Players...search for "LEAD"
+
+Pos Len
+0: 4: "LEAD" packet ID
+4: 4: data-length of packet (always $1174?)
+8: 4: player number (range 0-31, in ascending order. 0 is
+always
+Barbarian; human is currently always 1)
+12: 4: race of player's civilization (range 0-16)
+232: 4: current research project
+
+
+Units...search for "UNIT"
+
+Pos Len
+0: 4: "UNIT" packet ID
+4: 4: data-length of packet (always $0121?)
+8: 4: unique unit number, in ascending order. First unit is 0
+12: 4: X-position
+16: 4: Y-position
+20: 4: previous X-position, -1 if unit never moved
+24: 4: previous Y-position
+28: 4: owner (by player number, NOT race number)
+40: 4: unit type (index into list of units)
+44: 4: level (0 = conscript, 1 = regular, etc.)
+52: 4: damage taken (0 = full strength)
+
+Cities...search for "CITY"
+
+Note there are several data packets labelled "CITY" for each city...
+I am oversimplifying by counting from the first.
+
+Pos Len
+0: 4: "CITY" packet ID
+4: 4: data-length of packet (always $0088?)
+8: 4: unique index number of city?
+12: 2: X-position
+14: 2: Y-position
+16: 1: owner (by player number)
+44: 4: shields collected for construction
+52: 4: what city is constructing (index into list of either
+units or buildings, see next entry)
+56: 4: type of construction ( 1 = building, 2 = unit)
+384: 28: city name
+
+After the city name there are several packets relating to population and citizens, followed by a "BINF" packet which relates to improvements:
+
+Pos Len
+0: 4: "BINF" packet ID
+4: 4: data-length of packet (always $0004?)
+8: 4: number of possible buildings
+
+This is followed by 12 bytes for each building. To discover which
+building is meant, you have to index into the building list:
+
+Pos Len
+0: 4: year of construction, 0 if not built
+4: 4: number of player who constructed building (?), -1 if
+not built
+8: 4: accumulated cultural value of building (??)
+
+
+60: 4 year founded
+
+384: 24: city name 
+408: 4 numbers of queue slots used
+412: 9 * 8 Build data (4 Index and 4 type) for each of the 9 slots
+
+
+The BITM section:
+0: BITM Section starter
+4: 4 length (40)
+8: 32 bitwise building info. One bit foe each building type
+40: 4 Number of bits used (74 with default rules)
+44: 4 Unknown
+
+
+For the UNITS:
+32: Nationality
+56: Movements used (stored in number of road movements used (default rules 3* movements))
+72: Loaded on (Ingame Unit ID of unit that holds this unit. (used with ships and armies))
+
+
+But remember that the hardest is to find the right Section. (If you make a tool)
+
+005808.sav
+
+0x3459b
+0x34651
+0x3468d
+0x34761
+
+0x3468d - 0x3459b = f2
+0x34761 - 0x3468d = d4
+0x91859 - 0x3468d = 0x5D1CC
+0x5D1CC / 0xd4 = 0x707 = 1799
+
+1800 = 30 * 60 = 0x708;
+
+345af
+34665
+346a1
+
+346a1 - 345af = f2
+
+0x3468d + d4 * 0x708 = 9192D
+
+
+LEAD 32
+
+0x91a15		2921	+8	+159C = 92FB9 + 11ED	941a6 +190
+0x94336		2BF1	+8	+159C = 958DA + +350(d4*4) 95c2a +116D 96d97 +190
+0x96f27		2BF1	
+0x99b18		2BF1
+0x9c709		2BF1	
+0x9f2fa		1A84
+0xa0d7e		1A84
+0xa2802
+0xa4286		1A84	+8	+159C	+350(d4*4)	+190
+0xa5d0a
+0xa778e
+0xa9212
+0xaac96
+0xac71a
+0xae19e
+0xafc22		1A84
+0xb16a6		1A84
+0xb312a		1A84
+0xca462		1A84
+
+
+024124.sav
+
+LEAD
+
+15AC
+137479	2985
+139dfe	2C55
+13ca53	2C55
+13f6a8	2C55	+8	+159C	140C4C +350 140F9C	+11D1 14216D +190
+1422fd	2C55
+144f52	2C55
+147ba7	2C55
+14a7fc	2C55
+14d451	2C55
+1500a6	1A84
+151b2a	1A84
+1535ae
+155032
+156ab6	1A84
+15853a
