@@ -14,13 +14,14 @@ def main():
     saveStream = sys.stdin
     reloffset = 0
     string="LEAD"
-    reloffset = seek(saveStream, "CNSL")
-    while reloffset >= 0 :
-      #reloffset = horspool.boyermoore_horspool(saveStream, string)
-      #print string + " relative offset: " + str(reloffset)
-      reloffset = seek(saveStream, "LEAD")
-      reloffset = seek(saveStream, "CULT")
-      reloffset = seek(saveStream, "CULT")
+    reloffset = seek(saveStream, "GAME")
+    reloffset = seek(saveStream, "GAME")
+#    while reloffset >= 0 :
+#      #reloffset = horspool.boyermoore_horspool(saveStream, string)
+#      #print string + " relative offset: " + str(reloffset)
+#      reloffset = seek(saveStream, "LEAD")
+#      reloffset = seek(saveStream, "CULT")
+#      reloffset = seek(saveStream, "CULT")
     #saveStream.close()
     return
 

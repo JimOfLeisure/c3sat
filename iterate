@@ -1,7 +1,8 @@
 #!/bin/sh
 
-#myProg=./mystrings
+myProg=./mystrings
 myProg=./offsets.py
+myProg=./civ3.py
 inFolder=gamesaves
 outFolder=out
 deCompress=tools/blast
