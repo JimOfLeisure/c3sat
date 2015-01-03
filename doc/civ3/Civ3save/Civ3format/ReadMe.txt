@@ -27,3 +27,35 @@ StdAfx.h, StdAfx.cpp
 应用程序向导使用“TODO:”注释来指示应添加或自定义的源代码部分。
 
 /////////////////////////////////////////////////////////////////////////////
+-----
+The above translated to English via Google 2015-01-03:
+-----
+================================================== ======================
+    Console application : Civ3format Project Overview
+================================================== ======================
+
+Application Wizard has created this Civ3format application for you.
+
+This document provides an overview of the application of the composition Civ3format
+The contents of each file .
+
+
+Civ3format.vcproj
+    This is the main project file using an application wizard generated VC ++ project ,
+    Visual C ++ is generated which contains the file version information , as well as the platform on using the application wizard selection , configuration and information project functions.
+
+Civ3format.cpp
+    This is the main application source files.
+
+////////////////////////////////////////////////// ///////////////////////////
+Other standard file :
+
+StdAfx.h, StdAfx.cpp
+    These files are used to generate named Civ3format.pch precompiled header (PCH) files and precompiled types file named StdAfx.obj .
+
+////////////////////////////////////////////////// ///////////////////////////
+Other comments :
+
+Application Wizard uses "TODO:" Comments should be added to indicate the source or custom parts.
+
+////////////////////////////////////////////////// ///////////////////////////
