@@ -94,7 +94,8 @@ class Flavor():
         (self.number, self.name, self.numRecords) =   struct.unpack('i256si', saveStream.read(264))
         self.records = []
         for i in range(self.numRecords):
-            self.records.append(struct.unpack('i', saveStream.read(4)))
+            (someinteger,) = struct.unpack('i', saveStream.read(4))
+            self.records.append(someinteger)
 
 class FlavSection(NameLength):
     """The FLAV section of the BIQ is different"""
