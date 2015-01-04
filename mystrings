@@ -2,14 +2,15 @@
 
 strings | \
   # Omit everything before CNSL. Using grep with first match and an "after" context large enough to hopefully get the rest of any stream it encounters
-  grep -m 1 -A 999999 CNSL | \
+  #grep -m 1 -A 999999 CNSL | \
   # Omit strings 9 chars or longer
   grep -vE '.{9}' | \
-  # Match headers, return only matched characters (so e.g. TILE$ isn't separate from TILE)
-  grep -oE '^[A-Z ]{3}[A-Z0-9# ]' | \
-  # Need to sort before uniq
-  sort | \
-  # Show counts of uniqe values
-  uniq -c | \
-  # Sort the results, largest counts last
-  sort
+  grep 'GAME\|DATE\|PLGI\|CNSL'
+#  # Match headers, return only matched characters (so e.g. TILE$ isn't separate from TILE)
+#  grep -oE '^[A-Z ]{3}[A-Z0-9# ]' | \
+#  # Need to sort before uniq
+#  sort | \
+#  # Show counts of uniqe values
+#  uniq -c | \
+#  # Sort the results, largest counts last
+#  sort

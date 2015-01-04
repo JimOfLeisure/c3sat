@@ -16,6 +16,13 @@ def main():
     string="LEAD"
     reloffset = seek(saveStream, "GAME")
     reloffset = seek(saveStream, "GAME")
+    reloffset = seek(saveStream, "DATE")
+    reloffset = seek(saveStream, "PLGI")
+    reloffset = seek(saveStream, "PLGI")
+    reloffset = seek(saveStream, "DATE")
+    reloffset = seek(saveStream, "DATE")
+    reloffset = seek(saveStream, "CNSL")
+    reloffset = seek(saveStream, "WRLD")
 #    while reloffset >= 0 :
 #      #reloffset = horspool.boyermoore_horspool(saveStream, string)
 #      #print string + " relative offset: " + str(reloffset)

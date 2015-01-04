@@ -40,7 +40,7 @@ import sys
 class Section:
     """Top-level class for reading sections / serialized C++ class dumps from safe file"""
     def __init__(self, saveStream, expectedName = None, length = None):
-        # This breaks when run before the first read of the filestream
+        # Apparently tell() doesn't work on stdin / pipes
         #self.offset = saveStream.tell()
         self.expectedName = expectedName
         self.expectedLength = length
@@ -72,6 +72,12 @@ class NameLength(Section):
     """A typical record that starts with a 4-char sequence followed by length of data in bytes"""
     def readHeader(self, saveStream):
         (self.name, self.length) = struct.unpack('4si', saveStream.read(8))
+
+class HorspoolNameLength(NameLength):
+    """A NameLength record where the name has been consumed by a horspool seek"""
+    def readHeader(self, saveStream):
+        (self.length,) = struct.unpack('i', saveStream.read(4))
+        self.name = self.expectedName
 
 class ObjectArray(NameLength):
     """In this type of record the 4-char sequence is followed by a length in records, each of which starts with an integer length in bytes"""
@@ -158,64 +164,56 @@ class newParse:
     """Starting over with parsing strategy. Will read in chunks as I see fit."""
     def __init__(self, saveStream):
         self.civ3 = Section(saveStream, 'CIV3', 26)
-        print self.civ3
+        #print self.civ3
 
         self.bic = NameLength(saveStream, 'BIC ', 524)
-        print self.bic
+        #print self.bic
 
         self.embeddedBic = Bic(saveStream, 'BICQ', 1)
-        print self.embeddedBic
+        #print self.embeddedBic
 
-#        self.bicq = hexdump(saveStream.read(736))
-#        print self.bicq
-#
-#        # Plan to read array of arrays until the GAME array is read
-#        name = ""
-#        self.bicarray = []
-#        while name <> "GAME":
-#            (name, count,) = struct.unpack('4si', saveStream.read(8))
-#            print name
-#            print count
-#            for i in range(count):
-#                array = []
-#                (len,) = struct.unpack('i', saveStream.read(4))
-#                print len
-#                array.append(hexdump(saveStream.read(len)))
-#            self.bicarray.append(array)
+        #self.game = NameLength(saveStream, 'GAME ', 0x350)
+        #self.game = Section(saveStream, 'GAME ', 4000)
+        #print self.game
+        #print hexdump(self.game.data, 4)
+        #print hexdump(self.game.data, 64)
+        # Skipping over GAME section since I haven't figured it out yet
+        self.gameLength = horspool.boyermoore_horspool(saveStream, "DATE")
+        print 'GAME section length: {0}'.format(self.gameLength)
 
-#        # This isn't always GAME...sometimes it's BLDG
-#        #self.game = hexdump(saveStream.read(7593))
-#        #print self.game
-#
-#        # Hmm, this seems to work so far
-#        (self.arrayname, self.arraylen,) = struct.unpack('4si', saveStream.read(8))
-#        print self.arrayname
-#        print self.arraylen
-#        self.array = []
-#        for i in range(self.arraylen):
-#            (len,) = struct.unpack('i', saveStream.read(4))
-#            print len
-#            self.array.append(hexdump(saveStream.read(len)))
-#        print json.dumps(self.array)
-#
-#        # so let's try it again
-#        # Hmm, works on the custom biqs but not the standard ones
-#        # Maybe look for GAME and stop
-#        (self.array2name, self.array2len,) = struct.unpack('4si', saveStream.read(8))
-#        print self.array2name
-#        print self.array2len
-#        self.array2 = []
-#        if self.array2name <> 'GAME':
-#            for i in range(self.array2len):
-#                (len,) = struct.unpack('i', saveStream.read(4))
-#                print len
-#                data = hexdump(saveStream.read(len))
-#                print data
-#                self.array2.append(data)
-#        #print json.dumps(self.array2)
+        self.date1 = HorspoolNameLength(saveStream, 'DATE', 84)
+        #print self.date1
+
+        self.plgi1 = NameLength(saveStream, 'PLGI', 4)
+        #print self.plgi1
+
+        self.plgi2 = NameLength(saveStream, 'PLGI', 8)
+        #print self.plgi2
+
+        self.date2 = NameLength(saveStream, 'DATE', 84)
+        #print self.date2
+
+        self.date3 = NameLength(saveStream, 'DATE', 84)
+        #print self.date3
+
+        # There seem to be 8 bytes here; guessing two integers
+        (self.integer1,) = struct.unpack('i', saveStream.read(4))
+        (self.integer2,) = struct.unpack('i', saveStream.read(4))
+
+        self.cnsl = NameLength(saveStream, 'CNSL', 228)
+        print self.cnsl
+
+        self.wrld1 = NameLength(saveStream, 'WRLD', 2)
+        print self.wrld1
+
+        self.wrld2 = NameLength(saveStream, 'WRLD', 164)
+        print self.wrld2
+
+        self.wrld2 = NameLength(saveStream, 'WRLD', 52)
+        print self.wrld2
 
         print "\nWhat's Next:\n\n"
-        self.whatsnext = hexdump(saveStream.read(400))
+        self.whatsnext = hexdump(saveStream.read(40))
         print self.whatsnext
 
 
