@@ -17,11 +17,11 @@ for file in "${myFiles[@]}"; do
   if [ "$fingerprint" = "0000000 4943 3356" ]; then
     # Uncompressed save file
     printf "$file starts with CIV3; uncompressed save\n"
-    cat "$inFolder/$file" | $myProg > "$outFolder/$file.out"
+    cat "$inFolder/$file" | $myProg > "$outFolder/$file.out" &
   elif  [ "$fingerprint" = "0000000 0600 2486" ]; then
     # Compressed save file
     printf "$file starts with data matching compressed save\n"
-    cat "$inFolder/$file" | $deCompress | $myProg > "$outFolder/$file.out"
+    cat "$inFolder/$file" | $deCompress | $myProg > "$outFolder/$file.out" &
   else
     printf "$file is not recognized as a Civ3 save file\n"
   fi

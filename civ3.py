@@ -37,94 +37,150 @@ import json     # to export JSON
 from horspool import horspool    # to seek to first match; from http://inspirated.com/2010/06/19/using-boyer-moore-horspool-algorithm-on-file-streams-in-python
 import sys
 
-#class SectionParent:
-class Bic:
-    """Class for the embedded BIC"""
-    def __init__(self, saveStream, debug=False):
-        self.offset = saveStream.tell()
-        (self.name, self.verNumText, self.verNum, self.length,) = struct.unpack_from('4s4sii', saveStream.read(16))
-        self.buffer = saveStream.read(self.length)
-        self.hexdump = hexdump(self.buffer)
+class Section:
+    """Top-level class for reading sections / serialized C++ class dumps from safe file"""
+    def __init__(self, saveStream, expectedName = None, length = None):
+        # This breaks when run before the first read of the filestream
+        #self.offset = saveStream.tell()
+        self.expectedName = expectedName
+        self.expectedLength = length
+        self.noexist = None
+        self.readHeader(saveStream)
+        self.readData(saveStream)
 
-        #self.Game = GenericSection(saveStream)
-        (self.GameName, self.GameVerNum, self.GameLength,) = struct.unpack_from('4sii', saveStream.read(12))
-        self.GameHexdump = hexdump(saveStream.read(self.GameLength))
+    def readHeader(self, saveStream):
+        (self.name,) = struct.unpack('4s', saveStream.read(4))
+        self.length = self.expectedLength
 
-        #self.Game2 = GenericSection(saveStream)
-        #(self.Game2Name, self.Game2VerNum, self.Game2Length,) = struct.unpack_from('4sii', saveStream.read(12))
-        #self.Game2Hexdump = hexdump(saveStream.read(self.Game2Length))
+    def readData(self, saveStream):
+        if self.length:
+            self.data = saveStream.read(self.length)
 
-        if not debug:
-          del self.buffer
-          #del self.whatsThis.buffer
+    def dumpHeader(self):
+        return 'Expected: Name: {0}  Length: {1}\nActual:   Name: {2}  Length: {3}\n'.format(self.expectedName, self.expectedLength, self.name, self.length)
 
-class Civ3:
-    """Class for entire save game"""
-    def __init__(self, saveStream, debug=False):
-        self.offset = saveStream.tell()
-        self.name = saveStream.read(4)
-        if self.name <> 'CIV3':
-            print "wah wah wah wahhhhhhhh."
-            print "Stub. Provided stream not decompressed C3C save"
-            return -1
-        self.buffer = saveStream.read(26)
-        self.hexdump = hexdump(self.buffer, 26)
-        # This Bic appears to be a save game class that contains a copy of a BIx file
-        self.Bic = GenericSection(saveStream)
-        self.Bic.Bic = Bic(saveStream, debug)
+    def dumpData(self):
+        return '{0}\n'.format(hexdump(self.data))
 
-        ### Skipping 2nd GAME section as I can't figure out what it is. Think I'm also skipping a couple of DATEs and a PLGI
+    def dumpSelf(self):
+        return self.dumpHeader() + self.dumpData()
 
-        horspoolOffset = horspool.boyermoore_horspool(saveStream, "CNSL")
-        self.Cnsl = GenericSection(saveStream, "CNSL")
-        self.Cnsl.horspoolOffset = horspoolOffset 
+    def __str__(self):
+        return self.dumpSelf()
 
-        self.Wrld = Wrld(saveStream, debug)
+class NameLength(Section):
+    """A typical record that starts with a 4-char sequence followed by length of data in bytes"""
+    def readHeader(self, saveStream):
+        (self.name, self.length) = struct.unpack('4si', saveStream.read(8))
 
-        ### Skipping some padding or other unknown data
+class ObjectArray(NameLength):
+    """In this type of record the 4-char sequence is followed by a length in records, each of which starts with an integer length in bytes"""
+    def readData(self, saveStream):
+        self.data = []
+        for i in range(self.length):
+            (length,) =  struct.unpack('i', saveStream.read(4))
+            data = saveStream.read(length)
+            self.data.append(data)
+    def dumpData(self):
+        outtext = []
+        for i in range(len(self.data)):
+            outtext.append(hexdump(self.data[i]))
+        separator = "\n" + "-" * 53 + "\n"
+        return separator.join(outtext)
 
-        horspoolOffset = horspool.boyermoore_horspool(saveStream, "LEAD")
-        self.Lead1 = GenericSection(saveStream, "LEAD")
-        self.Lead1.horspoolOffset = horspoolOffset 
+class Flavor():
+    """The data unit of FLAV"""
+    def __init__(self, saveStream):
+        (self.number, self.name, self.numRecords) =   struct.unpack('i256si', saveStream.read(264))
+        self.records = []
+        for i in range(self.numRecords):
+            self.records.append(struct.unpack('i', saveStream.read(4)))
 
-        #self.whatsNext = GenericSection(saveStream)
-        self.whatsNextOffset = saveStream.tell()
-        self.whatsNext = hexdump(saveStream.read(40000))
-        #self.whatsNext = GenericSection(saveStream)
+class FlavSection(NameLength):
+    """The FLAV section of the BIQ is different"""
+    def readData(self, saveStream):
+        self.flavorGroups = []
+        for i in range(self.length):
+            (flavors,) =  struct.unpack('i', saveStream.read(4))
+            flavor = []
+            for j in range(flavors):
+                flavor.append(Flavor(saveStream))
+        self.flavorGroups.append(flavor)
+        self.data = "dummy data for the FLAV class. TODO: FIXME"
+#    def dumpData(self):
+#        outtext = []
+#        for i in range(len(self.flavorGroups)):
+#            for j in range(len(self.flavorGroups[i])):
+#                outtext.append(Flavor.__str__(self.flavorGroups[i][j]))
+#        separator = "\n" + "-" * 53 + "\n"
+#        return separator.join(outtext)
 
-        if not debug:
-          del self.buffer
-          del self.Bic.buffer
-          del self.Cnsl.buffer
-          del self.Lead1.buffer
-          #del self.whatsNext.buffer
-        saveStream.close()
+class Bic(ObjectArray):
+    """The embedded BIC is a little more complex and different, but mostly object arrays"""
+    def __init__(self, saveStream, expectedName = None, length = None):
+        ObjectArray.__init__(self, saveStream, expectedName, length)
+        self.defs = []
+        self.defs.append(ObjectArray(saveStream))
+        # If GAME is not the first section, then the other rules appear (? Surely there is a flag or other indictor for this content somewhere)
+        if self.defs[0].name == "BLDG":
+            # The order is assumed to always be the same, but I'm not sure of this yet
+            self.defs.append(ObjectArray(saveStream, "CTZN"))
+            self.defs.append(ObjectArray(saveStream, "CULT"))
+            self.defs.append(ObjectArray(saveStream, "DIFF"))
+            self.defs.append(ObjectArray(saveStream, "ERAS"))
+            self.defs.append(ObjectArray(saveStream, "ESPN"))
+            self.defs.append(ObjectArray(saveStream, "EXPR"))
+            # NOTE: In the acutal BIQ file, FLAV seems to come after WSIZ
+            self.defs.append(FlavSection(saveStream))
+            self.defs.append(ObjectArray(saveStream, "GOOD"))
+            self.defs.append(ObjectArray(saveStream, "GOVT"))
+            self.defs.append(ObjectArray(saveStream, "RULE"))
+            self.defs.append(ObjectArray(saveStream, "PRTO"))
+            self.defs.append(ObjectArray(saveStream, "RACE"))
+            self.defs.append(ObjectArray(saveStream, "TECH"))
+            self.defs.append(ObjectArray(saveStream, "TRFM"))
+            self.defs.append(ObjectArray(saveStream, "TERR"))
+            self.defs.append(ObjectArray(saveStream, "WSIZ"))
+            self.defs.append(ObjectArray(saveStream, "GAME"))
+            self.defs.append(ObjectArray(saveStream, "LEAD"))
+    def readHeader(self, saveStream):
+        (self.name, self.verNum, self.length) = struct.unpack('4s4si', saveStream.read(12))
+    def dumpData(self):
+        outtext = []
+        outtext.append(ObjectArray.dumpData(self))
+        for i in range(len(self.defs)):
+            outtext.append(self.defs[i].dumpSelf())
+        separator = "\n" + "-" * 53 + "\n"
+        return separator.join(outtext)
 
 class newParse:
     """Starting over with parsing strategy. Will read in chunks as I see fit."""
     def __init__(self, saveStream):
-        self.civ3 = hexdump(saveStream.read(30),30)
-        #print self.civ3
+        self.civ3 = Section(saveStream, 'CIV3', 26)
+        print self.civ3
 
-        self.bic = hexdump(saveStream.read(532))
-        #print self.bic
+        self.bic = NameLength(saveStream, 'BIC ', 524)
+        print self.bic
 
-        self.bicq = hexdump(saveStream.read(736))
-        print self.bicq
+        self.embeddedBic = Bic(saveStream, 'BICQ', 1)
+        print self.embeddedBic
 
-        # Plan to read array of arrays until the GAME array is read
-        name = ""
-        self.bicarray = []
-        while name <> "GAME":
-            (name, count,) = struct.unpack('4si', saveStream.read(8))
-            print name
-            print count
-            for i in range(count):
-                array = []
-                (len,) = struct.unpack('i', saveStream.read(4))
-                print len
-                array.append(hexdump(saveStream.read(len)))
-            self.bicarray.append(array)
+#        self.bicq = hexdump(saveStream.read(736))
+#        print self.bicq
+#
+#        # Plan to read array of arrays until the GAME array is read
+#        name = ""
+#        self.bicarray = []
+#        while name <> "GAME":
+#            (name, count,) = struct.unpack('4si', saveStream.read(8))
+#            print name
+#            print count
+#            for i in range(count):
+#                array = []
+#                (len,) = struct.unpack('i', saveStream.read(4))
+#                print len
+#                array.append(hexdump(saveStream.read(len)))
+#            self.bicarray.append(array)
 
 #        # This isn't always GAME...sometimes it's BLDG
 #        #self.game = hexdump(saveStream.read(7593))
@@ -157,7 +213,8 @@ class newParse:
 #                self.array2.append(data)
 #        #print json.dumps(self.array2)
 
-        self.whatsnext = hexdump(saveStream.read(40))
+        print "\nWhat's Next:\n\n"
+        self.whatsnext = hexdump(saveStream.read(400))
         print self.whatsnext
 
 
