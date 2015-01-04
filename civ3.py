@@ -201,19 +201,38 @@ class newParse:
         (self.integer2,) = struct.unpack('i', saveStream.read(4))
 
         self.cnsl = NameLength(saveStream, 'CNSL', 228)
-        print self.cnsl
+        #print self.cnsl
 
         self.wrld1 = NameLength(saveStream, 'WRLD', 2)
-        print self.wrld1
+        #print self.wrld1
+        (num_continents,) = struct.unpack_from('h', self.wrld1.data)
 
         self.wrld2 = NameLength(saveStream, 'WRLD', 164)
-        print self.wrld2
+        #print self.wrld2
+        self.mapHeight = struct.unpack_from('41i', self.wrld2.data)[1]
+        self.mapWidth = struct.unpack_from('41i', self.wrld2.data)[6]
+        print "map: " + str(self.mapWidth) + " x " + str(self.mapHeight)
 
         self.wrld2 = NameLength(saveStream, 'WRLD', 52)
-        print self.wrld2
+        #print self.wrld2
+
+        self.tiles = []
+        for tile in range(self.mapWidth / 2 * self.mapHeight):
+            data = []
+            for i in range(4):
+                data.append(NameLength(saveStream, 'TILE'))
+            self.tiles.append(data)
+
+        self.continents = []
+        for i in range(num_continents):
+            self.continents.append(NameLength(saveStream, 'CONT'))
+
+        # There is some data of length 0x68 here that looks like 26 integers to me
+        twenty_six_integers =  struct.unpack('26i', saveStream.read(0x68))
+        print twenty_six_integers
 
         print "\nWhat's Next:\n\n"
-        self.whatsnext = hexdump(saveStream.read(40))
+        self.whatsnext = hexdump(saveStream.read(0x100))
         print self.whatsnext
 
 
