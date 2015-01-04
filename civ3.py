@@ -172,14 +172,9 @@ class newParse:
         self.embeddedBic = Bic(saveStream, 'BICQ', 1)
         #print self.embeddedBic
 
-        #self.game = NameLength(saveStream, 'GAME ', 0x350)
-        #self.game = Section(saveStream, 'GAME ', 4000)
-        #print self.game
-        #print hexdump(self.game.data, 4)
-        #print hexdump(self.game.data, 64)
-        # Skipping over GAME section since I haven't figured it out yet
+        # SKIPPING over GAME section since I haven't figured it out yet
         self.gameLength = horspool.boyermoore_horspool(saveStream, "DATE")
-        print 'GAME section length: {0}'.format(self.gameLength)
+        #print 'GAME section length: {0}'.format(self.gameLength)
 
         self.date1 = HorspoolNameLength(saveStream, 'DATE', 84)
         #print self.date1
@@ -211,7 +206,7 @@ class newParse:
         #print self.wrld2
         self.mapHeight = struct.unpack_from('41i', self.wrld2.data)[1]
         self.mapWidth = struct.unpack_from('41i', self.wrld2.data)[6]
-        print "map: " + str(self.mapWidth) + " x " + str(self.mapHeight)
+        #print "map: " + str(self.mapWidth) + " x " + str(self.mapHeight)
 
         self.wrld2 = NameLength(saveStream, 'WRLD', 52)
         #print self.wrld2
@@ -226,13 +221,21 @@ class newParse:
         self.continents = []
         for i in range(num_continents):
             self.continents.append(NameLength(saveStream, 'CONT'))
+        print self.continents[-1]
 
         # There is some data of length 0x68 here that looks like 26 integers to me
+        #### FIXME: in some modded games there are a different number of integers
+        ####   wild guess: something to do with number of resources?
+        ####   not related to # of players, continents or size of world
         twenty_six_integers =  struct.unpack('26i', saveStream.read(0x68))
         print twenty_six_integers
 
-        print "\nWhat's Next:\n\n"
-        self.whatsnext = hexdump(saveStream.read(0x100))
+        # this isn't right
+        #self.lead1 = NameLength(saveStream, 'LEAD')
+        #print self.lead1
+
+        print "\nWhat's Next:"
+        self.whatsnext = hexdump(saveStream.read(0x400))
         print self.whatsnext
 
 
