@@ -160,103 +160,116 @@ class Bic(ObjectArray):
         separator = "\n" + "-" * 53 + "\n"
         return separator.join(outtext)
 
+class Idls():
+    """The IDLS section seems unique if somewhat like FLAV"""
+    def __init__(self, saveStream):
+        (self.name, self.someNumber, self.numRecords) =   struct.unpack('4sii', saveStream.read(12))
+        self.records = []
+        for i in range(self.numRecords):
+            (numIntegers,) = struct.unpack('i', saveStream.read(4))
+            integers = []
+            for j in range(numIntegers):
+                (integer,) = struct.unpack('i', saveStream.read(4))
+                integers.append(integer)
+            self.records.append(integers)
+
 class newParse:
     """Starting over with parsing strategy. Will read in chunks as I see fit."""
     def __init__(self, saveStream):
         self.civ3 = Section(saveStream, 'CIV3', 26)
-        #print self.civ3
-
         self.bic = NameLength(saveStream, 'BIC ', 524)
-        #print self.bic
-
         self.embeddedBic = Bic(saveStream, 'BICQ', 1)
-        #print self.embeddedBic
 
         # SKIPPING over GAME section since I haven't figured it out yet
         self.gameLength = horspool.boyermoore_horspool(saveStream, "DATE")
         #print 'GAME section length: {0}'.format(self.gameLength)
 
         self.date1 = HorspoolNameLength(saveStream, 'DATE', 84)
-        #print self.date1
-
         self.plgi1 = NameLength(saveStream, 'PLGI', 4)
-        #print self.plgi1
-
         self.plgi2 = NameLength(saveStream, 'PLGI', 8)
-        #print self.plgi2
-
         self.date2 = NameLength(saveStream, 'DATE', 84)
-        #print self.date2
-
         self.date3 = NameLength(saveStream, 'DATE', 84)
-        #print self.date3
-
         # There seem to be 8 bytes here; guessing two integers
         (self.integer1,) = struct.unpack('i', saveStream.read(4))
         (self.integer2,) = struct.unpack('i', saveStream.read(4))
-
         self.cnsl = NameLength(saveStream, 'CNSL', 228)
-        #print self.cnsl
-
         self.wrld1 = NameLength(saveStream, 'WRLD', 2)
-        #print self.wrld1
         (num_continents,) = struct.unpack_from('h', self.wrld1.data)
-
         self.wrld2 = NameLength(saveStream, 'WRLD', 164)
-        #print self.wrld2
         self.mapHeight = struct.unpack_from('41i', self.wrld2.data)[1]
         self.mapWidth = struct.unpack_from('41i', self.wrld2.data)[6]
         #print "map: " + str(self.mapWidth) + " x " + str(self.mapHeight)
-
         self.wrld2 = NameLength(saveStream, 'WRLD', 52)
-        #print self.wrld2
-
         self.tiles = []
         for tile in range(self.mapWidth / 2 * self.mapHeight):
             data = []
             for i in range(4):
                 data.append(NameLength(saveStream, 'TILE'))
             self.tiles.append(data)
-
         self.continents = []
         for i in range(num_continents):
             self.continents.append(NameLength(saveStream, 'CONT'))
         print self.continents[-1]
 
-        # There is some data of length 0x68 here that looks like 26 integers to me
-        #### FIXME: in some modded games there are a different number of integers
-        ####   wild guess: something to do with number of resources?
-        ####   not related to # of players, continents or size of world
-        twenty_six_integers =  struct.unpack('26i', saveStream.read(0x68))
-        print twenty_six_integers
+        # There is some data--usually of length 0x68--here that looks like an integer array to me
+        # I believe the number of integers is the number of resources including bonus resources
+        self.integers = []
+        data  = ""
+        data = saveStream.read(4)
+        while data <> 'LEAD':
+            (integer,) = struct.unpack_from('i', data)
+            self.integers.append(integer)
+            data = saveStream.read(4)
+        #print len(self.integers)
+        #print self.integers
 
         # this isn't right
         #self.lead1 = NameLength(saveStream, 'LEAD')
         #print self.lead1
 
+        self.leads = []
+        for i in range(32):
+            data = []
+            # SKIPPING over LEAD section since I haven't figured it out yet
+            self.leadLength = horspool.boyermoore_horspool(saveStream, "CULT")
+            print 'LEAD section length: {0}'.format(self.leadLength)
+
+            data.append(HorspoolNameLength(saveStream, 'CULT', 0x10))
+            data.append(NameLength(saveStream, 'ESPN', 0x20))
+            data.append(NameLength(saveStream, 'ESPN', 0x20))
+#            for j in range(len(data)):
+#                print data[j]
+            self.leads.append(data)
+
+        self.units = []
+        # SKIPPING to first UNIT because I'm not sure what's here
+        self.skipLength = horspool.boyermoore_horspool(saveStream, "UNIT")
+        print 'pre-UNIT skipped length: {0}'.format(self.leadLength)
+        unit = []
+        unit.append(HorspoolNameLength(saveStream, 'UNIT', 0x1d8))
+        # TODO : read IDLS and append them to UNIT array
+        idls = Idls(saveStream)
+        print idls.records
+        unit.append(idls)
+        self.units.append(unit)
+
+        nextSection = NameLength(saveStream, 'UNIT', 0x1d8)
+        print nextSection.name
+        while nextSection.name == 'UNIT':
+            unit = []
+            unit.append(nextSection)
+            idls = Idls(saveStream)
+            print idls.records
+            unit.append(idls)
+            self.units.append(unit)
+            nextSection = NameLength(saveStream, 'UNIT', 0x1d8)
+        print nextSection
+
+
+
         print "\nWhat's Next:"
         self.whatsnext = hexdump(saveStream.read(0x400))
         print self.whatsnext
-
-
-def get_byte(buffer, offset):
-    """Unpack an byte from a buffer at the given offest."""
-    (the_byte,) = struct.unpack('B', buffer[offset:offset+1])
-    return the_byte
-
-def get_short(buffer, offset):
-    """Unpack an int from a buffer at the given offest."""
-    (the_short,) = struct.unpack('H', buffer[offset:offset+2])
-    return the_short
-
-def get_int(buffer, offset):
-    """Unpack an int from a buffer at the given offest."""
-    (the_int,) = struct.unpack('I', buffer[offset:offset+4])
-    return the_int
-
-def parse_save(saveFile, debug=False):
-    game = Civ3(saveFile, debug)
-    return game
 
 def hexdump(src, length=16):
     """Totally yoinked from https://gist.github.com/sbz/1080258"""
