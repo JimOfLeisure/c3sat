@@ -173,6 +173,19 @@ class Idls():
                 integers.append(integer)
             self.records.append(integers)
 
+class Popd(ObjectArray):
+    """Popd appears to be an object array with an extra number in front of the length"""
+    def readHeader(self, saveStream):
+        (self.name, self.integer, self.integer2, self.length,) = struct.unpack('4siii', saveStream.read(16))
+        print self.name, self.integer, self.integer2, self.length
+    def readData(self, saveStream):
+        self.data = []
+        for i in range(self.length):
+            self.data.append(NameLength(saveStream, 'CTZN'))
+#            print self.data[-1].name
+#            print self.data[-1].length
+#            print hexdump(self.data[-1].data)
+
 class newParse:
     """Starting over with parsing strategy. Will read in chunks as I see fit."""
     def __init__(self, saveStream):
@@ -259,16 +272,68 @@ class newParse:
             unit = []
             unit.append(nextSection)
             idls = Idls(saveStream)
-            print idls.records
+            #print idls.records
             unit.append(idls)
             self.units.append(unit)
             nextSection = NameLength(saveStream, 'UNIT', 0x1d8)
-        print nextSection
+        #print nextSection
 
+        # TODO: what about saves with no cities? (4000 BC)
+        self.cities = []
+    #while nextSection.name == 'CITY':
+        city = []
+        city.append(nextSection)
+        city.append(NameLength(saveStream, 'CITY'))
+        city.append(NameLength(saveStream, 'CITY'))
+        city.append(NameLength(saveStream, 'CITY'))
+        city.append(NameLength(saveStream, 'CITY'))
+        city.append(Popd(saveStream, 'POPD'))
+        binfLength = horspool.boyermoore_horspool(saveStream, "BITM")
+        print "BINF Length:", binfLength
+        city.append(HorspoolNameLength(saveStream, 'BITM'))
+        city.append(NameLength(saveStream, 'DATE'))
 
+        self.cities.append(city)
+        #nextSection = NameLength(saveStream, 'CITY')
+    #print nextSection
+
+        ## TODO: There are a lot of empty CITY sections. Need to figure out format
+        ## Also, some cities have CTPG sections I'm not reading in
+        ## Also, CLNY sections, if any, would be between CITY and PALV
+
+        skipToPalvLength = horspool.boyermoore_horspool(saveStream, "PALV")
+        self.palv = []
+        self.palv.append(HorspoolNameLength(saveStream, 'PALV'))
+        #print self.palv[-1]
+        for i in range(31):
+            self.palv.append(NameLength(saveStream, 'PALV'))
+            #print self.palv[-1]
+
+        # HIST
+        # Already there after PALV, but don't see how it's formatted
+
+        # TUTR
+        print "Skip to TUTR: ", horspool.boyermoore_horspool(saveStream, "TUTR")
+        self.tutr = HorspoolNameLength(saveStream, 'TUTR')
+        #print self.tutr
+
+        # FAXX
+        self.faxx = NameLength(saveStream, 'FAXX')
+        #print self.faxx
+
+        # RPLS
+        (rplsname, numRecords) = struct.unpack_from('4si', saveStream.read(8))
+        print rplsname, numRecords
+        # this isn't right
+        print NameLength(saveStream)
+#        self.rpls = []
+#        #for i in range(numRecords)
+#        for i in range(5):
+#            self.rpls.append(NameLength(saveStream))
+#            print self.rpls[-1]
 
         print "\nWhat's Next:"
-        self.whatsnext = hexdump(saveStream.read(0x400))
+        self.whatsnext = hexdump(saveStream.read(0x800))
         print self.whatsnext
 
 def hexdump(src, length=16):
