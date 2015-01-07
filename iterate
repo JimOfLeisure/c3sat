@@ -26,3 +26,7 @@ for file in "${myFiles[@]}"; do
     printf "$file is not recognized as a Civ3 save file\n"
   fi
 done
+
+# Wait for jobs to complete before exiting so I don't have to
+# keep peeking at top
+wait

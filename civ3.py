@@ -193,9 +193,26 @@ class newParse:
         self.bic = NameLength(saveStream, 'BIC ', 524)
         self.embeddedBic = Bic(saveStream, 'BICQ', 1)
 
+        # GAME
+        # Trying to  figure it out based on https://github.com/Antal1987/C3CPatchFramework/blob/master/Civ3/Game.h
+        # Looks like a bunch of integers
         # SKIPPING over GAME section since I haven't figured it out yet
-        self.gameLength = horspool.boyermoore_horspool(saveStream, "DATE")
+        #self.gameLength = horspool.boyermoore_horspool(saveStream, "DATE")
         #print 'GAME section length: {0}'.format(self.gameLength)
+
+        #self.game = struct.unpack('46i', saveStream.read(46*4))
+        #self.game = struct.unpack('74i', saveStream.read(74*4))
+        #self.game = struct.unpack('96i', saveStream.read(96*4))
+        #self.game = struct.unpack('263i', saveStream.read(263*4))
+        #print len(self.game)
+        #print self.game
+
+        print "\nWhat's Next:"
+        self.whatsnext = hexdump(saveStream.read(263*4))
+        print self.whatsnext
+
+        ### EXITING EARLY WHILE DECODING GAME
+        return
 
         self.date1 = HorspoolNameLength(saveStream, 'DATE', 84)
         self.plgi1 = NameLength(saveStream, 'PLGI', 4)
