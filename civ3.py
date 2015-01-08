@@ -196,16 +196,28 @@ class newParse:
         # GAME
         # Trying to  figure it out based on https://github.com/Antal1987/C3CPatchFramework/blob/master/Civ3/Game.h
         # Looks like a bunch of integers
-        # SKIPPING over GAME section since I haven't figured it out yet
-        #self.gameLength = horspool.boyermoore_horspool(saveStream, "DATE")
-        #print 'GAME section length: {0}'.format(self.gameLength)
 
-        #self.game = struct.unpack('46i', saveStream.read(46*4))
-        #self.game = struct.unpack('74i', saveStream.read(74*4))
-        #self.game = struct.unpack('96i', saveStream.read(96*4))
-        #self.game = struct.unpack('263i', saveStream.read(263*4))
+        self.game = struct.unpack('263i', saveStream.read(263*4))
         #print len(self.game)
         #print self.game
+
+        # GAME / default game settings
+        (self.top_menu, self.preferences, self.difficulty, self.rules) = struct.unpack('4i', saveStream.read(4*4))
+        self.factions = struct.unpack('31i', saveStream.read(31*4))
+        self.gamelimits = struct.unpack('14i', saveStream.read(14*4))
+        self.moregamesettings = struct.unpack('8i', saveStream.read(8*4))
+        (self.custom_leader_name, self.custom_leader_title, self.custom_formal_name, self.custom_noun, self.custom_adjective) = struct.unpack('32s24s40s40s40s', saveStream.read(32+24+40*3))
+        self.moregamesettings2 = struct.unpack('10i', saveStream.read(10*4))
+        (self.world_seed_name,) = struct.unpack('12s', saveStream.read(12))
+        self.moregamesettings3 = struct.unpack('7i', saveStream.read(7*4))
+        self.actual_civ_array = struct.unpack('31i', saveStream.read(31*4))
+        (self.seafaring,) = struct.unpack('4s', saveStream.read(4))
+
+        #print self.__dict__
+
+        # SKIPPING over GAME section since I haven't figured it out yet
+        self.gameLength = horspool.boyermoore_horspool(saveStream, "DATE")
+        print 'GAME section length: {0}'.format(self.gameLength)
 
         print "\nWhat's Next:"
         self.whatsnext = hexdump(saveStream.read(263*4))
