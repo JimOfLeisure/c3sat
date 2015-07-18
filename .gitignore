@@ -1,0 +1,23 @@
+*.SAV
+*.sav
+*.gz
+Saves/
+old/
+*.xxd
+*.bak
+blast
+html/*.svg
+html/debug/
+pyblast/output
+pyblast/test.pk
+pyblast/test.txt
+
+#python specific
+*.pyc
+
+## generic files to ignore
+*~
+*.lock
+*.DS_Store
+*.swp
+*.out

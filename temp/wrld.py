@@ -1,0 +1,325 @@
+#!/usr/bin/env python
+# -*- coding: latin-1 -*-
+
+#    Copyright 2013 2014 Jim Nelson
+#
+#    This file is part of Civ3 Show-And-Tell.
+#
+#    Civ3 Show-And-Tell is free software: you can redistribute it and/or modify
+#    it under the terms of the GNU General Public License as published by
+#    the Free Software Foundation, either version 3 of the License, or
+#    (at your option) any later version.
+#
+#    Civ3 Show-And-Tell is distributed in the hope that it will be useful,
+#    but WITHOUT ANY WARRANTY; without even the implied warranty of
+#    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+#    GNU General Public License for more details.
+#
+#    You should have received a copy of the GNU General Public License
+#    along with Civ3 Show-And-Tell.  If not, see <http://www.gnu.org/licenses/>.
+
+# 2014-05-19 Now I want to skip to the first WRLD section in arbitrary uncompressed SAV files
+
+import struct	# For parsing binary data
+import json     # to export JSON for the HTML browser
+import horspool    # to seek to first match; from http://inspirated.com/2010/06/19/using-boyer-moore-horspool-algorithm-on-file-streams-in-python
+
+class GenericSection:
+    """Base class for reading SAV sections."""
+    def __init__(self, saveStream):
+        buffer = saveStream.read(8)
+        (self.name, self.length,) = struct.unpack_from('4si', buffer)
+        #self.offset = saveStream.tell()
+        self.buffer = saveStream.read(self.length)
+
+class Tile:
+    """Class for each logical tile."""
+    def __init__(self, saveStream):
+
+        self.info = {}
+
+        self.Tile36 = GenericSection(saveStream)
+        self.continent = get_short(self.Tile36.buffer, 0x1a)
+        self.info['continent'] = get_short(self.Tile36.buffer, 0x1a)
+        del self.Tile36.buffer
+
+        self.Tile12 = GenericSection(saveStream)
+        self.info['terrain'] = get_byte(self.Tile12.buffer, 0x5)
+        #self.whatsthis = get_byte(self.Tile12.buffer, 0xa)
+        self.whatsthis = get_byte(self.Tile12.buffer, 0x5)
+        self.whatsthis2 = get_byte(self.Tile12.buffer, 0x5)
+        self.whatsthis3 = get_byte(self.Tile12.buffer, 0xa)
+        self.whatsthis4 = get_byte(self.Tile12.buffer, 0xb)
+        self.whatsthis5 = get_int(self.Tile12.buffer, 0x0)
+        del self.Tile12.buffer
+
+        self.Tile4 = GenericSection(saveStream)
+        del self.Tile4.buffer
+
+        self.Tile128 = GenericSection(saveStream)
+        self.is_visible_to = get_int(self.Tile128.buffer, 0)
+        self.is_visible_now_to = get_int(self.Tile128.buffer, 4)
+        self.is_visible = self.is_visible_to & 0x02
+        #self.is_visible = self.is_visible_to & 0x10
+        self.is_visible_now = self.is_visible_now_to & 0x02
+        del self.Tile128.buffer
+
+class Tiles:
+    """Class to read all tiles"""
+    def __init__(self, saveStream, width, height):
+        self.width = width      # These may eventually be redundant to a parent class
+        self.height = height
+        self.tile = []          # List of individual tiles
+        self.tile_matrix = []       # x,y matrix of individual tiles
+        self.tile_iso_matrix = []   # faux isometric padded matrix  of individual tiles
+#        logical_tiles = width / 2 * height
+#        while logical_tiles > 0:
+#            self.tile.append(Tile(saveStream))
+#            logical_tiles -= 1
+        for y in range(height):
+            self.tile_matrix.append([])
+            self.tile_iso_matrix.append([])
+            if y % 2 == 1:
+                self.tile_iso_matrix[y].append(None)
+            for x in range(width / 2):
+                this_tile = Tile(saveStream)
+
+                self.tile.append(this_tile)
+
+                self.tile_matrix[y].append(this_tile)
+
+                self.tile_iso_matrix[y].append(this_tile)
+                self.tile_iso_matrix[y].append(None)
+
+            if y % 2 == 0:
+                self.tile_iso_matrix[y].append(None)
+
+    def map_id(self, i):
+        """Return a string to be used as a CSS ID for the tile group. i is the index of self.tile"""
+        return 'map' + str(i)
+
+    def svg_out(self):
+        """Return a string of svg-coded map"""
+        x_axis_wrap = True
+        y_axis_wrap = False
+        tile_width = 128
+        tile_height = 64
+        map_width = (self.width * tile_width / 2) + (tile_width / 2)
+        map_height = (self.height * tile_height / 2) + (tile_height / 2)
+        svg_string = ""
+        svg_string += '<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" version="1.1" x="0" y="0" viewBox="0 0 ' + str(map_width) + ' ' + str(map_height) + '">\n'
+        svg_string += """
+<defs>
+  <g transform="scale(0.1) translate(-355,-450)" id="myTree">
+    <rect
+       style="fill:#502d16"
+       id="rect3755"
+       width="38.385796"
+       height="135.36044"
+       x="333.35034"
+       y="412.93561" />
+    <path
+       style="fill:#003e00;stroke:#000000;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1"
+       d="m 350.52294,162.41779 c 45.35523,49.58592 68.30881,76.28117 137.38074,106.06602 -49.49747,3.16986 -65.65992,7.45477 -115.15739,-8.08122 37.19346,33.65589 79.36925,63.67564 136.3706,89.90357 -29.52448,8.86132 -77.90225,-10.22203 -126.26907,-20.20305 31.03325,29.4296 63.72488,75.96279 115.15739,105.05586 -84.46056,-24.01069 -184.4487,-22.38115 -314.15745,10e-6 40.71838,-21.12578 104.53494,-63.53265 141.42137,-105.05587 -33.89684,20.76304 -87.0985,20.089 -133.34014,16.16243 54.92101,-23.31175 90.86412,-44.06567 135.36045,-83.84266 -20.68253,3.88388 -77.82911,7.71658 -107.07619,10.10154 26.31048,-5.29696 125.20682,-84.59227 130.30969,-110.10663 z" />
+  </g>    
+  <g id="myForest">    
+    <use xlink:href = "#myTree" x="-10" y="-2" />
+    <use xlink:href = "#myTree" x="10" y="2" />
+    <use xlink:href = "#myTree" x="-40" y="7" />
+    <use xlink:href = "#myTree" x="32" y="7" />
+  </g>    
+    <linearGradient
+       id="linearGradient5222">
+      <stop
+         id="stop5224"
+         style="stop-color:#000000;stop-opacity:1"
+         offset="0" />
+      <stop
+         id="stop5226"
+         style="stop-color:#000000;stop-opacity:0"
+         offset="1" />
+    </linearGradient>
+    <linearGradient
+       id="linearGradient5212">
+      <stop
+         id="stop5214"
+         style="stop-color:#000000;stop-opacity:1"
+         offset="0" />
+    </linearGradient>
+    <linearGradient
+       x1="64.056763"
+       y1="989.39154"
+       x2="64.83329"
+       y2="1020.7062"
+       id="linearGradient5228"
+       xlink:href="#linearGradient5222"
+       gradientUnits="userSpaceOnUse"
+       spreadMethod="pad" />
+  <path
+     d="m 2.0535714,1020.4872 c 13.5301796,-8.7075 29.1766786,-22.0124 45.9821426,-27.67859 11.437648,-3.13407 17.614315,-4.40002 25.892858,-2.49999 10.58224,0.4331 33.946458,16.04268 47.857148,31.07138 -16.23876,11.6432 -38.546295,22.6862 -56.964291,21.4286 -31.562398,-2.1549 -42.206641,-13.3311 -62.7678576,-22.3214 z"
+     id="myHill"
+     transform="translate(-64,-1020.36218)"
+     style="fill:#008000;fill-opacity:1;stroke:url(#linearGradient5228);stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1" />
+  </defs>
+"""
+        svg_string += '<rect class="mapEdge" x="0" y="0" width="' + str(map_width) + '" height="' + str(map_height) + '" />\n'
+        for y in range(self.height):
+            x_indent = (y % 2) * tile_width / 2
+            y_offset = y * tile_height / 2
+            svg_string += '<g row="' + str(y) + '" transform="translate(' + str(x_indent) + ', ' + str(y_offset) + ')">\n'
+            for x in range(self.width / 2):
+                i = x  + y * self.width /2
+                info = hex(self.tile[i].whatsthis)
+                cssclass = 'tile'
+                if 0 <= i < len(self.tile):
+                    svg_string += '  <g id="' + self.map_id(i) + '" transform="translate(' + str(x * tile_width) + ', 0)">\n'
+                    svg_string += '    <polygon points="0,32 64,0 128,32 64,64" '
+                    if self.tile[i].is_visible:
+                        # Get right-nibble of terrain byte
+                        base_terrain = self.tile[i].info['terrain'] & 0x0F
+                        # Get left-nibble of terrain byte: bit-rotate right 4, then mask to be sure it wasn't more than a byte
+                        overlay_terrain = (self.tile[i].info['terrain'] >> 4) & 0x0F
+                        cssclass += 'baseterrain terrbase' + str(base_terrain)
+                        svg_string += 'class="' + cssclass + '" />\n'
+                        # Not sure I need this comparison; may just be able to key off the nibble value
+                        if overlay_terrain <> base_terrain:
+                            cssclass = 'overlayterrain terroverlay' + str(overlay_terrain)
+                            if overlay_terrain == 0x04:
+                                # Flood plain
+                                svg_string += '    <text class="' + cssclass + '" text-anchor="middle" alignment-baseline="central" x="' + str(tile_width / 2) + '" y="' + str(tile_height / 2) + '">Flood Plain</text>\n'
+                            elif overlay_terrain == 0x05:
+                                # Hill
+                                #svg_string += '    <text class="' + cssclass + '" text-anchor="middle" alignment-baseline="central" x="' + str(tile_width / 2) + '" y="' + str(tile_height / 2) + '">○</text>\n'
+                                svg_string += '    <use class="' + cssclass + '" x="' + str(tile_width / 2) + '" y="' + str(tile_height / 2) + '" xlink:href = "#myHill" />\n'
+                            elif overlay_terrain == 0x06:
+                                # Mountain
+                                svg_string += '    <text class="' + cssclass + '" text-anchor="middle" alignment-baseline="central" x="' + str(tile_width / 2) + '" y="' + str(tile_height / 2) + '">▲</text>\n'
+                            elif overlay_terrain == 0x07:
+                                # Forest
+                                #svg_string += '    <text class="' + cssclass + '" text-anchor="middle" alignment-baseline="central" x="' + str(tile_width / 2) + '" y="' + str(tile_height / 2) + '">↑↑↑</text>\n'
+                                #svg_string += '    <use class="' + cssclass + '" x="' + str(tile_width / 2) + '" y="' + str(tile_height / 2) + '" xlink:href = "#myTree" />\n'
+                                svg_string += '    <use class="' + cssclass + '" x="' + str(tile_width / 2) + '" y="' + str(tile_height / 2) + '" xlink:href = "#myForest" />\n'
+                            elif overlay_terrain == 0x08:
+                                # Jungle
+                                svg_string += '    <text class="' + cssclass + '" text-anchor="middle" alignment-baseline="central" x="' + str(tile_width / 2) + '" y="' + str(tile_height / 2) + '">Jungle</text>\n'
+                            elif overlay_terrain == 0x09:
+                                # Marsh
+                                svg_string += '    <text class="' + cssclass + '" text-anchor="middle" alignment-baseline="central" x="' + str(tile_width / 2) + '" y="' + str(tile_height / 2) + '">Marsh</text>\n'
+                            elif overlay_terrain == 0x0a:
+                                # Volcano
+                                svg_string += '    <text class="' + cssclass + '" text-anchor="middle" alignment-baseline="central" x="' + str(tile_width / 2) + '" y="' + str(tile_height / 2) + '">Volcano</text>\n'
+                            else:
+                                svg_string += '    <text class="' + cssclass + '" text-anchor="middle" alignment-baseline="central" x="' + str(tile_width / 2) + '" y="' + str(tile_height / 2) + '">' + info + '</text>\n'
+                        svg_string += '    <text class="whatsthis" text-anchor="middle" alignment-baseline="central" x="' + str(tile_width / 2) + '" y="' + str(tile_height / 2) + '">' + info + '</text>\n'
+                        svg_string += '  </g>\n'
+                    else:
+                        cssclass = 'fog'
+                        svg_string += 'class="' + cssclass + '" />\n'
+                        svg_string += '  </g>\n'
+            # link the first item and place at the end for even rows; link to the last item and place at the first. Will be half-cropped by viewport
+            # using math (even lines have 0 remainder, multiplying to cancel out values) instead of if, but it's a little harder to follow
+            svg_string += '  <use xlink:href="#' + self.map_id((y * self.width / 2) + (x * (y % 2))) + '" transform="translate(' + str((map_width - tile_width / 2) - (map_width - tile_width / 2) * 2 * (y % 2)) + ', 0)" />\n'
+            svg_string += '</g>\n'
+        svg_string += '</svg>\n'
+        return svg_string
+
+class Wrld:
+    """Class for 3 WRLD sections"""
+    def __init__(self, saveStream):
+        """Currently calling this from the horspool seek, so WRLD is already consumed from the stream. Read the length first."""
+        self.name = "WRLD"
+        buffer = saveStream.read(4)
+        (self.length,) = struct.unpack_from('i', buffer)
+        print self.length
+        #self.offset = saveStream.tell()
+        self.buffer = saveStream.read(self.length)
+        # Extract any data here, but I think it's only 2 bytes
+        print self.name
+        print hexdump(self.buffer)
+        del self.buffer
+
+        self.Wrld2 = GenericSection(saveStream)
+        print self.Wrld2.name
+        self.values = struct.unpack_from('41i', self.Wrld2.buffer)
+        self.height = self.values[1]
+        self.width = self.values[6]
+        print self.height
+        print self.width
+        print self.values
+        print hexdump(self.Wrld2.buffer)
+        del self.Wrld2.buffer
+
+        self.Wrld3 = GenericSection(saveStream)
+        print self.Wrld3.name
+        print hexdump(self.Wrld3.buffer)
+        del self.Wrld3.buffer
+
+        self.Tiles = Tiles(saveStream, self.width, self.height)
+
+
+def get_byte(buffer, offset):
+    """Unpack an byte from a buffer at the given offest."""
+    (the_byte,) = struct.unpack('B', buffer[offset:offset+1])
+    return the_byte
+
+def get_short(buffer, offset):
+    """Unpack an int from a buffer at the given offest."""
+    (the_short,) = struct.unpack('H', buffer[offset:offset+2])
+    return the_short
+
+def get_int(buffer, offset):
+    """Unpack an int from a buffer at the given offest."""
+    (the_int,) = struct.unpack('I', buffer[offset:offset+4])
+    return the_int
+
+def parse_save(saveFile):
+    #saveFilePath = "unc-test.sav"
+    #saveFilePath = "unc-lk151-650ad.sav"
+    #saveFile = open(saveFilePath, 'rb')
+    #print 'HACK: Skipping to first TILE in my test SAV.'
+    print 'Using Horspool search to go to first WRLD section'
+    print horspool.boyermoore_horspool(saveFile, "WRLD")
+    #print saveFile.tell()
+    #saveFile.seek(0x34a4, 0)
+    #saveFile.seek(0x2b7dc, 0)
+    game = Wrld(saveFile)
+    print 'HACK: Instantiating the class that reads TILEs with width x height hard-coded to my test SAV.'
+    #game = Tiles(saveFile, 60, 60)
+    #game = Tiles(saveFile, 256, 204)
+    return game
+
+def hexdump(src, length=16):
+    """Totally yoinked from https://gist.github.com/sbz/1080258"""
+    FILTER = ''.join([(len(repr(chr(x))) == 3) and chr(x) or '.' for x in range(256)])
+    lines = []
+    for c in xrange(0, len(src), length):
+        chars = src[c:c+length]
+        hex = ' '.join(["%02x" % ord(x) for x in chars])
+        printable = ''.join(["%s" % ((ord(x) <= 127 and FILTER[ord(x)]) or '.') for x in chars])
+        #lines.append("%04x  %-*s  %s\n" % (c, length*3, hex, printable))
+        lines.append("%04x  %-*s  %s" % (c, length*3, hex, printable))
+    return '\n'.join(lines)
+
+def main():
+    print json
+    game = parse_save("unc-test.sav")
+    game = parse_save("unc-lk151-650ad.sav")
+    print 'Printing something(s) from the class to ensure I have what I intended'
+    #print game.name, game.length
+    #print game.tile.pop()[1].length
+    #print game.width, game.height
+    #print game.tile[0].Tile128.length
+    #print game.tile[1000].Tile128.length
+    #print game.tile[0].is_visible_to
+    #max = len(game.tile)
+    max = 10
+    for i in range(max):
+        #print i, hex(game.tile[i].Tile36.offset), hex(game.tile[i].whatsthis), hex(game.tile[i].whatsthis2), hex(game.tile[i].whatsthis3), hex(game.tile[i].whatsthis4), hex(game.tile[i].whatsthis5)
+        #print i, hex(game.tile[i].Tile36.offset), hex(game.tile[i].whatsthis2)
+        #print hex(game.tile[i].whatsthis)
+        #print hexdump(game.tile[i].Tile12.buffer)
+        print game.Tiles.tile[i].continent
+    #print game.html_out()
+
+if __name__=="__main__":
+    main()
