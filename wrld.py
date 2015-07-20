@@ -25,7 +25,7 @@
 # 2014-05-19 Now I want to skip to the first WRLD section in arbitrary uncompressed SAV files
 
 import struct	# For parsing binary data
-#import json     # to export JSON for the HTML browser
+import json     # to export JSON for the HTML browser
 from horspool import horspool    # to seek to first match; from http://inspirated.com/2010/06/19/using-boyer-moore-horspool-algorithm-on-file-streams-in-python
 import sys
 
@@ -144,29 +144,37 @@ class Tiles:
         self.width = width      # These may eventually be redundant to a parent class
         self.height = height
         self.tile = []          # List of individual tiles
-        self.tile_matrix = []       # x,y matrix of individual tiles
-        self.tile_iso_matrix = []   # faux isometric padded matrix  of individual tiles
+        #self.tile_matrix = []       # x,y matrix of individual tiles
+        #self.tile_iso_matrix = []   # faux isometric padded matrix  of individual tiles
 #        logical_tiles = width / 2 * height
 #        while logical_tiles > 0:
 #            self.tile.append(Tile(saveStream))
 #            logical_tiles -= 1
         for y in range(height):
-            self.tile_matrix.append([])
-            self.tile_iso_matrix.append([])
-            if y % 2 == 1:
-                self.tile_iso_matrix[y].append(None)
+            #self.tile_matrix.append([])
+            #self.tile_iso_matrix.append([])
+            #if y % 2 == 1:
+            #    self.tile_iso_matrix[y].append(None)
             for x in range(width / 2):
                 this_tile = Tile(saveStream, debug)
 
                 self.tile.append(this_tile)
 
-                self.tile_matrix[y].append(this_tile)
+                #self.tile_matrix[y].append(this_tile)
 
-                self.tile_iso_matrix[y].append(this_tile)
-                self.tile_iso_matrix[y].append(None)
+                #self.tile_iso_matrix[y].append(this_tile)
+                #self.tile_iso_matrix[y].append(None)
 
-            if y % 2 == 0:
-                self.tile_iso_matrix[y].append(None)
+            #if y % 2 == 0:
+            #    self.tile_iso_matrix[y].append(None)
+
+    def jsonDefault(self, o):
+        """Trying to make json.dumps() work on all my data"""
+        return o.__dict__
+
+    def json_out(self, spoiler=False, debug=False):
+        """Return a string of json-coded map"""
+        return json.dumps(self, default=self.jsonDefault, indent=4)
 
 #    def map_id(self, i):
 #        """Return a string to be used as a CSS ID for the tile group. i is the index of self.tile"""

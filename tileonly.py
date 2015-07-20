@@ -285,8 +285,8 @@ def get_int(buffer, offset):
     return the_int
 
 def parse_save():
-    saveFilePath = "unc-test.sav"
-    #saveFilePath = "unc-lk151-650ad.sav"
+    saveFilePath = "gamesaves/unc-test.sav"
+    #saveFilePath = "gamesaves/unc-lk151-650ad.sav"
     saveFile = open(saveFilePath, 'rb')
     print 'HACK: Skipping to first TILE in my test SAV.'
     saveFile.seek(0x34a4, 0)
@@ -327,6 +327,7 @@ def main():
         #print hexdump(game.tile[i].Tile12.buffer)
         print game.tile[i].continent
     #print game.html_out()
+    print game.json_out()
 
 if __name__=="__main__":
     main()
