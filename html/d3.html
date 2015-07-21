@@ -4,6 +4,23 @@
   <title>Civ3 Show-and-Tell JSON/d3/SVG Map</title>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/d3/3.5.6/d3.min.js" charset="utf-8"></script>
 <script>
+
+mapstyle = {
+    'baseTerrain': {
+        // plains
+        0x01: 'sandybrown',
+        // grassland
+        0x02: 'green',
+        // tundra
+        0x03: 'white',
+        // coast
+        0x0b: 'blue',
+        // sea
+        0x0c: 'mediumblue',
+        // ocean
+        0x0d: 'darkblue'
+    }
+}
 // load map json file
 d3.json("civmap.json", function(error, data){
     if (error) return console.warn(error);
@@ -39,10 +56,7 @@ d3.json("civmap.json", function(error, data){
     // Assign fill color based on terrain
     tiles.attr('style', function(d, i) {
        // return data.tile[i].info['terrain']
-       if (data.tile[i]['info']['terrain'] == 34)
-         return 'fill: green'
-       else
-         return 'fill: blue'
+       return 'fill: ' + mapstyle.baseTerrain[data.tile[i]['info']['terrain'] & 0x0F] 
     });
 });
 </script>
