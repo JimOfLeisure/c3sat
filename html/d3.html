@@ -33,8 +33,8 @@ d3.json("civmap.json", function(error, data){
     // Add svg element and assign to var
     var svg = d3.select('body').append('svg')
        .attr('style', 'background: gray')
-       .attr('width', data.width * 128 + 64)
-       .attr('height', data.height * 16 + 32);
+       .attr('width', data.width * 64 + 64)
+       .attr('height', data.height * 32 + 32);
 
     var tiles = svg.selectAll('polygon')
         .data(data.tile);
@@ -48,8 +48,8 @@ d3.json("civmap.json", function(error, data){
     // Set x transforms for tiles
     tiles.attr('transform', function(d, i) {
        // tile-width * map width, aslo add half-tile offset to the right for odd rows
-       x = 128 * (i % data.width) + 64 * ( Math.floor(i / data.width) % 2);
-       y = 32 * Math.floor(i / data.width);
+       x = 128 * (i % (data.width / 2)) + 64 * ( Math.floor(i / (data.width /2)) % 2);
+       y = 32 * Math.floor(i / (data.width / 2));
        return 'translate(' + x.toString() + ',' + y.toString() + ')'
     });
 
