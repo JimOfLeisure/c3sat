@@ -7,6 +7,8 @@
 
 mapstyle = {
     'baseTerrain': {
+        // desert
+        0x00: 'cornsilk',
         // plains
         0x01: 'sandybrown',
         // grassland
@@ -41,8 +43,6 @@ d3.json("civmap.json", function(error, data){
 
     // Adds tiles to the DOM
     tiles.enter().append('polygon')
-       //.attr('width', 64)
-       //.attr('height', 64);
        .attr('points', '0,32 64,0 128,32 64,64');
 
     // Set x transforms for tiles
@@ -55,8 +55,13 @@ d3.json("civmap.json", function(error, data){
 
     // Assign fill color based on terrain
     tiles.attr('style', function(d, i) {
-       // return data.tile[i].info['terrain']
-       return 'fill: ' + mapstyle.baseTerrain[data.tile[i]['info']['terrain'] & 0x0F] 
+       myFill = mapstyle.baseTerrain[data.tile[i]['info']['terrain'] & 0x0F] 
+       if (myFill)
+         return 'fill: ' + myFill
+       else {
+         console.warn('Unstyled tile terrain ' + data.tile[i].info.terrain.toString())
+         return 'fill: red'
+       }
     });
 });
 </script>
