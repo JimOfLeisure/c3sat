@@ -15,6 +15,7 @@ d3.json("civmap.json", function(error, data){
 
     // Add svg element and assign to var
     var svg = d3.select('body').append('svg')
+       .attr('style', 'background: gray')
        .attr('width', data.width * 128 + 64)
        .attr('height', data.height * 16 + 32);
 
@@ -35,14 +36,14 @@ d3.json("civmap.json", function(error, data){
        return 'translate(' + x.toString() + ',' + y.toString() + ')'
     });
 
-    /*
-    // Set y transforms for tiles
-    tiles.attr('y', function(d, i) {
-       // Ros is height modulus width; rows are half-height because overlap
-       return 32 * Math.floor(i / data.width);
+    // Assign fill color based on terrain
+    tiles.attr('style', function(d, i) {
+       // return data.tile[i].info['terrain']
+       if (data.tile[i]['info']['terrain'] == 34)
+         return 'fill: green'
+       else
+         return 'fill: blue'
     });
-    */
-
 });
 </script>
 </head>
