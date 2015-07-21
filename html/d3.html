@@ -15,8 +15,8 @@ d3.json("civmap.json", function(error, data){
 
     // Add svg element and assign to var
     var svg = d3.select('body').append('svg')
-       .attr('width', data.width * 64 + 64)
-       .attr('height', data.height * 32);
+       .attr('width', data.width * 128 + 64)
+       .attr('height', data.height * 16 + 32);
 
     var tiles = svg.selectAll('polygon')
         .data(data.tile);
