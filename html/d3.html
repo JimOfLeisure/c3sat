@@ -18,14 +18,14 @@ d3.json("civmap.json", function(error, data){
        .attr('width', data.width * 64 + 64)
        .attr('height', data.height * 32);
 
-    var tiles = svg.selectAll('rect')
+    var tiles = svg.selectAll('polygon')
         .data(data.tile);
 
     // Adds tiles to the DOM
-    tiles.enter().append('rect')
-       .attr('width', 64)
-       .attr('height', 64);
-       //.attr('points', '0,32 64,0 128,32 64,64');
+    tiles.enter().append('polygon')
+       //.attr('width', 64)
+       //.attr('height', 64);
+       .attr('points', '0,32 64,0 128,32 64,64');
 
     // Set x transforms for tiles
     tiles.attr('x', function(d, i) {
