@@ -28,16 +28,20 @@ d3.json("civmap.json", function(error, data){
        .attr('points', '0,32 64,0 128,32 64,64');
 
     // Set x transforms for tiles
-    tiles.attr('x', function(d, i) {
+    tiles.attr('transform', function(d, i) {
        // tile-width * map width, aslo add half-tile offset to the right for odd rows
-       return 128 * (i % data.width) + 64 * ( Math.floor(i / data.width) % 2);
+       x = 128 * (i % data.width) + 64 * ( Math.floor(i / data.width) % 2);
+       y = 32 * Math.floor(i / data.width);
+       return 'translate(' + x.toString() + ',' + y.toString() + ')'
     });
 
+    /*
     // Set y transforms for tiles
     tiles.attr('y', function(d, i) {
        // Ros is height modulus width; rows are half-height because overlap
        return 32 * Math.floor(i / data.width);
     });
+    */
 
 });
 </script>
