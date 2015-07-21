@@ -1,0 +1,48 @@
+<!DOCTYPE HTML>
+<html>
+<head>
+  <title>Civ3 Show-and-Tell JSON/d3/SVG Map</title>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/d3/3.5.6/d3.min.js" charset="utf-8"></script>
+<script>
+// load map json file
+d3.json("civmap.json", function(error, data){
+    if (error) return console.warn(error);
+    else
+    // Just making sure I have the data
+    console.log(data.tile.length); 
+    console.log(data.width); 
+    console.log(data.height); 
+
+    // Add svg element and assign to var
+    var svg = d3.select('body').append('svg')
+       .attr('width', data.width * 64 + 64)
+       .attr('height', data.height * 32);
+
+    var tiles = svg.selectAll('rect')
+        .data(data.tile);
+
+    // Adds tiles to the DOM
+    tiles.enter().append('rect')
+       .attr('width', 64)
+       .attr('height', 64);
+       //.attr('points', '0,32 64,0 128,32 64,64');
+
+    // Set x transforms for tiles
+    tiles.attr('x', function(d, i) {
+       // tile-width * map width, aslo add half-tile offset to the right for odd rows
+       return 128 * (i % data.width) + 64 * ( Math.floor(i / data.width) % 2);
+    });
+
+    // Set y transforms for tiles
+    tiles.attr('y', function(d, i) {
+       // Ros is height modulus width; rows are half-height because overlap
+       return 32 * Math.floor(i / data.width);
+    });
+
+});
+</script>
+</head>
+<body>
+  <h1>Civ3 Show-and-Tell JSON/d3/SVG Map</h1>
+</body>
+</html>
