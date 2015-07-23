@@ -30,22 +30,23 @@ polygon {
 
 /* Base Terrain for Desert (?) */
 .terrbase0 {
-    fill: cornsilk;
+    fill: #F7DE94;
 }
 
 /* Base Terrain for Plains */
 .terrbase1 {
-    fill: sandybrown;
+    fill: #E7C663;
 }
 
 /* Base Terrain for Grassland */
 .terrbase2 {
-    fill: green;
+    /* fill: #888921; */
+    fill: #9C9C39;
 }
 
 /* Base Terrain for Tundra */
 .terrbase3 {
-    fill: white;
+    fill: #D0E5E0;
 }
 
 /* Base Terrain */
@@ -54,17 +55,17 @@ polygon {
 
 /* Base Terrain for Coast (water tile) */
 .terrbase11 {
-    fill: blue;
+    fill: #9CE7BD;
 }
 
 /* Base Terrain for Sea */
 .terrbase12 {
-    fill: mediumblue;
+    fill: #39B5AD;
 }
 
 /* Base Terrain for Ocean */
 .terrbase13 {
-    fill: darkblue;
+    fill: #014353;
 }
 
 /* Overlay Terrain for Forest */
