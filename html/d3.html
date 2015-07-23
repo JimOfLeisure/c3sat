@@ -2,6 +2,7 @@
 <html>
 <head>
   <title>Civ3 Show-and-Tell JSON/d3/SVG Map</title>
+  <link rel="stylesheet" type="text/css" href="svgmap.css">
   <script src="https://cdnjs.cloudflare.com/ajax/libs/d3/3.5.6/d3.min.js" charset="utf-8"></script>
 <script>
 
@@ -53,6 +54,22 @@ d3.json("civmap.json", function(error, data){
        return 'translate(' + x.toString() + ',' + y.toString() + ')'
     });
 
+    // Assign class based on terrain
+    tiles.attr('class', function(d, i) {
+       /*
+       myFill = mapstyle.baseTerrain[d.info.terrain & 0x0F] 
+       if (myFill)
+         return 'fill: ' + myFill
+       else {
+         console.warn('Unstyled tile terrain ' + d.info.terrain.toString())
+         return 'fill: red'
+       //.attr('class', 'terrbase' + (d.info.terrain & 0x0F).toString );
+       }
+       */
+       return 'terrbase' + (d.info.terrain & 0x0F).toString();
+    });
+
+/*
     // Assign fill color based on terrain
     tiles.attr('style', function(d, i) {
        myFill = mapstyle.baseTerrain[d.info.terrain & 0x0F] 
@@ -63,6 +80,7 @@ d3.json("civmap.json", function(error, data){
          return 'fill: red'
        }
     });
+*/
 });
 </script>
 </head>
