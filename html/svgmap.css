@@ -1,0 +1,86 @@
+/* "fog of war"; unrevealed tiles */
+.fog {
+    fill: black;
+}
+
+/* "What's This" text elements I use to show given hex tiles per map */
+.whatsthis {
+    display: none;
+}
+
+/* .map > polygon { */
+polygon {
+    fill: red; /* red should stand out if I don't have a polygon otherwise styled */
+    /* for gridlines
+    stroke: black;
+    stroke-width: 1;
+    */
+    shape-rendering: crispEdges;
+}
+
+/* The map edge rectangle(s) that backdrop the edge tiles */
+.mapEdge {
+    fill: black;
+}
+
+/* Overlay Terrain */
+.overlayterrain {
+    /* display: none; */
+}
+
+/* Base Terrain for Desert (?) */
+.terrbase0 {
+    fill: cornsilk;
+}
+
+/* Base Terrain for Plains */
+.terrbase1 {
+    fill: sandybrown;
+}
+
+/* Base Terrain for Grassland */
+.terrbase2 {
+    fill: green;
+}
+
+/* Base Terrain for Tundra */
+.terrbase3 {
+    fill: white;
+}
+
+/* Base Terrain */
+.terrbase4 {
+}
+
+/* Base Terrain for Coast (water tile) */
+.terrbase11 {
+    fill: blue;
+}
+
+/* Base Terrain for Sea */
+.terrbase12 {
+    fill: mediumblue;
+}
+
+/* Base Terrain for Ocean */
+.terrbase13 {
+    fill: darkblue;
+}
+
+/* Overlay Terrain for Forest */
+.terroverlay7 {
+    font-size: 3em;   /* A Forest is currently a string unicode up arrows; let's make it big */
+    /* fill: darkgreen; */
+}
+
+/* Overlay Terrain for Mountain */
+/* Overlay Terrain for Hill */
+.terroverlay5 {
+  font-size: 6em;   /* A hill is currently a unicode circle in a string; let's make it big */
+}
+
+/* Overlay Terrain for Mountain */
+.terroverlay6 {
+  font-size: 5em;   /* A mountain is currently a unicode triangle in a string; let's make it big */
+  fill: saddlebrown;
+}
