@@ -24,16 +24,20 @@ d3.json("civmap.json", function(error, data){
     var tiles = svg.selectAll('polygon')
         .data(data.tile);
 
+    var x = function(i){
+       // tile-width * map width, aslo add half-tile offset to the right for odd rows
+       return 128 * (i % (data.width / 2)) + 64 * ( Math.floor(i / (data.width /2)) % 2);
+    }
+    var y = function(i){
+       return 32 * Math.floor(i / (data.width / 2));
+    }
     // Adds tiles to the DOM
     tiles.enter().append('polygon')
        .attr('points', '0,32 64,0 128,32 64,64');
 
-    // Set x transforms for tiles
+    // Set transforms for tiles
     tiles.attr('transform', function(d, i) {
-       // tile-width * map width, aslo add half-tile offset to the right for odd rows
-       x = 128 * (i % (data.width / 2)) + 64 * ( Math.floor(i / (data.width /2)) % 2);
-       y = 32 * Math.floor(i / (data.width / 2));
-       return 'translate(' + x.toString() + ',' + y.toString() + ')'
+       return 'translate(' + x(i).toString() + ',' + y(i).toString() + ')'
     });
 
     // Assign class based on terrain
