@@ -99,6 +99,8 @@ d3.json("civmap.json", function(error, data){
     removenodes(tiles, function(d){ return d.rivers; } );
     rivers(tiles, 0, 32, 64, 0, 0x80);
     rivers(tiles, 64, 0, 128, 32, 0x02);
+    rivers(tiles, 128, 32, 64, 64, 0x08);
+    rivers(tiles, 64, 64, 0, 32, 0x20);
 
 });
 </script>
