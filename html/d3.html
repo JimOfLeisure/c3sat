@@ -8,27 +8,23 @@
 
 var resources = {
     0x08: '\uD83C\uDF47', // "#myWines" 
-    /*
-    0x09: // self.svg_text("Furs",textxypos)
-    0x0c: // self.svg_text("Spices",textxypos)
-    0x0d: // self.svg_text("Ivory",textxypos)
-    0x0a: // self.svg_text("Dyes",textxypos)
-    0x0b: // self.svg_text("Incense",textxypos)
-    0x0e: // self.svg_text("Silks",textxypos)
-    0x0f: // self.svg_text("Gems",textxypos)
-    0x10: // self.svg_text("Whales",textxypos)
-    0x11: // self.svg_text("Deer",textxypos)
-    0x12: // "#myFish"
-    */
-    0x13: '\uD83D\uDC04' // Cow
-    /*
-    0x14: // self.svg_text("Wheat",textxypos)
-    0x15: // self.svg_text("Gold",textxypos)
-    0x16: // self.svg_text("Sugar",textxypos)
-    0x17: // self.svg_text("Trop.Fruit",textxypos)
-    0x18: // self.svg_text("Oasis",textxypos)
-    0x19: // self.svg_text("Tobacco",textxypos)
-    */
+    0x09: 'Furs', // Furs
+    0x0c: 'Spices', // Spices
+    0x0d: 'Ivory', // Ivory
+    0x0a: 'Dyes', // Dyes
+    0x0b: 'Incense', // Incense
+    0x0e: 'Silks', // Silks
+    0x0f: 'Gems', // Gems
+    0x10: 'Whales', // Whales
+    0x11: 'Deer', // Deer
+    0x12: 'Fish', // Fish
+    0x13: '\uD83D\uDC04', // Cow
+    0x14: 'Wheat', // Wheat
+    0x15: 'Gold', // Gold
+    0x16: 'Sugar', // Sugar
+    0x17: 'Trop.Fruit', // Trop.Fruit
+    0x18: 'Oasis', // Oasis
+    0x19: 'Tobacco' // Tobacco
 }
 console.log('Resource object test:');
 Object.keys(resources).forEach(function(key){ console.log(key, resources[key]); });
@@ -115,11 +111,14 @@ d3.json("civmap.json", function(error, data){
     // SW river
     rivers(tiles, 64, 64, 0, 32, 0x20);
 
+    // Add resources to map
     tiles.enter().append('text')
         .attr('class', 'resource')
         .attr('x', function(d, i) { return x(i) + 64})
         .attr('y', function(d, i) { return y(i) + 32 })
         .text(function(d){ return resources[d.resource]});
+    // Remove empty text nodes (those that don't have an entry in resources)
+    removenodes(tiles, function(d){ return resources[d.resource] } );
 
 });
 </script>
