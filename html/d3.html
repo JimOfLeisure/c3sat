@@ -66,24 +66,7 @@ d3.json("civmap.json", function(error, data){
 
 
     // Rivers
-    tiles.enter().append('circle')
-       .attr('class', 'river')
-        .attr('cx', function(d, i) {
-           //return (x(i) + 64).toString && d.rivers
-           return d.rivers ? (x(i) + 64).toString() : null
-        })
-        .attr('cy', function(d, i) {
-           return d.rivers ? (y(i) + 32).toString() : null
-        })
-        .attr('r', function(d, i) {
-           return d.rivers ? '16' : null
-        });
-
-    despoil(tiles);
-
-    // remove null river bindings
-    removenodes(tiles, function(d){ return d.rivers; } );
-
+    // Currently this draws rivers for every tile then deletes the inappropriate ones
     var rivers = function(selection, x1, y1, x2, y2, mask) {
         selection.enter().append('line')
             .attr('class', 'river')
@@ -92,14 +75,18 @@ d3.json("civmap.json", function(error, data){
             .attr('x2', function(d, i) { return x(i) + x2 })
             .attr('y2', function(d, i) { return y(i) + y2});
     
+        // Remove spoiler tiles
         despoil(selection);
+        // Remove lines for unmatched data
         removenodes(selection, function(d){ return d.rivers & mask; } );
     }
-    // remove null river bindings
-    removenodes(tiles, function(d){ return d.rivers; } );
+    // NW river
     rivers(tiles, 0, 32, 64, 0, 0x80);
+    // NE river
     rivers(tiles, 64, 0, 128, 32, 0x02);
+    // SE river
     rivers(tiles, 128, 32, 64, 64, 0x08);
+    // SW river
     rivers(tiles, 64, 64, 0, 32, 0x20);
 
 });
