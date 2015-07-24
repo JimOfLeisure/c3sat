@@ -33,6 +33,15 @@ var resources = {
 console.log('Resource object test:');
 Object.keys(resources).forEach(function(key){ console.log(key, resources[key]); });
 
+var overlay = {
+    0x05: '#myHill',
+    0x06: '#myMountain',
+    0x07: '#myForest',
+    0x08: '#myJungle',
+    0x09: '#myMarsh',
+    0x0a: '#myVolcano'
+}
+
 // load map json file
 d3.json("civmap.json", function(error, data){
     if (error) return console.warn(error);
