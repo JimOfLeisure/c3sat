@@ -53,30 +53,15 @@ d3.json("civmap.json", function(error, data){
     console.log(data.height); 
 */
 
-/*
-// load svg defs file
-var mapdefs = d3.xml("mapdefs.svg", function(error, mapdefs){
-    if (error) return console.warn(error);
-    else
-    console.log('Mapdefs loaded');
-    console.log(mapdefs);
-    return mapdefs
-});
-*/
-
     // Add svg element and assign to var
     var svg = d3.select('svg#map')
        // These xmlns's cause d3 to error out:
-       //.attr('xmlns', 'http://www.w3.org/2000/svg')
-       //.attr('xmlns:xlink', 'http://www.w3.org/1999/xlink')
+       .attr(':xmlns', 'http://www.w3.org/2000/svg')
+       .attr(':xmlns:xlink', 'http://www.w3.org/1999/xlink')
        .attr('id', 'map')
        .attr('style', 'background: darkslategray')
        .attr('width', data.width * 64 + 64)
        .attr('height', data.height * 32 + 32);
-
-    // Trying to append mapdefs and failing
-    // console.log(svg.selectAll('svg').data(mapdefs).enter().append('svg'))
-    // d3.select('svg').data(mapdefs).enter().append('svg');
 
     var tiles = svg.selectAll('polygon')
         .data(data.tile)
@@ -143,6 +128,15 @@ var mapdefs = d3.xml("mapdefs.svg", function(error, mapdefs){
     rivers(tiles, 128, 32, 64, 64, 0x08);
     // SW river
     rivers(tiles, 64, 64, 0, 32, 0x20);
+
+    // Add overlay to map
+    tiles.enter().append('use')
+        // .attr('class', 'terroverlay')
+        .attr('x', function(d, i) { return x(i) + 64})
+        .attr('y', function(d, i) { return y(i) + 32 })
+        .attr(':xlink:href', function(d){ return overlay[(d.info.terrain >> 4) & 0X0f]});
+    // Remove empty text nodes (those that don't have an entry in resources)
+    // removenodes(tiles, function(d){ return overlay[d.info.terrain >> 4 & 0x0f] } );
 
     // Add resources to map
     tiles.enter().append('text')
