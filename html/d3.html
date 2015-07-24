@@ -53,6 +53,7 @@ d3.json("civmap.json", function(error, data){
     console.log(data.height); 
 */
 
+/*
 // load svg defs file
 var mapdefs = d3.xml("mapdefs.svg", function(error, mapdefs){
     if (error) return console.warn(error);
@@ -61,9 +62,10 @@ var mapdefs = d3.xml("mapdefs.svg", function(error, mapdefs){
     console.log(mapdefs);
     return mapdefs
 });
+*/
 
     // Add svg element and assign to var
-    var svg = d3.select('body').append('svg')
+    var svg = d3.select('svg#map')
        // These xmlns's cause d3 to error out:
        //.attr('xmlns', 'http://www.w3.org/2000/svg')
        //.attr('xmlns:xlink', 'http://www.w3.org/1999/xlink')
