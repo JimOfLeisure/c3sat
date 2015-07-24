@@ -54,6 +54,9 @@ d3.json("civmap.json", function(error, data){
 */
     // Add svg element and assign to var
     var svg = d3.select('body').append('svg')
+       // These xmlns's cause d3 to error out:
+       //.attr('xmlns', 'http://www.w3.org/2000/svg')
+       //.attr('xmlns:xlink', 'http://www.w3.org/1999/xlink')
        .attr('style', 'background: darkslategray')
        .attr('width', data.width * 64 + 64)
        .attr('height', data.height * 32 + 32);
