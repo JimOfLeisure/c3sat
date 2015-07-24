@@ -30,8 +30,8 @@ var resources = {
     // 0x19: 'Tobacco' // Tobacco
     0x19: '\uD83D\uDEAC' // Unicode smoking // Tobacco
 }
-console.log('Resource object test:');
-Object.keys(resources).forEach(function(key){ console.log(key, resources[key]); });
+// console.log('Resource object test:');
+// Object.keys(resources).forEach(function(key){ console.log(key, resources[key]); });
 
 var overlay = {
     0x05: '#myHill',
@@ -58,7 +58,7 @@ var mapdefs = d3.xml("mapdefs.svg", function(error, mapdefs){
     if (error) return console.warn(error);
     else
     console.log('Mapdefs loaded');
-    // console.log(mapdefs);
+    console.log(mapdefs);
     return mapdefs
 });
 
@@ -67,11 +67,14 @@ var mapdefs = d3.xml("mapdefs.svg", function(error, mapdefs){
        // These xmlns's cause d3 to error out:
        //.attr('xmlns', 'http://www.w3.org/2000/svg')
        //.attr('xmlns:xlink', 'http://www.w3.org/1999/xlink')
+       .attr('id', 'map')
        .attr('style', 'background: darkslategray')
        .attr('width', data.width * 64 + 64)
-       .attr('height', data.height * 32 + 32)
-       // Trying to append mapdefs and failing
-       //.text(mapdefs);
+       .attr('height', data.height * 32 + 32);
+
+    // Trying to append mapdefs and failing
+    // console.log(svg.selectAll('svg').data(mapdefs).enter().append('svg'))
+    d3.select('svg').data(mapdefs).enter().append('svg');
 
     var tiles = svg.selectAll('polygon')
         .data(data.tile)
