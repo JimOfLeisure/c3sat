@@ -27,6 +27,11 @@ d3.json("civmap.json", function(error, data){
         .data(data.tile)
         // causes tiles not to have .enter() -.filter(function(d){ return d.is_visible_to_flags & spoilmask});
 
+    // If callback() is true, remove the node
+    var removenodes = function(selection, callback){
+        selection.filter(function(d){ return ! callback(d); }).remove();
+    }
+
     // bitmask for "is visible to" value. 0x2 is human player 1, 0x1 is barbs, 0xffff matches all
     var spoilmask = 0x2;
     // spoilmask = 0x4;
@@ -34,7 +39,7 @@ d3.json("civmap.json", function(error, data){
 
     // remove spoiler bindings
     var despoil = function(selection){
-      selection.filter(function(d){ return ! (d.is_visible_to_flags & spoilmask)}).remove();
+      removenodes(selection, function(d){ return d.is_visible_to_flags & spoilmask; } );
     }
 
     var x = function(i){
@@ -72,7 +77,8 @@ d3.json("civmap.json", function(error, data){
            return d.rivers ? '32' : null
         });
 
-    despoil(tiles);
+    // remove null river bindings
+    removenodes(tiles, function(d){ return d.rivers; } );
 
 });
 </script>
