@@ -23,6 +23,11 @@ polygon {
     fill: black;
 }
 
+/* Rivers */
+/* Rivers are temporarily just a circle in the middle of the tile */
+.river {
+    fill: blue;
+}
 /* Overlay Terrain */
 .overlayterrain {
     /* display: none; */

@@ -54,6 +54,20 @@ d3.json("civmap.json", function(error, data){
           return spoil(d, i, 'fog') || 'terrbase' + (d.info.terrain & 0x0F).toString();
        });
 
+    // Rivers
+    tiles.enter().append('circle')
+       .attr('class', 'river')
+        .attr('cx', function(d, i) {
+           //return (x(i) + 64).toString && d.rivers
+           return d.rivers ? (x(i) + 64).toString() : null
+        })
+        .attr('cy', function(d, i) {
+           return d.rivers ? (y(i) + 32).toString() : null
+        })
+        .attr('r', function(d, i) {
+           return d.rivers ? spoil(d, i, null) || '32' : null
+        });
+
 });
 </script>
 </head>
