@@ -66,6 +66,7 @@ d3.json("civmap.json", function(error, data){
 
 
     // Rivers
+/*
     tiles.enter().append('circle')
        .attr('class', 'river')
         .attr('cx', function(d, i) {
@@ -80,22 +81,36 @@ d3.json("civmap.json", function(error, data){
         });
 
     despoil(tiles);
-
     // remove null river bindings
     removenodes(tiles, function(d){ return d.rivers; } );
 
+*/
     var rivers = function(selection, x1, y1, x2, y2, mask) {
         selection.enter().append('line')
             .attr('class', 'river')
-            .attr('x1', function(d, i) { return x(i) + x1})
+            //.attr('rivermask', function(d){ d.rivers & mask })
+            .attr('x1', function(d, i) { return d.rivers & mask ? x(i) + x1 : null})
+            .attr('y1', function(d, i) { return d.rivers & mask ? x(i) + y1 : null})
+            .attr('x2', function(d, i) { return d.rivers & mask ? x(i) + x2 : null})
+            .attr('y2', function(d, i) { return d.rivers & mask ? x(i) + y2 : null})
+            /*
+            .attr('y1', d.rivers & mask ? function(d, i) { return y(i) + y1} : null)
+            .attr('x2', d.rivers & mask ? function(d, i) { return x(i) + x2} : null)
+            .attr('y2', d.rivers & mask ? function(d, i) { return y(i) + y2} : null)
+            /*
             .attr('y1', function(d, i) { return y(i) + y1 })
             .attr('x2', function(d, i) { return x(i) + x2 })
             .attr('y2', function(d, i) { return y(i) + y2});
+            */
     
-        despoil(tiles);
+        //despoil(selection);
+        //removenodes(selection, function(d){ return d.rivers & mask; } );
     }
     // remove null river bindings
-    removenodes(tiles, function(d){ return d.rivers; } );
+    rivers(tiles, 0, 32, 64, 0, 0x80);
+    rivers(tiles, 64, 0, 128, 64, 0x02);
+    //rivers(tiles, 0, 32, 64, 0, 0x80);
+    //rivers(tiles, 0, 32, 64, 0, 0x80);
 
 });
 </script>
