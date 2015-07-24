@@ -61,7 +61,7 @@ d3.json("civmap.json", function(error, data){
     // bitmask for "is visible to" value. 0x2 is human player 1, 0x1 is barbs, 0xffff matches all
     var spoilmask = 0x2;
     // spoilmask = 0x4;
-    // spoilmask = 0xffff;
+    spoilmask = 0xffff;
 
     // remove spoiler bindings
     var despoil = function(selection){
@@ -114,6 +114,12 @@ d3.json("civmap.json", function(error, data){
     rivers(tiles, 128, 32, 64, 64, 0x08);
     // SW river
     rivers(tiles, 64, 64, 0, 32, 0x20);
+
+    tiles.enter().append('text')
+        .attr('class', 'resource')
+        .attr('x', function(d, i) { return x(i) + 64})
+        .attr('y', function(d, i) { return y(i) + 32 })
+        .text(function(d){ return resources[d.resource]});
 
 });
 </script>
