@@ -84,6 +84,18 @@ d3.json("civmap.json", function(error, data){
     // remove null river bindings
     removenodes(tiles, function(d){ return d.rivers; } );
 
+    tiles.enter().append('line')
+        .attr('class', 'river')
+        .attr('x1', function(d, i) { return x(i) })
+        .attr('y1', function(d, i) { return y(i) + 32 })
+        .attr('x2', function(d, i) { return x(i) + 64 })
+        .attr('y2', function(d, i) { return y(i) });
+
+    despoil(tiles);
+
+    // remove null river bindings
+    removenodes(tiles, function(d){ return d.rivers; } );
+
 });
 </script>
 </head>

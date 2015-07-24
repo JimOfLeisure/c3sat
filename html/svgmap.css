@@ -27,6 +27,9 @@ polygon {
 /* Rivers are temporarily just a circle in the middle of the tile */
 .river {
     fill: blue;
+    stroke: blue;
+    stroke-width: 10;
+    stroke-linecap: round;
 }
 /* Overlay Terrain */
 .overlayterrain {
