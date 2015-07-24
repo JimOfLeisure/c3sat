@@ -59,7 +59,7 @@ d3.json("civmap.json", function(error, data){
        // Assign class based on terrain
        .attr('class', function(d, i) {
           // including itentify flood plains
-          return 'terrbase' + (d.info.terrain & 0x0F).toString() + (d.rivers ? ' floodplain' : '');
+          return 'terrbase' + (d.info.terrain & 0x0F).toString() + (!(d.info.terrain & 0x0f) && d.rivers ? ' floodplain' : '');
        });
 
     despoil(tiles);
