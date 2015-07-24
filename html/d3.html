@@ -74,7 +74,7 @@ var mapdefs = d3.xml("mapdefs.svg", function(error, mapdefs){
 
     // Trying to append mapdefs and failing
     // console.log(svg.selectAll('svg').data(mapdefs).enter().append('svg'))
-    d3.select('svg').data(mapdefs).enter().append('svg');
+    // d3.select('svg').data(mapdefs).enter().append('svg');
 
     var tiles = svg.selectAll('polygon')
         .data(data.tile)
@@ -156,5 +156,6 @@ var mapdefs = d3.xml("mapdefs.svg", function(error, mapdefs){
 </head>
 <body>
   <h1>Civ3 Show-and-Tell JSON/d3/SVG Map</h1>
+  <svg id="map" />
 </body>
 </html>
