@@ -75,7 +75,7 @@ d3.json("civmap.json", function(error, data){
     // bitmask for "is visible to" value. 0x2 is human player 1, 0x1 is barbs, 0xffff matches all
     var spoilmask = 0x2;
     // spoilmask = 0x4;
-    // spoilmask = 0xffff;
+    spoilmask = 0xffff;
 
     // remove spoiler bindings
     var despoil = function(selection){
@@ -136,7 +136,7 @@ d3.json("civmap.json", function(error, data){
         .attr('y', function(d, i) { return y(i) + 32 })
         .attr(':xlink:href', function(d){ return overlay[(d.info.terrain >> 4) & 0X0f]});
     // Remove empty text nodes (those that don't have an entry in resources)
-    // removenodes(tiles, function(d){ return overlay[d.info.terrain >> 4 & 0x0f] } );
+    removenodes(tiles, function(d){ return overlay[d.info.terrain >> 4 & 0x0f] } );
 
     // Add resources to map
     tiles.enter().append('text')
@@ -154,6 +154,15 @@ d3.json("civmap.json", function(error, data){
   <h1>Civ3 Show-and-Tell JSON/d3/SVG Map</h1>
   <svg id="map">
   <defs>
+ <svg xmlns="http://www.w3.org/2000/svg"
+    xmlns:xlink="http://www.w3.org/1999/xlink"
+    xmlns:dc="http://purl.org/dc/elements/1.1/"
+    xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
+    xmlns:cc="http://web.resource.org/cc/"
+    xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape"
+
+    version="1.1"> 
+
   <g transform="scale(0.1) translate(285,-130)" id="myTree">
     <rect
        style="fill:#502d16"
@@ -343,6 +352,7 @@ d3.json("civmap.json", function(error, data){
        id="path3780"
        style="fill:#0000ff;stroke:none" />
   </g>
+</svg>
   </defs>
   </svg>
 </body>
