@@ -134,8 +134,9 @@ d3.json("civmap.json", function(error, data){
         .attr('xlink:xlink:href', function(d){ return overlay[(d.info.terrain >> 4) & 0X0f]})
         .attr('x', function(d, i) { return x(i)})
         .attr('y', function(d, i) { return y(i)});
-    // Remove empty text nodes (those that don't have an entry in resources)
+    // Remove empty text nodes (those that don't have an entry in overlay)
     removenodes(tiles, function(d){ return overlay[d.info.terrain >> 4 & 0x0f] } );
+    despoil(tiles);
 
     // Add resources to map
     tiles.enter().append('text')
@@ -145,6 +146,7 @@ d3.json("civmap.json", function(error, data){
         .text(function(d){ return resources[d.resource]});
     // Remove empty text nodes (those that don't have an entry in resources)
     removenodes(tiles, function(d){ return resources[d.resource] } );
+    despoil(tiles);
 });
 </script>
 </head>
