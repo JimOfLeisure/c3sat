@@ -58,7 +58,7 @@ var mapdefs = d3.xml("mapdefs.svg", function(error, mapdefs){
     if (error) return console.warn(error);
     else
     console.log('Mapdefs loaded');
-    console.log(mapdefs);
+    // console.log(mapdefs);
     return mapdefs
 });
 
@@ -85,7 +85,7 @@ var mapdefs = d3.xml("mapdefs.svg", function(error, mapdefs){
     // bitmask for "is visible to" value. 0x2 is human player 1, 0x1 is barbs, 0xffff matches all
     var spoilmask = 0x2;
     // spoilmask = 0x4;
-    spoilmask = 0xffff;
+    // spoilmask = 0xffff;
 
     // remove spoiler bindings
     var despoil = function(selection){
