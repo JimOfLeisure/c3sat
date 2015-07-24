@@ -10,23 +10,32 @@
 d3.json("civmap.json", function(error, data){
     if (error) return console.warn(error);
     else
+/*
     // Just making sure I have the data
     console.log(data.tile.length); 
     console.log(data.width); 
     console.log(data.height); 
+*/
 
     // Add svg element and assign to var
     var svg = d3.select('body').append('svg')
-       .attr('style', 'background: gray')
+       .attr('style', 'background: darkslategray')
        .attr('width', data.width * 64 + 64)
        .attr('height', data.height * 32 + 32);
 
     var tiles = svg.selectAll('polygon')
-        .data(data.tile);
+        .data(data.tile)
+        // causes tiles not to have .enter() -.filter(function(d){ return d.is_visible_to_flags & spoilmask});
 
-    // bitmask for "is visible to" value. 0x2 is human player 1, 0x1 is barbs, 0xFF matches all
+    // bitmask for "is visible to" value. 0x2 is human player 1, 0x1 is barbs, 0xffff matches all
     var spoilmask = 0x2;
-    //var spoilmask = 0xff;
+    // spoilmask = 0x4;
+    // spoilmask = 0xffff;
+
+    // remove spoiler bindings
+    var despoil = function(selection){
+      selection.filter(function(d){ return ! (d.is_visible_to_flags & spoilmask)}).remove();
+    }
 
     var spoil = function(d, i, spoilresult){
        if (d.is_visible_to_flags & spoilmask)
@@ -35,6 +44,7 @@ d3.json("civmap.json", function(error, data){
          return spoilresult;
          //return d.is_visible_to_flags;
     }
+
     var x = function(i){
        // tile-width * map width, aslo add half-tile offset to the right for odd rows
        return 128 * (i % (data.width / 2)) + 64 * ( Math.floor(i / (data.width /2)) % 2);
@@ -54,6 +64,13 @@ d3.json("civmap.json", function(error, data){
           return spoil(d, i, 'fog') || 'terrbase' + (d.info.terrain & 0x0F).toString();
        });
 
+    // despoil(tiles);
+
+    /*
+    var spoilertiles = tiles.filter(function(d){ return ! (d.is_visible_to_flags & spoilmask)});
+    spoilertiles.remove();
+    */
+
     // Rivers
     tiles.enter().append('circle')
        .attr('class', 'river')
@@ -67,6 +84,8 @@ d3.json("civmap.json", function(error, data){
         .attr('r', function(d, i) {
            return d.rivers ? spoil(d, i, null) || '32' : null
         });
+
+    // despoil(tiles);
 
 });
 </script>
