@@ -37,6 +37,7 @@ d3.json("civmap.json", function(error, data){
       selection.filter(function(d){ return ! (d.is_visible_to_flags & spoilmask)}).remove();
     }
 
+    /*
     var spoil = function(d, i, spoilresult){
        if (d.is_visible_to_flags & spoilmask)
          return false;
@@ -44,6 +45,7 @@ d3.json("civmap.json", function(error, data){
          return spoilresult;
          //return d.is_visible_to_flags;
     }
+    */
 
     var x = function(i){
        // tile-width * map width, aslo add half-tile offset to the right for odd rows
@@ -61,7 +63,7 @@ d3.json("civmap.json", function(error, data){
        })
        // Assign class based on terrain
        .attr('class', function(d, i) {
-          return spoil(d, i, 'fog') || 'terrbase' + (d.info.terrain & 0x0F).toString();
+          return 'terrbase' + (d.info.terrain & 0x0F).toString();
        });
 
     // despoil(tiles);
@@ -82,7 +84,7 @@ d3.json("civmap.json", function(error, data){
            return d.rivers ? (y(i) + 32).toString() : null
         })
         .attr('r', function(d, i) {
-           return d.rivers ? spoil(d, i, null) || '32' : null
+           return d.rivers ? '32' : null
         });
 
     // despoil(tiles);
