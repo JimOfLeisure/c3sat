@@ -59,6 +59,7 @@ var mapdefs = d3.xml("mapdefs.svg", function(error, mapdefs){
     else
     console.log('Mapdefs loaded');
     console.log(mapdefs);
+    return mapdefs
 });
 
     // Add svg element and assign to var
@@ -69,7 +70,8 @@ var mapdefs = d3.xml("mapdefs.svg", function(error, mapdefs){
        .attr('style', 'background: darkslategray')
        .attr('width', data.width * 64 + 64)
        .attr('height', data.height * 32 + 32)
-       .append(mapdefs.mapdefs.svg);
+       // Trying to append mapdefs and failing
+       //.text(mapdefs);
 
     var tiles = svg.selectAll('polygon')
         .data(data.tile)
