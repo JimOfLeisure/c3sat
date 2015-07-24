@@ -73,7 +73,7 @@ d3.json("civmap.json", function(error, data){
     // bitmask for "is visible to" value. 0x2 is human player 1, 0x1 is barbs, 0xffff matches all
     var spoilmask = 0x2;
     // spoilmask = 0x4;
-    spoilmask = 0xffff;
+    // spoilmask = 0xffff;
 
     // remove spoiler bindings
     var despoil = function(selection){
@@ -131,12 +131,12 @@ d3.json("civmap.json", function(error, data){
     // Add overlay to map
     tiles.enter().append('use')
         .attr('class', 'terroverlay')
-        //.text(function(d){ return overlay[(d.info.terrain >> 4) & 0X0f]})
         .attr('xlink:xlink:href', function(d){ return overlay[(d.info.terrain >> 4) & 0X0f]})
         .attr('x', function(d, i) { return x(i)})
         .attr('y', function(d, i) { return y(i)});
     // Remove empty text nodes (those that don't have an entry in resources)
     removenodes(tiles, function(d){ return overlay[d.info.terrain >> 4 & 0x0f] } );
+
     // Add resources to map
     tiles.enter().append('text')
         .attr('class', 'resource')
@@ -352,7 +352,6 @@ d3.json("civmap.json", function(error, data){
   </g>
 </svg>
   </defs>
-  <use xlink:href = "#myForest"></use>
   </svg>
 </body>
 </html>
