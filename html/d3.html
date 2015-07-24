@@ -77,6 +77,8 @@ d3.json("civmap.json", function(error, data){
            return d.rivers ? '32' : null
         });
 
+    despoil(tiles);
+
     // remove null river bindings
     removenodes(tiles, function(d){ return d.rivers; } );
 
