@@ -24,6 +24,17 @@ d3.json("civmap.json", function(error, data){
     var tiles = svg.selectAll('polygon')
         .data(data.tile);
 
+    // bitmask for "is visible to" value. 0x2 is human player 1, 0x1 is barbs, 0xFF matches all
+    var spoilmask = 0x2;
+    //var spoilmask = 0xff;
+
+    var spoil = function(d, i, spoilresult){
+       if (d.is_visible_to_flags & spoilmask)
+         return false;
+       else
+         return spoilresult;
+         //return d.is_visible_to_flags;
+    }
     var x = function(i){
        // tile-width * map width, aslo add half-tile offset to the right for odd rows
        return 128 * (i % (data.width / 2)) + 64 * ( Math.floor(i / (data.width /2)) % 2);
@@ -33,17 +44,15 @@ d3.json("civmap.json", function(error, data){
     }
     // Adds tiles to the DOM
     tiles.enter().append('polygon')
-       .attr('points', '0,32 64,0 128,32 64,64');
-
-    // Set transforms for tiles
-    tiles.attr('transform', function(d, i) {
-       return 'translate(' + x(i).toString() + ',' + y(i).toString() + ')'
-    });
-
-    // Assign class based on terrain
-    tiles.attr('class', function(d, i) {
-       return 'terrbase' + (d.info.terrain & 0x0F).toString();
-    });
+       .attr('points', '0,32 64,0 128,32 64,64')
+       // Set transforms for tiles
+       .attr('transform', function(d, i) {
+          return 'translate(' + x(i).toString() + ',' + y(i).toString() + ')'
+       })
+       // Assign class based on terrain
+       .attr('class', function(d, i) {
+          return spoil(d, i, 'fog') || 'terrbase' + (d.info.terrain & 0x0F).toString();
+       });
 
 });
 </script>
