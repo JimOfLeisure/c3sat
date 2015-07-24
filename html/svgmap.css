@@ -23,6 +23,14 @@ polygon {
     fill: black;
 }
 
+/* Resources */
+/* Resources are currently unicode glyphs in text elements */
+.resource {
+    text-anchor: middle;
+    alignment-baseline: central;
+    font-size: 32px;
+}
+
 /* Rivers */
 .river {
     stroke: #5AB5AD;
