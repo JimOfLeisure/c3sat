@@ -10,21 +10,25 @@ var resources = {
     0x08: '\uD83C\uDF47', // "#myWines" 
     0x09: 'Furs', // Furs
     0x0c: 'Spices', // Spices
-    0x0d: 'Ivory', // Ivory
+    0x0d: '\uD83D\uDC18', // Unicode elephant // Ivory
     0x0a: 'Dyes', // Dyes
     0x0b: 'Incense', // Incense
     0x0e: 'Silks', // Silks
-    0x0f: 'Gems', // Gems
-    0x10: 'Whales', // Whales
-    0x11: 'Deer', // Deer
-    0x12: 'Fish', // Fish
+    0x0f: '\uD83D\uDC8E', // Gems
+    // 0x10: '\uD83D\uDC33', // Spouting whale // Whales
+    0x10: '\uD83D\uDC0B', // Whales
+    0x11: '\uD800\uDC82', // Deer
+    0x12: '\uD83D\uDC1F', // Fish
     0x13: '\uD83D\uDC04', // Cow
     0x14: 'Wheat', // Wheat
     0x15: 'Gold', // Gold
     0x16: 'Sugar', // Sugar
-    0x17: 'Trop.Fruit', // Trop.Fruit
-    0x18: 'Oasis', // Oasis
-    0x19: 'Tobacco' // Tobacco
+    0x17: '\uD83C\uDF4C', // Trop.Fruit
+    // 0x18: '\uD83C\uDFDD', // Unicode desert island // Oasis
+    // 0x18: 'Oasis', // Oasis
+    0x18: '\uD83C\uDF34', // Unicode palm tree // Oasis
+    // 0x19: 'Tobacco' // Tobacco
+    0x19: '\uD83D\uDEAC' // Unicode smoking // Tobacco
 }
 console.log('Resource object test:');
 Object.keys(resources).forEach(function(key){ console.log(key, resources[key]); });
