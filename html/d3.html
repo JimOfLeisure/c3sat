@@ -58,10 +58,12 @@ d3.json("civmap.json", function(error, data){
        })
        // Assign class based on terrain
        .attr('class', function(d, i) {
-          return 'terrbase' + (d.info.terrain & 0x0F).toString();
+          // including itentify flood plains
+          return 'terrbase' + (d.info.terrain & 0x0F).toString() + (d.rivers ? ' floodplain' : '');
        });
 
     despoil(tiles);
+
 
     // Rivers
     tiles.enter().append('circle')
@@ -74,7 +76,7 @@ d3.json("civmap.json", function(error, data){
            return d.rivers ? (y(i) + 32).toString() : null
         })
         .attr('r', function(d, i) {
-           return d.rivers ? '32' : null
+           return d.rivers ? '16' : null
         });
 
     despoil(tiles);

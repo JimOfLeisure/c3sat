@@ -33,9 +33,14 @@ polygon {
     /* display: none; */
 }
 
-/* Base Terrain for Desert (?) */
+/* Base Terrain for Desert */
 .terrbase0 {
     fill: #F7DE94;
+}
+
+/* Flood Plain Terrain */
+.floodplain {
+    fill: #C7FF94;
 }
 
 /* Base Terrain for Plains */
