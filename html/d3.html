@@ -6,6 +6,33 @@
   <script src="https://cdnjs.cloudflare.com/ajax/libs/d3/3.5.6/d3.min.js" charset="utf-8"></script>
 <script>
 
+var resources = {
+    0x08: '\uD83C\uDF47', // "#myWines" 
+    /*
+    0x09: // self.svg_text("Furs",textxypos)
+    0x0c: // self.svg_text("Spices",textxypos)
+    0x0d: // self.svg_text("Ivory",textxypos)
+    0x0a: // self.svg_text("Dyes",textxypos)
+    0x0b: // self.svg_text("Incense",textxypos)
+    0x0e: // self.svg_text("Silks",textxypos)
+    0x0f: // self.svg_text("Gems",textxypos)
+    0x10: // self.svg_text("Whales",textxypos)
+    0x11: // self.svg_text("Deer",textxypos)
+    0x12: // "#myFish"
+    */
+    0x13: '\uD83D\uDC04' // Cow
+    /*
+    0x14: // self.svg_text("Wheat",textxypos)
+    0x15: // self.svg_text("Gold",textxypos)
+    0x16: // self.svg_text("Sugar",textxypos)
+    0x17: // self.svg_text("Trop.Fruit",textxypos)
+    0x18: // self.svg_text("Oasis",textxypos)
+    0x19: // self.svg_text("Tobacco",textxypos)
+    */
+}
+console.log('Resource object test:');
+Object.keys(resources).forEach(function(key){ console.log(key, resources[key]); });
+
 // load map json file
 d3.json("civmap.json", function(error, data){
     if (error) return console.warn(error);
@@ -16,7 +43,6 @@ d3.json("civmap.json", function(error, data){
     console.log(data.width); 
     console.log(data.height); 
 */
-
     // Add svg element and assign to var
     var svg = d3.select('body').append('svg')
        .attr('style', 'background: darkslategray')
