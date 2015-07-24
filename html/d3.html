@@ -42,6 +42,14 @@ var overlay = {
     0x0a: '#myVolcano'
 }
 
+// load svg defs file
+d3.xml("mapdefs.svg", function(error, mapdefs){
+    if (error) return console.warn(error);
+    else
+    console.log('Mapdefs loaded');
+    // console.log(mapdefs);
+});
+
 // load map json file
 d3.json("civmap.json", function(error, data){
     if (error) return console.warn(error);
