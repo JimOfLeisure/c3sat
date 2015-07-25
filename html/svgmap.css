@@ -8,6 +8,10 @@
     display: none;
 }
 
+svg#map {
+    background: darkslategray;
+}
+
 /* .map > polygon { */
 polygon {
     fill: red; /* red should stand out if I don't have a polygon otherwise styled */
