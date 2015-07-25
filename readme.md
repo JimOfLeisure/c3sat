@@ -4,7 +4,7 @@ This is an attempt at an accessory map viewer for Civilization III Conquests sav
 
 Run to-json.py and pass it a filename of an uncompressed save (use an autosave or decompress with dynamite) or pipe it an uncompressed save file (autosave or blast) and it will output html/civmap.json viewable as a map with html/d3.html.
 
-Status: Currently changing from generating the SVG from Python to generating JSON output and constructing the map with d3.js in-browser.
+Status: Currently changing from generating the SVG from Python to generating JSON output and constructing the map with d3.js in-browser. [Tag 0.1](https://github.com/myjimnelson/c3sat/tree/0.1) was the most public-ready version of the svg-out code.
 
 I am licensing my "artwork" which includes SVG representations of mountains, hills and trees under a [Creative Commons Attribution 4.0 International License](http://creativecommons.org/licenses/by/4.0/). Don't try too hard; in your attribution you can link back to my GitHub repo, my GitHub user page or my CivFantatics Forums user page or a thread started by me; whatever is easy. Or heck just use my name. I'm just licensing it to assure you you can use it.
 
