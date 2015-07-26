@@ -49,15 +49,11 @@ class Tile:
     """Class for each logical tile."""
     def __init__(self, saveStream, debug=False):
 
-        self.info = {}
-
         self.Tile36 = GenericSection(saveStream)
-        #self.continent = get_short(self.Tile36.buffer, 0x1a)
-        #self.info['continent'] = get_short(self.Tile36.buffer, 0x1a)
         self.rivers = get_byte(self.Tile36.buffer, 0x00)
         self.Tile36.values = struct.unpack_from('2h3i2c9h', self.Tile36.buffer)
         self.continent = self.Tile36.values[11]
-        self.info['continent'] = self.Tile36.values[11]
+        self.continent = self.Tile36.values[11]
         self.top_unit_id = self.Tile36.values[3]
         self.resource = self.Tile36.values[2]
         self.barb_info = self.Tile36.values[8]
@@ -70,7 +66,7 @@ class Tile:
 
         self.Tile12 = GenericSection(saveStream)
         self.Tile12.values = struct.unpack_from('iihh', self.Tile12.buffer)
-        self.info['terrain'] = get_byte(self.Tile12.buffer, 0x5)
+        self.terrain = get_byte(self.Tile12.buffer, 0x5)
         self.improvements = self.Tile12.values[0]
         self.terrain_features = get_short(self.Tile12.buffer, 0x0a)
         # Mask 0x0001 is *** Bonus Grassland *** . Interesting, some hills and mountains have it (base tile is grassland)
@@ -96,25 +92,10 @@ class Tile:
 
         self.Tile128 = GenericSection(saveStream)
         self.Tile128.values = struct.unpack_from('4i96b', self.Tile128.buffer)
-        #self.is_visible_to = get_int(self.Tile128.buffer, 0)
-        #self.is_visible = self.is_visible_to & 0x02
-        #self.is_visible = self.is_visible_to & 0x10
-        #self.is_visible_now = self.is_visible_now_to & 0x02
-        #self.is_visible_now_to = get_int(self.Tile128.buffer, 4)
 
         self.is_visible_to_flags = self.Tile128.values[0]
-        # self.is_visible_to = []
-        # mytemp = self.is_visible_to_flags
-        # for civ in range(32):
-            # self.is_visible_to.append(mytemp & 0x01 == 1)
-            # mytemp = mytemp >> 1
 
         self.is_visible_now_to_flags = self.Tile128.values[1]
-        # self.is_visible_now_to = []
-        # mytemp = self.is_visible_now_to_flags
-        # for civ in range(32):
-            # self.is_visible_now_to.append(mytemp & 0x01 == 1)
-            # mytemp = mytemp >> 1
 
         self.worked_by_city_id = get_short(self.Tile128.buffer, 0x14)
 

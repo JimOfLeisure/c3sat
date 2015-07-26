@@ -98,7 +98,7 @@ d3.json("civmap.json", function(error, data){
        // Assign class based on terrain
        .attr('class', function(d, i) {
           // including itentify flood plains
-          return 'terrbase' + (d.info.terrain & 0x0F).toString() + (!(d.info.terrain & 0x0f) && d.rivers ? ' floodplain' : '');
+          return 'terrbase' + (d.terrain & 0x0F).toString() + (!(d.terrain & 0x0f) && d.rivers ? ' floodplain' : '');
        });
 
     despoil(tiles);
@@ -131,11 +131,11 @@ d3.json("civmap.json", function(error, data){
     // Add overlay to map
     tiles.enter().append('use')
         .attr('class', 'terroverlay')
-        .attr('xlink:xlink:href', function(d){ return overlay[(d.info.terrain >> 4) & 0X0f]})
+        .attr('xlink:xlink:href', function(d){ return overlay[(d.terrain >> 4) & 0X0f]})
         .attr('x', function(d, i) { return x(i)})
         .attr('y', function(d, i) { return y(i)});
     // Remove empty text nodes (those that don't have an entry in overlay)
-    removenodes(tiles, function(d){ return overlay[d.info.terrain >> 4 & 0x0f] } );
+    removenodes(tiles, function(d){ return overlay[d.terrain >> 4 & 0x0f] } );
     despoil(tiles);
 
     // Add resources to map
