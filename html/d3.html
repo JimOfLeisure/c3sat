@@ -34,12 +34,12 @@ var resources = {
 // Object.keys(resources).forEach(function(key){ console.log(key, resources[key]); });
 
 var overlay = {
-    0x05: '#myHill',
-    0x06: '#myMountain',
-    0x07: '#myForest',
-    0x08: '#myJungle',
-    0x09: '#myMarsh',
-    0x0a: '#myVolcano'
+    0x50: '#myHill',
+    0x60: '#myMountain',
+    0x70: '#myForest',
+    0x80: '#myJungle',
+    0x90: '#myMarsh',
+    0xa0: '#myVolcano'
 }
 
 // load map json file
@@ -77,18 +77,6 @@ d3.json("civmap.json", function(error, data){
             return d.is_visible_to_flags % spoilmask ? { i: i, d: d } : null;
         })
         .filter(function(d){ return d != null; })
-    // console.log(nonspoiler);
-
-    // If callback() is true, remove the node
-    var removenodes = function(selection, callback){
-        //console.log(selection.filter(function(d){ return ! callback(d); }));
-        selection.filter(function(d){ return ! callback(d); }).remove();
-    }
-
-    // remove spoiler bindings
-    var despoil = function(selection){
-      removenodes(selection, function(d){ return d.is_visible_to_flags & spoilmask; } );
-    }
 
     var x = function(i){
        // tile-width * map width, aslo add half-tile offset to the right for odd rows
@@ -100,7 +88,6 @@ d3.json("civmap.json", function(error, data){
 
     // Adds tiles to the DOM
     var tiles = svg.append('g').attr('id', 'baseTerrain')
-    //svg.selectAll('polygon')
     tiles.selectAll('polygon').data(nonSpoilerTiles, function(d){ return d.i;})
         .enter()
         .append('polygon')
@@ -115,30 +102,23 @@ d3.json("civmap.json", function(error, data){
             return 'terrbase' + (d.d.terrain & 0x0F).toString() + (!(d.d.terrain & 0x0f) && d.d.rivers ? ' floodplain' : '');
          });
 
-    //despoil(tiles);
-
+    // Rivers
     var rivers = svg.append('g').attr('id', 'rivers')
             .attr('class', 'river')
-        // console.log(tiles)
-    // Rivers
+
     // Currently this draws rivers for every tile then deletes the inappropriate ones
     var addRivers = function(selection, x1, y1, x2, y2, mask) {
         // Since running for each edge of tile, have to append a group else it will try to merge with the previous run and see the data is the same and create nothing
-        selection.append('g').selectAll('line')
-            //.data(selection.filter(function(d){ return d.d.rivers & mask == mask; }), function(d){ return d.i; })
-        .data(nonSpoilerTiles.filter(function(d){ return d.d.rivers & mask; }))
+        selection.append('g').attr('id', 'river-0x' + mask.toString(16) ).selectAll('line')
+        .data(nonSpoilerTiles.filter(function(d){ return d.d.rivers & mask; }), function(d){ return d.i; })
             .enter()
             .append('line')
             .attr('x1', function(d, i) { return x(d.i) + x1})
             .attr('y1', function(d, i) { return y(d.i) + y1 })
             .attr('x2', function(d, i) { return x(d.i) + x2 })
             .attr('y2', function(d, i) { return y(d.i) + y2});
-    
-        // Remove spoiler tiles
-        // despoil(selection);
-        // Remove lines for unmatched data
-        // removenodes(selection, function(d){ return d.d.rivers & mask; } );
     }
+
     // NW river
     addRivers(rivers, 0, 32, 64, 0, 0x80);
     // NE river
@@ -147,28 +127,31 @@ d3.json("civmap.json", function(error, data){
     addRivers(rivers, 128, 32, 64, 64, 0x08);
     // SW river
     addRivers(rivers, 64, 64, 0, 32, 0x20);
-/*
-    // TODO: Ensure only needed "use"s are begin created
+
     // Add overlay to map
-    tiles.enter().append('use')
+    var terrainOverlay = svg.append('g').attr('id', 'terrainOverlay').attr('class', 'terroverlay');
+
+    terrainOverlay.selectAll('use')
+        //.data(nonSpoilerTiles)
+        //.data(overlay, function(d){ console.log('Hi ' + (d.d.terrain & 0x0f).toString(16)); return d.d.terrain & 0xf0; })
+        .data(nonSpoilerTiles.filter(function(d){ return overlay[d.d.terrain & 0xf0]; }), function(d){ return d.i; })
+        .enter().append('use')
         .attr('class', 'terroverlay')
-        .attr('xlink:xlink:href', function(d){ return overlay[(d.d.terrain >> 4) & 0X0f]})
+        .attr('xlink:xlink:href', function(d){ return overlay[(d.d.terrain) & 0Xf0]})
         .attr('x', function(d, i) { return x(d.i)})
         .attr('y', function(d, i) { return y(d.i)});
-    // Remove empty text nodes (those that don't have an entry in overlay)
-    // removenodes(tiles, function(d){ return overlay[d.d.terrain >> 4 & 0x0f] } );
-    // despoil(tiles);
 
     // Add resources to map
-    tiles.enter().append('text')
+    var mapResources = svg.append('g').attr('id', 'resources').attr('class', 'terroverlay');
+    mapResources.selectAll('text')
+        .data(nonSpoilerTiles.filter(function(d){ return resources[d.d.resource]; }), function(d){ return d.i; })
+        .enter()
+        .append('text')
         .attr('class', 'resource')
         .attr('x', function(d, i) { return x(d.i) + 64})
         .attr('y', function(d, i) { return y(d.i) + 32 })
-        .text(function(d){ return resources[d.d.resource]});
-    // Remove empty text nodes (those that don't have an entry in resources)
-    // removenodes(tiles, function(d){ return resources[d.resource] } );
-    // despoil(tiles);
-*/
+        .text(function(d){ return resources[d.d.resource] });
+
 });
 </script>
 </head>
