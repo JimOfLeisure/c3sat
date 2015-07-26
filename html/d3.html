@@ -74,7 +74,7 @@ d3.json("civmap.json", function(error, data){
     // nonspoiler = data.tile.map(function(d, i){ return i % 2 == 0 ? d : null; });
     var nonSpoilerTiles = data.tile
         .map(function(d, i){
-            return d.is_visible_to_flags % spoilmask ? { i: i, d: d } : null;
+            return d.is_visible_to_flags & spoilmask ? { i: i, d: d } : null;
         })
         .filter(function(d){ return d != null; })
 
