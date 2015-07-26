@@ -59,7 +59,8 @@ d3.json("civmap.json", function(error, data){
        .attr('id', 'map')
        //.attr('style', 'background: darkslategray')
        .attr('width', data.width * 64 + 64)
-       .attr('height', data.height * 32 + 32);
+       .attr('height', data.height * 32 + 32)
+       .data(data.tile)
 
     // bitmask for "is visible to" value. 0x2 is human player 1, 0x1 is barbs, 0xffff matches all
     var spoilmask = 0x2;
@@ -67,10 +68,12 @@ d3.json("civmap.json", function(error, data){
     // spoilmask = 0xffff;
 
     var tiles = svg.selectAll('polygon')
-        .select(function(d){ return this })
-        .data(data.tile)
-        // causes tiles not to have .enter() -.filter(function(d){ return d.is_visible_to_flags & spoilmask}); // see https://github.com/mbostock/d3/wiki/Selections#filter
-        // .select(function(d){ return d.is_visible_to_flags & spoilmask ? this : null;});
+    //var tiles = svg.select(function(d, i){ return i % 2 === 1 ? this : null;})
+        //.select(function(d, i){ return (d.is_visible_to_flags % spoilmask) == 0 ? this : null;})
+        //.select(function(d, i){ return i % 2 ? this : null;})
+        //.select(function(d){ return null;})
+        // .data(data.tile, function(d, i){ return i % 2 == 1 ? d : null;})
+        .data(data.tile, function(d, i){ return d.is_visible_to_flags % spoilmask ? this : null;})
 
     // If callback() is true, remove the node
     var removenodes = function(selection, callback){
@@ -93,7 +96,6 @@ d3.json("civmap.json", function(error, data){
     // Adds tiles to the DOM
     tiles.enter().append('polygon')
     //tiles.update().append('polygon')
-    //tiles.append('polygon')
        .attr('points', '0,32 64,0 128,32 64,64')
        // Set transforms for tiles
        .attr('transform', function(d, i) {
@@ -105,7 +107,7 @@ d3.json("civmap.json", function(error, data){
           return 'terrbase' + (d.terrain & 0x0F).toString() + (!(d.terrain & 0x0f) && d.rivers ? ' floodplain' : '');
        });
 
-    despoil(tiles);
+    //despoil(tiles);
 
 
     // Rivers
@@ -119,7 +121,7 @@ d3.json("civmap.json", function(error, data){
             .attr('y2', function(d, i) { return y(i) + y2});
     
         // Remove spoiler tiles
-        despoil(selection);
+        // despoil(selection);
         // Remove lines for unmatched data
         removenodes(selection, function(d){ return d.rivers & mask; } );
     }
@@ -140,7 +142,7 @@ d3.json("civmap.json", function(error, data){
         .attr('y', function(d, i) { return y(i)});
     // Remove empty text nodes (those that don't have an entry in overlay)
     removenodes(tiles, function(d){ return overlay[d.terrain >> 4 & 0x0f] } );
-    despoil(tiles);
+    // despoil(tiles);
 
     // Add resources to map
     tiles.enter().append('text')
@@ -150,7 +152,7 @@ d3.json("civmap.json", function(error, data){
         .text(function(d){ return resources[d.resource]});
     // Remove empty text nodes (those that don't have an entry in resources)
     removenodes(tiles, function(d){ return resources[d.resource] } );
-    despoil(tiles);
+    // despoil(tiles);
 });
 </script>
 </head>
