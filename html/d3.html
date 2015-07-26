@@ -61,19 +61,21 @@ d3.json("civmap.json", function(error, data){
        .attr('width', data.width * 64 + 64)
        .attr('height', data.height * 32 + 32);
 
+    // bitmask for "is visible to" value. 0x2 is human player 1, 0x1 is barbs, 0xffff matches all
+    var spoilmask = 0x2;
+    // spoilmask = 0x4;
+    // spoilmask = 0xffff;
+
     var tiles = svg.selectAll('polygon')
+        .select(function(d){ return this })
         .data(data.tile)
-        // causes tiles not to have .enter() -.filter(function(d){ return d.is_visible_to_flags & spoilmask});
+        // causes tiles not to have .enter() -.filter(function(d){ return d.is_visible_to_flags & spoilmask}); // see https://github.com/mbostock/d3/wiki/Selections#filter
+        // .select(function(d){ return d.is_visible_to_flags & spoilmask ? this : null;});
 
     // If callback() is true, remove the node
     var removenodes = function(selection, callback){
         selection.filter(function(d){ return ! callback(d); }).remove();
     }
-
-    // bitmask for "is visible to" value. 0x2 is human player 1, 0x1 is barbs, 0xffff matches all
-    var spoilmask = 0x2;
-    // spoilmask = 0x4;
-    // spoilmask = 0xffff;
 
     // remove spoiler bindings
     var despoil = function(selection){
@@ -90,6 +92,8 @@ d3.json("civmap.json", function(error, data){
 
     // Adds tiles to the DOM
     tiles.enter().append('polygon')
+    //tiles.update().append('polygon')
+    //tiles.append('polygon')
        .attr('points', '0,32 64,0 128,32 64,64')
        // Set transforms for tiles
        .attr('transform', function(d, i) {
