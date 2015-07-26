@@ -2,7 +2,7 @@
 
 This is an attempt at an accessory map viewer for Civilization III Conquests save game files.
 
-Run `to-json.py` and pass it a filename of an uncompressed save (use an autosave or decompress with dynamite) or pipe it an uncompressed save file (autosave or blast) and it will output html/civmap.json viewable as a map with html/d3.html.
+Run `civ3tojson.py` and pass it a filename of an uncompressed save (use an autosave or decompress with dynamite) or pipe it an uncompressed save file (autosave or blast) and it will output html/civmap.json viewable as a map with html/d3.html.
 
 Status: Currently changing from generating the SVG from Python to generating JSON output and constructing the map with d3.js in-browser. [Tag 0.1](https://github.com/myjimnelson/c3sat/tree/0.1) was the most public-ready version of the svg-out code.
 
@@ -30,7 +30,7 @@ The short-term goal is to parse the save game file, extract interesting
 information and display it in HTML/SVG format. The base and overlay
 terrain is represented by SVG shapes or temporary text.
 
-wrld.py is the most current and successful file I've been working
+civ3parse.py is the most current and successful file I've been working
 on. Its purpose is to read in the game data and output it in JSON format.
 It currently uses horspool.py to find the first instance of WRLD in the
 save game file and then proceed to read the map size and map tiles.
