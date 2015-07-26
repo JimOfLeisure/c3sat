@@ -64,7 +64,12 @@ d3.json("civmap.json", function(error, data){
     // bitmask for "is visible to" value. 0x2 is human player 1, 0x1 is barbs, 0xffff matches all
     var spoilmask = 0x2;
     // spoilmask = 0x4;
+    // spoilmask = 0x8;
+    // spoilmask = 0x10;
     // spoilmask = 0xffff;
+
+    // nonspoiler = data.tile.map(function(d, i){ return i % 2 == 0 ? d : null; });
+    // console.log(nonspoiler);
 
     var tiles = svg.selectAll('polygon')
     //var tiles = svg.select(function(d, i){ return i % 2 === 1 ? this : null;})
@@ -73,7 +78,22 @@ d3.json("civmap.json", function(error, data){
         //.select(function(d){ return null;})
         // .data(data.tile, function(d, i){ return i % 2 == 1 ? d : null;})
         // .data(data.tile, function(d, i){ return this.is_visible_to_flags % spoilmask ? this : null;})
-        .data(data.tile.filter(function(d){ return d.is_visible_to_flags % spoilmask}))
+        // This gets the right data, but the index is not preserved
+        // .data(data.tile.filter(function(d){ return d.is_visible_to_flags % spoilmask}))
+        //.select(function(d){ return d.is_visible_to_flags % spoilmask ? this : null;})
+        // .selectAll(function(d, i){ return i % 2 == 1 ? this : null;})
+        // .selectAll(function(d, i){ return true ? this : null;})
+        //.selectAll(function(d, i){ return this;})
+        // .data(data.tile)
+        // .data(nonspoiler)
+        // .data(data.tile.map(function(d, i){ console.log(Boolean(i % 2)); return i % 2 == 1 ? d : null; }))
+        // Filter out the spoiler data, preserve the original index alongside the data in an object
+        // Maybe I shouldn't use i and d
+        .data(data.tile
+            .map(function(d, i){ return d.is_visible_to_flags % spoilmask ? { i: i, d: d } : null; })
+            .filter(function(d){ return d != null; })
+        )
+        .enter()
         
 
     // If callback() is true, remove the node
@@ -95,22 +115,23 @@ d3.json("civmap.json", function(error, data){
     }
 
     // Adds tiles to the DOM
-    tiles.enter().append('polygon')
+    //tiles.enter().append('polygon')
+    tiles.append('polygon')
     //tiles.update().append('polygon')
        .attr('points', '0,32 64,0 128,32 64,64')
        // Set transforms for tiles
        .attr('transform', function(d, i) {
-          return 'translate(' + x(i).toString() + ',' + y(i).toString() + ')'
+          return 'translate(' + x(d.i).toString() + ',' + y(d.i).toString() + ')'
        })
        // Assign class based on terrain
        .attr('class', function(d, i) {
           // including itentify flood plains
-          return 'terrbase' + (d.terrain & 0x0F).toString() + (!(d.terrain & 0x0f) && d.rivers ? ' floodplain' : '');
+          return 'terrbase' + (d.d.terrain & 0x0F).toString() + (!(d.d.terrain & 0x0f) && d.d.rivers ? ' floodplain' : '');
        });
 
     //despoil(tiles);
 
-
+/*
     // Rivers
     // Currently this draws rivers for every tile then deletes the inappropriate ones
     var rivers = function(selection, x1, y1, x2, y2, mask) {
@@ -154,6 +175,7 @@ d3.json("civmap.json", function(error, data){
     // Remove empty text nodes (those that don't have an entry in resources)
     removenodes(tiles, function(d){ return resources[d.resource] } );
     // despoil(tiles);
+*/
 });
 </script>
 </head>
