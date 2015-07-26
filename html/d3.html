@@ -118,29 +118,26 @@ d3.json("civmap.json", function(error, data){
     //despoil(tiles);
 
     var rivers = svg.append('g').attr('id', 'rivers')
+            .attr('class', 'river')
         // console.log(tiles)
     // Rivers
     // Currently this draws rivers for every tile then deletes the inappropriate ones
     var addRivers = function(selection, x1, y1, x2, y2, mask) {
-        //selection.filter(function(d){ return d.d.rivers & mask; }).enter().append('line')
-        //selection.selectAll('line')
-        //selection.enter().append('g').attr('id', 'rivers').selectAll('line')
-        selection.selectAll('line')
+        // Since running for each edge of tile, have to append a group else it will try to merge with the previous run and see the data is the same and create nothing
+        selection.append('g').selectAll('line')
             //.data(selection.filter(function(d){ return d.d.rivers & mask == mask; }), function(d){ return d.i; })
-        .data(nonSpoilerTiles)
+        .data(nonSpoilerTiles.filter(function(d){ return d.d.rivers & mask; }))
             .enter()
             .append('line')
-            .attr('class', 'river')
-//            .attr('x1', function(d, i) { return x(d.i) + x1})
-//            .attr('y1', function(d, i) { return y(d.i) + y1 })
-//            .attr('x2', function(d, i) { return x(d.i) + x2 })
-//            .attr('y2', function(d, i) { return y(d.i) + y2});
+            .attr('x1', function(d, i) { return x(d.i) + x1})
+            .attr('y1', function(d, i) { return y(d.i) + y1 })
+            .attr('x2', function(d, i) { return x(d.i) + x2 })
+            .attr('y2', function(d, i) { return y(d.i) + y2});
     
         // Remove spoiler tiles
         // despoil(selection);
         // Remove lines for unmatched data
         // removenodes(selection, function(d){ return d.d.rivers & mask; } );
-        console.log("Hi");
     }
     // NW river
     addRivers(rivers, 0, 32, 64, 0, 0x80);
