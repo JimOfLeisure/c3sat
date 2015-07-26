@@ -93,7 +93,7 @@ d3.json("civmap.json", function(error, data){
             .map(function(d, i){ return d.is_visible_to_flags % spoilmask ? { i: i, d: d } : null; })
             .filter(function(d){ return d != null; })
         )
-        .enter()
+        // .enter()
         
 
     // If callback() is true, remove the node
@@ -115,8 +115,8 @@ d3.json("civmap.json", function(error, data){
     }
 
     // Adds tiles to the DOM
-    //tiles.enter().append('polygon')
-    tiles.append('polygon')
+    tiles.enter().append('polygon')
+    // tiles.append('polygon')
     //tiles.update().append('polygon')
        .attr('points', '0,32 64,0 128,32 64,64')
        // Set transforms for tiles
@@ -131,21 +131,20 @@ d3.json("civmap.json", function(error, data){
 
     //despoil(tiles);
 
-/*
     // Rivers
     // Currently this draws rivers for every tile then deletes the inappropriate ones
     var rivers = function(selection, x1, y1, x2, y2, mask) {
         selection.enter().append('line')
             .attr('class', 'river')
-            .attr('x1', function(d, i) { return x(i) + x1})
-            .attr('y1', function(d, i) { return y(i) + y1 })
-            .attr('x2', function(d, i) { return x(i) + x2 })
-            .attr('y2', function(d, i) { return y(i) + y2});
+            .attr('x1', function(d, i) { return x(d.i) + x1})
+            .attr('y1', function(d, i) { return y(d.i) + y1 })
+            .attr('x2', function(d, i) { return x(d.i) + x2 })
+            .attr('y2', function(d, i) { return y(d.i) + y2});
     
         // Remove spoiler tiles
         // despoil(selection);
         // Remove lines for unmatched data
-        removenodes(selection, function(d){ return d.rivers & mask; } );
+        // removenodes(selection, function(d){ return d.rivers & mask; } );
     }
     // NW river
     rivers(tiles, 0, 32, 64, 0, 0x80);
@@ -159,23 +158,22 @@ d3.json("civmap.json", function(error, data){
     // Add overlay to map
     tiles.enter().append('use')
         .attr('class', 'terroverlay')
-        .attr('xlink:xlink:href', function(d){ return overlay[(d.terrain >> 4) & 0X0f]})
-        .attr('x', function(d, i) { return x(i)})
-        .attr('y', function(d, i) { return y(i)});
+        .attr('xlink:xlink:href', function(d){ return overlay[(d.d.terrain >> 4) & 0X0f]})
+        .attr('x', function(d, i) { return x(d.i)})
+        .attr('y', function(d, i) { return y(d.i)});
     // Remove empty text nodes (those that don't have an entry in overlay)
-    removenodes(tiles, function(d){ return overlay[d.terrain >> 4 & 0x0f] } );
+    // removenodes(tiles, function(d){ return overlay[d.terrain >> 4 & 0x0f] } );
     // despoil(tiles);
 
     // Add resources to map
     tiles.enter().append('text')
         .attr('class', 'resource')
-        .attr('x', function(d, i) { return x(i) + 64})
-        .attr('y', function(d, i) { return y(i) + 32 })
-        .text(function(d){ return resources[d.resource]});
+        .attr('x', function(d, i) { return x(d.i) + 64})
+        .attr('y', function(d, i) { return y(d.i) + 32 })
+        .text(function(d){ return resources[d.d.resource]});
     // Remove empty text nodes (those that don't have an entry in resources)
-    removenodes(tiles, function(d){ return resources[d.resource] } );
+    // removenodes(tiles, function(d){ return resources[d.resource] } );
     // despoil(tiles);
-*/
 });
 </script>
 </head>
