@@ -2,7 +2,7 @@
 
 This is an attempt at an accessory map viewer for Civilization III Conquests save game files.
 
-Run `civ3tojson.py` and pass it a filename of an uncompressed save (use an autosave or decompress with dynamite) or pipe it an uncompressed save file (autosave or blast) and it will output html/civmap.json viewable as a map with html/d3.html.
+Run `civ3tojson.py` and pass it a filename of an uncompressed save (use an autosave or decompress with dynamite) or pipe it an uncompressed save file (autosave or blast) and it will print JSON output which can be redirected to html/civmap.json and viewed as a map with html/d3.html.
 
 Status: Currently changing from generating the SVG from Python to generating JSON output and constructing the map with d3.js in-browser. [Tag 0.1](https://github.com/myjimnelson/c3sat/tree/0.1) was the most public-ready version of the svg-out code.
 
