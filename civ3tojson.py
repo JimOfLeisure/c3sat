@@ -27,6 +27,9 @@ import sys
 def main():
     """This module instantiates readciv3.parse_save() and prints json"""
 
+    #pretty = True
+    pretty = False
+
     # If no argument provided, use stdin so files can be piped to this
     if len(sys.argv) < 2:
         saveFile = sys.stdin
@@ -35,6 +38,6 @@ def main():
 
     game = readciv3.parse_save(saveFile)
 
-    print game.Tiles.json_out()
+    print game.Tiles.json_out(pretty)
 
 main()

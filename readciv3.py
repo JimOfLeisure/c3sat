@@ -153,10 +153,12 @@ class Tiles:
         """Trying to make json.dumps() work on all my data"""
         return o.__dict__
 
-    def json_out(self, spoiler=False, debug=False):
+    def json_out(self, pretty=False):
         """Return a string of json-coded map"""
-        #return json.dumps(self, default=self.jsonDefault, indent=4)
-        return json.dumps(self, default=self.jsonDefault)
+        if pretty:
+            return json.dumps(self, default=self.jsonDefault, indent=4)
+        else:
+            return json.dumps(self, default=self.jsonDefault)
 
 class Wrld:
     """Class for 3 WRLD sections"""
