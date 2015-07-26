@@ -8,7 +8,7 @@ Status: Currently changing from generating the SVG from Python to generating JSO
 
 I am licensing my "artwork" which includes SVG representations of mountains, hills and trees under a [Creative Commons Attribution 4.0 International License](http://creativecommons.org/licenses/by/4.0/). Don't try too hard; in your attribution you can link back to my GitHub repo, my GitHub user page or my CivFantatics Forums user page or a thread started by me; whatever is easy. Or heck just use my name. I'm just licensing it to assure you you can use it.
 
-Some code from other authors is currently included in this repo. See [the horspool.py readme](horspool/readme.md) for license and attribution for that code and [timmywil's jquery.panzoom](https://github.com/timmywil/jquery.panzoom) for html/jquery.panzoom.min.js info.
+Some code from other authors is currently included in this repo. See [the horspool.py readme](horspool/readme.md) for license and attribution.
 
 ## History
 
