@@ -54,13 +54,24 @@ d3.json("civmap.json", function(error, data){
 */
     // Add svg element and assign to var
     var svg = d3.select('svg#map')
-       //.attr(':xmlns', 'http://www.w3.org/2000/svg')
-       //.attr(':xmlns:xlink', 'http://www.w3.org/1999/xlink')
-       .attr('id', 'map')
-       //.attr('style', 'background: darkslategray')
        .attr('width', data.width * 64 + 64)
        .attr('height', data.height * 32 + 32)
-       .append('g').attr('id', 'baseTerrain')
+       //.append('g')
+
+    // var tempdata = Array("baseTerrain,rivers,3,4,5,6,7,8,9".split(","));
+    //var wat = svg.selectAll('g')
+    var wat = d3.selectAll('body p')
+       .data(["baseTerrain", "rivers"])
+       //.data("baseTerrain,rivers".split(","))
+       //.data(tempdata)
+       .enter()
+       //.update()
+       .append('p').attr('id', function(d){ return d; });
+
+    console.log(tempdata);
+    console.log(wat);
+
+    //svg.append('g').attr('id', 'rivers')
 
     // bitmask for "is visible to" value. 0x2 is human player 1, 0x1 is barbs, 0xffff matches all
     var spoilmask = 0x2;
@@ -95,15 +106,9 @@ d3.json("civmap.json", function(error, data){
     var y = function(i){
        return 32 * Math.floor(i / (data.width / 2));
     }
-
-    var tiles = svg.selectAll('g')
-        .data(nonSpoilerTiles)
-
+/*
     // Adds tiles to the DOM
-    //tiles.append('g').enter().append('polygon')
     svg.selectAll('g#baseTerrain polygon').data(nonSpoilerTiles).enter().append('polygon')
-    // tiles.append('polygon')
-    //tiles.update().append('polygon')
        .attr('points', '0,32 64,0 128,32 64,64')
        // Set transforms for tiles
        .attr('transform', function(d, i) {
@@ -117,7 +122,6 @@ d3.json("civmap.json", function(error, data){
 
     //despoil(tiles);
 
-/*
     var rivers = svg.selectAll('g')
         .data(nonSpoilerTiles)
         // console.log(tiles)
@@ -150,6 +154,7 @@ d3.json("civmap.json", function(error, data){
     rivers(rivers, 128, 32, 64, 64, 0x08);
     // SW river
     rivers(rivers, 64, 64, 0, 32, 0x20);
+/*
     // TODO: Ensure only needed "use"s are begin created
     // Add overlay to map
     tiles.enter().append('use')
