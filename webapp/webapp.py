@@ -21,14 +21,14 @@
 # OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION
 # WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
-import ../civ3parse
+import readciv3
 import urllib
 import subprocess
 import os
 import urlparse
 
 def application(env, start_response):
-    """This module instantiates wrld.parse_save() and returns an svg file for the map"""
+    """This module instantiates readciv3.parse_save() and returns an svg file for the map"""
     #start_response('200 OK', [('Content-Type','text/html')])
     #return "Hello World From Python"
 
@@ -67,7 +67,7 @@ def application(env, start_response):
 #    for k in env:
 #        print k, env[k]
 
-    game = wrld.parse_save(saveFile)
+    game = readciv3.parse_save(saveFile)
     saveFile.close()
     start_response('200 OK', [('Content-Type','image/svg+xml')])
     return game.Tiles.svg_out()

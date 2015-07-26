@@ -27,7 +27,7 @@ import sys
 
 
 def main():
-    """This module instantiates wrld.parse_save() and writes an svg file for the map"""
+    """This module instantiates readciv3.parse_save() and writes an svg file for the map"""
     spoiler = True
     spoiler = False
     debug = True
@@ -40,9 +40,9 @@ def main():
     else:
         saveFile = open(sys.argv[1], 'rb')
 
-    #game = wrld.parse_save("unc-test.sav")
-    #game = wrld.parse_save("unc-lk151-650ad.sav")
-    game = wrld.parse_save(saveFile, debug)
+    #game = readciv3.parse_save("unc-test.sav")
+    #game = readciv3.parse_save("unc-lk151-650ad.sav")
+    game = readciv3.parse_save(saveFile, debug)
 
     write = open(outputsvgpath, 'w')
 
