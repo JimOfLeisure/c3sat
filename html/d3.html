@@ -57,27 +57,13 @@ d3.json("civmap.json", function(error, data){
        .attr('width', data.width * 64 + 64)
        .attr('height', data.height * 32 + 32)
        //.append('g')
-       .selectAll('svg#map g')
+/*
+       .selectAll('svg#map')
        //.data(["baseTerrain", "rivers"])
        .data(["baseTerrain", "rivers"], function(d){ return d;})
        .enter()
-       .append('g').attr('id', function(d){ return d; });
-
-    // var tempdata = Array("baseTerrain,rivers,3,4,5,6,7,8,9".split(","));
-    //var wat = svg.selectAll('g')
-
-    var wat = d3.selectAll('body p')
-       .data(["baseTerrain", "rivers"], function(d){ return d;})
-       //.data("baseTerrain,rivers".split(","))
-       //.data(tempdata)
-       .enter()
-       //.update()
-       .append('p').attr('id', function(d){ return d; });
-
-    console.log(wat);
-
-    //svg.append('g').attr('id', 'rivers')
-
+       .append('svg:g').attr('id', function(d){ return d; });
+*/
     // bitmask for "is visible to" value. 0x2 is human player 1, 0x1 is barbs, 0xffff matches all
     var spoilmask = 0x2;
     // spoilmask = 0x4;
@@ -111,33 +97,37 @@ d3.json("civmap.json", function(error, data){
     var y = function(i){
        return 32 * Math.floor(i / (data.width / 2));
     }
-/*
+
     // Adds tiles to the DOM
-    svg.selectAll('g#baseTerrain polygon').data(nonSpoilerTiles).enter().append('polygon')
-       .attr('points', '0,32 64,0 128,32 64,64')
-       // Set transforms for tiles
-       .attr('transform', function(d, i) {
-          return 'translate(' + x(d.i).toString() + ',' + y(d.i).toString() + ')'
-       })
-       // Assign class based on terrain
-       .attr('class', function(d, i) {
-          // including itentify flood plains
-          return 'terrbase' + (d.d.terrain & 0x0F).toString() + (!(d.d.terrain & 0x0f) && d.d.rivers ? ' floodplain' : '');
-       });
+    var tiles = svg.append('g').attr('id', 'baseTerrain')
+    //svg.selectAll('polygon')
+    tiles.selectAll('polygon').data(nonSpoilerTiles, function(d){ return d.i;})
+        .enter()
+        .append('polygon')
+        .attr('points', '0,32 64,0 128,32 64,64')
+        // Set transforms for tiles
+        .attr('transform', function(d, i) {
+            return 'translate(' + x(d.i).toString() + ',' + y(d.i).toString() + ')'
+        })
+        // Assign class based on terrain
+        .attr('class', function(d, i) {
+            // including itentify flood plains
+            return 'terrbase' + (d.d.terrain & 0x0F).toString() + (!(d.d.terrain & 0x0f) && d.d.rivers ? ' floodplain' : '');
+         });
 
     //despoil(tiles);
 
-    var rivers = svg.selectAll('g')
-        .data(nonSpoilerTiles)
+    var rivers = svg.append('g').attr('id', 'rivers')
         // console.log(tiles)
     // Rivers
     // Currently this draws rivers for every tile then deletes the inappropriate ones
-    var rivers = function(selection, x1, y1, x2, y2, mask) {
+    var addRivers = function(selection, x1, y1, x2, y2, mask) {
         //selection.filter(function(d){ return d.d.rivers & mask; }).enter().append('line')
         //selection.selectAll('line')
-        selection.enter().append('g').attr('id', 'rivers').selectAll('line')
+        //selection.enter().append('g').attr('id', 'rivers').selectAll('line')
+        selection.selectAll('line')
             //.data(selection.filter(function(d){ return d.d.rivers & mask == mask; }), function(d){ return d.i; })
-            .data(selection.filter(function(d){ return d.d.rivers & mask == mask; }))
+        .data(nonSpoilerTiles)
             .enter()
             .append('line')
             .attr('class', 'river')
@@ -150,15 +140,16 @@ d3.json("civmap.json", function(error, data){
         // despoil(selection);
         // Remove lines for unmatched data
         // removenodes(selection, function(d){ return d.d.rivers & mask; } );
+        console.log("Hi");
     }
     // NW river
-    rivers(rivers, 0, 32, 64, 0, 0x80);
+    addRivers(rivers, 0, 32, 64, 0, 0x80);
     // NE river
-    rivers(rivers, 64, 0, 128, 32, 0x02);
+    addRivers(rivers, 64, 0, 128, 32, 0x02);
     // SE river
-    rivers(rivers, 128, 32, 64, 64, 0x08);
+    addRivers(rivers, 128, 32, 64, 64, 0x08);
     // SW river
-    rivers(rivers, 64, 64, 0, 32, 0x20);
+    addRivers(rivers, 64, 64, 0, 32, 0x20);
 /*
     // TODO: Ensure only needed "use"s are begin created
     // Add overlay to map
