@@ -103,18 +103,18 @@ class Tile:
         #self.is_visible_now_to = get_int(self.Tile128.buffer, 4)
 
         self.is_visible_to_flags = self.Tile128.values[0]
-        self.is_visible_to = []
-        mytemp = self.is_visible_to_flags
-        for civ in range(32):
-            self.is_visible_to.append(mytemp & 0x01 == 1)
-            mytemp = mytemp >> 1
+        # self.is_visible_to = []
+        # mytemp = self.is_visible_to_flags
+        # for civ in range(32):
+            # self.is_visible_to.append(mytemp & 0x01 == 1)
+            # mytemp = mytemp >> 1
 
         self.is_visible_now_to_flags = self.Tile128.values[1]
-        self.is_visible_now_to = []
-        mytemp = self.is_visible_now_to_flags
-        for civ in range(32):
-            self.is_visible_now_to.append(mytemp & 0x01 == 1)
-            mytemp = mytemp >> 1
+        # self.is_visible_now_to = []
+        # mytemp = self.is_visible_now_to_flags
+        # for civ in range(32):
+            # self.is_visible_now_to.append(mytemp & 0x01 == 1)
+            # mytemp = mytemp >> 1
 
         self.worked_by_city_id = get_short(self.Tile128.buffer, 0x14)
 
@@ -133,6 +133,10 @@ class Tile:
         if not debug:
             del self.Tile128
 
+        # Remove values that are -1
+        for key in self.__dict__.keys():
+            if self.__dict__[key] == -1:
+                del self.__dict__[key]
 
 class Tiles:
     """Class to read all tiles"""
