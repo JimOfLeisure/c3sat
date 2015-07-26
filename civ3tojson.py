@@ -23,34 +23,18 @@
 
 import readciv3
 import sys
-#import json
-
 
 def main():
-    """This module instantiates readciv3.parse_save() and writes an svg file for the map"""
-    spoiler = True
-    spoiler = False
-    debug = True
-    debug = False
-    outputsvgpath = 'html/civmap.json'
+    """This module instantiates readciv3.parse_save() and prints json"""
+
+    # If no argument provided, use stdin so files can be piped to this
     if len(sys.argv) < 2:
-        #print "Usage: svg.py <filename>"
-        #sys.exit(-1)
         saveFile = sys.stdin
     else:
         saveFile = open(sys.argv[1], 'rb')
 
-    #game = readciv3.parse_save("unc-test.sav")
-    #game = readciv3.parse_save("unc-lk151-650ad.sav")
-    game = readciv3.parse_save(saveFile, debug)
+    game = readciv3.parse_save(saveFile)
 
-    write = open(outputsvgpath, 'w')
-
-    #write.write(game.Tiles.svg_out(True))
-    #write.write(game.Tiles.svg_out(spoiler, debug))
-    #write.write( json.dumps(game.Tiles.tile[0].__dict__, skipkeys=True, sort_keys=True, indent=4, separators=(',', ': ')) )
-    #write.write( json.dumps(dict(game), default=lambda x: None, skipkeys=True, sort_keys=True, indent=4, separators=(',', ': ')) )
-    write.write(game.Tiles.json_out())
-    #print game.Tiles.json_out()
+    print game.Tiles.json_out()
 
 main()
