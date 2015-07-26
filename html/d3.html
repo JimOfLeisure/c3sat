@@ -60,7 +60,6 @@ d3.json("civmap.json", function(error, data){
        //.attr('style', 'background: darkslategray')
        .attr('width', data.width * 64 + 64)
        .attr('height', data.height * 32 + 32)
-       .data(data.tile)
 
     // bitmask for "is visible to" value. 0x2 is human player 1, 0x1 is barbs, 0xffff matches all
     var spoilmask = 0x2;
@@ -73,7 +72,9 @@ d3.json("civmap.json", function(error, data){
         //.select(function(d, i){ return i % 2 ? this : null;})
         //.select(function(d){ return null;})
         // .data(data.tile, function(d, i){ return i % 2 == 1 ? d : null;})
-        .data(data.tile, function(d, i){ return d.is_visible_to_flags % spoilmask ? this : null;})
+        // .data(data.tile, function(d, i){ return this.is_visible_to_flags % spoilmask ? this : null;})
+        .data(data.tile.filter(function(d){ return d.is_visible_to_flags % spoilmask}))
+        
 
     // If callback() is true, remove the node
     var removenodes = function(selection, callback){
