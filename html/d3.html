@@ -57,18 +57,23 @@ d3.json("civmap.json", function(error, data){
        .attr('width', data.width * 64 + 64)
        .attr('height', data.height * 32 + 32)
        //.append('g')
+       .selectAll('svg#map g')
+       //.data(["baseTerrain", "rivers"])
+       .data(["baseTerrain", "rivers"], function(d){ return d;})
+       .enter()
+       .append('g').attr('id', function(d){ return d; });
 
     // var tempdata = Array("baseTerrain,rivers,3,4,5,6,7,8,9".split(","));
     //var wat = svg.selectAll('g')
+
     var wat = d3.selectAll('body p')
-       .data(["baseTerrain", "rivers"])
+       .data(["baseTerrain", "rivers"], function(d){ return d;})
        //.data("baseTerrain,rivers".split(","))
        //.data(tempdata)
        .enter()
        //.update()
        .append('p').attr('id', function(d){ return d; });
 
-    console.log(tempdata);
     console.log(wat);
 
     //svg.append('g').attr('id', 'rivers')
