@@ -56,7 +56,11 @@ d3.json("civmap.json", function(error, data){
     var svg = d3.select('svg#map')
        .attr('width', data.width * 64 + 64)
        .attr('height', data.height * 32 + 32)
-       //.append('g')
+        // from https://coderwall.com/p/psogia/simplest-way-to-add-zoom-pan-on-d3-js and http://bl.ocks.org/sgruhier/1d692762f8328a2c9957
+      .call(d3.behavior.zoom().on("zoom", function () {
+        svg.attr("transform", "translate(" + d3.event.translate + ")" + " scale(" + d3.event.scale + ")")
+      }))
+      .append("g")       //.append('g')
 /*
        .selectAll('svg#map')
        //.data(["baseTerrain", "rivers"])
