@@ -155,7 +155,8 @@ class Tiles:
 
     def json_out(self, spoiler=False, debug=False):
         """Return a string of json-coded map"""
-        return json.dumps(self, default=self.jsonDefault, indent=4)
+        #return json.dumps(self, default=self.jsonDefault, indent=4)
+        return json.dumps(self, default=self.jsonDefault)
 
 class Wrld:
     """Class for 3 WRLD sections"""
