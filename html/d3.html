@@ -60,44 +60,26 @@ d3.json("civmap.json", function(error, data){
        //.attr('style', 'background: darkslategray')
        .attr('width', data.width * 64 + 64)
        .attr('height', data.height * 32 + 32)
+       .append('g').attr('id', 'baseTerrain')
 
     // bitmask for "is visible to" value. 0x2 is human player 1, 0x1 is barbs, 0xffff matches all
     var spoilmask = 0x2;
     // spoilmask = 0x4;
     // spoilmask = 0x8;
     // spoilmask = 0x10;
-    // spoilmask = 0xffff;
+    spoilmask = 0xffff;
 
     // nonspoiler = data.tile.map(function(d, i){ return i % 2 == 0 ? d : null; });
+    var nonSpoilerTiles = data.tile
+        .map(function(d, i){
+            return d.is_visible_to_flags % spoilmask ? { i: i, d: d } : null;
+        })
+        .filter(function(d){ return d != null; })
     // console.log(nonspoiler);
-
-    var tiles = svg.selectAll('polygon')
-    //var tiles = svg.select(function(d, i){ return i % 2 === 1 ? this : null;})
-        //.select(function(d, i){ return (d.is_visible_to_flags % spoilmask) == 0 ? this : null;})
-        //.select(function(d, i){ return i % 2 ? this : null;})
-        //.select(function(d){ return null;})
-        // .data(data.tile, function(d, i){ return i % 2 == 1 ? d : null;})
-        // .data(data.tile, function(d, i){ return this.is_visible_to_flags % spoilmask ? this : null;})
-        // This gets the right data, but the index is not preserved
-        // .data(data.tile.filter(function(d){ return d.is_visible_to_flags % spoilmask}))
-        //.select(function(d){ return d.is_visible_to_flags % spoilmask ? this : null;})
-        // .selectAll(function(d, i){ return i % 2 == 1 ? this : null;})
-        // .selectAll(function(d, i){ return true ? this : null;})
-        //.selectAll(function(d, i){ return this;})
-        // .data(data.tile)
-        // .data(nonspoiler)
-        // .data(data.tile.map(function(d, i){ console.log(Boolean(i % 2)); return i % 2 == 1 ? d : null; }))
-        // Filter out the spoiler data, preserve the original index alongside the data in an object
-        // Maybe I shouldn't use i and d
-        .data(data.tile
-            .map(function(d, i){ return d.is_visible_to_flags % spoilmask ? { i: i, d: d } : null; })
-            .filter(function(d){ return d != null; })
-        )
-        // .enter()
-        
 
     // If callback() is true, remove the node
     var removenodes = function(selection, callback){
+        //console.log(selection.filter(function(d){ return ! callback(d); }));
         selection.filter(function(d){ return ! callback(d); }).remove();
     }
 
@@ -114,8 +96,12 @@ d3.json("civmap.json", function(error, data){
        return 32 * Math.floor(i / (data.width / 2));
     }
 
+    var tiles = svg.selectAll('g')
+        .data(nonSpoilerTiles)
+
     // Adds tiles to the DOM
-    tiles.enter().append('polygon')
+    //tiles.append('g').enter().append('polygon')
+    svg.selectAll('g#baseTerrain polygon').data(nonSpoilerTiles).enter().append('polygon')
     // tiles.append('polygon')
     //tiles.update().append('polygon')
        .attr('points', '0,32 64,0 128,32 64,64')
@@ -131,30 +117,40 @@ d3.json("civmap.json", function(error, data){
 
     //despoil(tiles);
 
+/*
+    var rivers = svg.selectAll('g')
+        .data(nonSpoilerTiles)
+        // console.log(tiles)
     // Rivers
     // Currently this draws rivers for every tile then deletes the inappropriate ones
     var rivers = function(selection, x1, y1, x2, y2, mask) {
-        selection.enter().append('line')
+        //selection.filter(function(d){ return d.d.rivers & mask; }).enter().append('line')
+        //selection.selectAll('line')
+        selection.enter().append('g').attr('id', 'rivers').selectAll('line')
+            //.data(selection.filter(function(d){ return d.d.rivers & mask == mask; }), function(d){ return d.i; })
+            .data(selection.filter(function(d){ return d.d.rivers & mask == mask; }))
+            .enter()
+            .append('line')
             .attr('class', 'river')
-            .attr('x1', function(d, i) { return x(d.i) + x1})
-            .attr('y1', function(d, i) { return y(d.i) + y1 })
-            .attr('x2', function(d, i) { return x(d.i) + x2 })
-            .attr('y2', function(d, i) { return y(d.i) + y2});
+//            .attr('x1', function(d, i) { return x(d.i) + x1})
+//            .attr('y1', function(d, i) { return y(d.i) + y1 })
+//            .attr('x2', function(d, i) { return x(d.i) + x2 })
+//            .attr('y2', function(d, i) { return y(d.i) + y2});
     
         // Remove spoiler tiles
         // despoil(selection);
         // Remove lines for unmatched data
-        // removenodes(selection, function(d){ return d.rivers & mask; } );
+        // removenodes(selection, function(d){ return d.d.rivers & mask; } );
     }
     // NW river
-    rivers(tiles, 0, 32, 64, 0, 0x80);
+    rivers(rivers, 0, 32, 64, 0, 0x80);
     // NE river
-    rivers(tiles, 64, 0, 128, 32, 0x02);
+    rivers(rivers, 64, 0, 128, 32, 0x02);
     // SE river
-    rivers(tiles, 128, 32, 64, 64, 0x08);
+    rivers(rivers, 128, 32, 64, 64, 0x08);
     // SW river
-    rivers(tiles, 64, 64, 0, 32, 0x20);
-
+    rivers(rivers, 64, 64, 0, 32, 0x20);
+    // TODO: Ensure only needed "use"s are begin created
     // Add overlay to map
     tiles.enter().append('use')
         .attr('class', 'terroverlay')
@@ -162,7 +158,7 @@ d3.json("civmap.json", function(error, data){
         .attr('x', function(d, i) { return x(d.i)})
         .attr('y', function(d, i) { return y(d.i)});
     // Remove empty text nodes (those that don't have an entry in overlay)
-    // removenodes(tiles, function(d){ return overlay[d.terrain >> 4 & 0x0f] } );
+    // removenodes(tiles, function(d){ return overlay[d.d.terrain >> 4 & 0x0f] } );
     // despoil(tiles);
 
     // Add resources to map
@@ -174,6 +170,7 @@ d3.json("civmap.json", function(error, data){
     // Remove empty text nodes (those that don't have an entry in resources)
     // removenodes(tiles, function(d){ return resources[d.resource] } );
     // despoil(tiles);
+*/
 });
 </script>
 </head>
