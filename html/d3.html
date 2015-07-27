@@ -50,7 +50,7 @@ var overlay = {
     // spoilmask = 0xffff;
 
 // Declaring global vars because of scope difference between JSON loads and DOMContentLoaded event
-var svg, gamedata, mapstatus
+var svg, gamedata, mapstatus, resetPanZoom
 
 // Similar to jQuery's $(document).ready()
 document.addEventListener("DOMContentLoaded", function(event) { 
@@ -97,6 +97,10 @@ d3.json("civmap.json", function(error, data){
     }
     var y = function(i){
        return 32 * Math.floor(i / (data.width / 2));
+    }
+
+    resetPanZoom = function() {
+        svg.attr("transform", "translate(" + x(gamedata.start_loc[1]) + ", " + y(gamedata.start_loc[1]) + ")" + " scale(1)")
     }
 
     // Adds tiles to the DOM
