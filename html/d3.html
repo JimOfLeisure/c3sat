@@ -42,34 +42,6 @@ var overlay = {
     0xa0: '#myVolcano'
 }
 
-// load map json file
-d3.json("civmap.json", function(error, data){
-    if (error) return console.warn(error);
-    else
-/*
-    // Just making sure I have the data
-    console.log(data.tile.length); 
-    console.log(data.width); 
-    console.log(data.height); 
-*/
-    // Add svg element and assign to var
-    var svg = d3.select('svg#map')
-       // .attr('width', data.width * 64 + 64)
-       // .attr('height', data.height * 32 + 32)
-       .attr('width', '100%')
-       .attr('height', '100%')
-        // from https://coderwall.com/p/psogia/simplest-way-to-add-zoom-pan-on-d3-js and http://bl.ocks.org/sgruhier/1d692762f8328a2c9957
-        .call(d3.behavior.zoom().on("zoom", function () {
-            svg.attr("transform", "translate(" + d3.event.translate + ")" + " scale(" + d3.event.scale + ")")
-        }))
-      .append("g")       //.append('g')
-/*
-       .selectAll('svg#map')
-       //.data(["baseTerrain", "rivers"])
-       .data(["baseTerrain", "rivers"], function(d){ return d;})
-       .enter()
-       .append('svg:g').attr('id', function(d){ return d; });
-*/
     // bitmask for "is visible to" value. 0x2 is human player 1, 0x1 is barbs, 0xffff matches all
     var spoilmask = 0x2;
     // spoilmask = 0x4;
@@ -77,6 +49,41 @@ d3.json("civmap.json", function(error, data){
     // spoilmask = 0x10;
     // spoilmask = 0xffff;
 
+// Declaring global vars because of scope difference between JSON loads and DOMContentLoaded event
+var svg, gamedata, mapstatus
+
+// Similar to jQuery's $(document).ready()
+document.addEventListener("DOMContentLoaded", function(event) { 
+  console.log("DOMContentLoaded event fired");
+
+    // Add svg element and assign to var
+    svg = d3.select('svg#map')
+       .attr('width', '100%')
+       .attr('height', '100%')
+       // from https://coderwall.com/p/psogia/simplest-way-to-add-zoom-pan-on-d3-js and http://bl.ocks.org/sgruhier/1d692762f8328a2c9957
+       .call(d3.behavior.zoom().on("zoom", function () {
+           svg.attr("transform", "translate(" + d3.event.translate + ")" + " scale(" + d3.event.scale + ")")
+       }))
+       .append("g");
+
+    mapstatus = d3.select('div#mapstatus').text('Loading map data')
+});
+
+// load map json file
+d3.json("civmap.json", function(error, data){
+    if (error) {
+        mapstatus.text('ERROR while loading map data')
+        return console.warn(error);
+    }
+    else
+        mapstatus.text('Map data loaded')
+        console.log("civmap.json load completed");
+/*
+    // Just making sure I have the data
+    console.log(data.tile.length); 
+    console.log(data.width); 
+    console.log(data.height); 
+*/
     // nonspoiler = data.tile.map(function(d, i){ return i % 2 == 0 ? d : null; });
     var nonSpoilerTiles = data.tile
         .map(function(d, i){
@@ -181,6 +188,7 @@ d3.json("civmap.json", function(error, data){
 </head>
 <body>
   <h1>Civ3 Show-and-Tell JSON/d3/SVG Map</h1>
+  <div id="mapstatus"></div>
   <svg id="map">
   <defs>
  <svg xmlns="http://www.w3.org/2000/svg"
