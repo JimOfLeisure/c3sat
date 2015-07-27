@@ -15,7 +15,7 @@ body, html {
 }
 
 svg#map {
-    background: darkslategray;
+    background: #333333;
 }
 
 /* .map > polygon { */
