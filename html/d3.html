@@ -70,7 +70,7 @@ document.addEventListener("DOMContentLoaded", function(event) {
 });
 
 // load map json file
-d3.json("civmap.json", function(error, data){
+d3.json("civmap.json", function(error, gamedata){
     if (error) {
         mapstatus.text('ERROR while loading map data')
         return console.warn(error);
@@ -78,14 +78,14 @@ d3.json("civmap.json", function(error, data){
     else
         mapstatus.text('Map data loaded')
         console.log("civmap.json load completed");
-/*
+
     // Just making sure I have the data
-    console.log(data.tile.length); 
-    console.log(data.width); 
-    console.log(data.height); 
-*/
+    console.log(gamedata.tile.length); 
+    console.log(gamedata.width); 
+    console.log(gamedata.height); 
+
     // nonspoiler = data.tile.map(function(d, i){ return i % 2 == 0 ? d : null; });
-    var nonSpoilerTiles = data.tile
+    var nonSpoilerTiles = gamedata.tile
         .map(function(d, i){
             return d.is_visible_to_flags & spoilmask ? { i: i, d: d } : null;
         })
@@ -93,15 +93,21 @@ d3.json("civmap.json", function(error, data){
 
     var x = function(i){
        // tile-width * map width, aslo add half-tile offset to the right for odd rows
-       return 128 * (i % (data.width / 2)) + 64 * ( Math.floor(i / (data.width /2)) % 2);
+       return 128 * (i % (gamedata.width / 2)) + 64 * ( Math.floor(i / (gamedata.width /2)) % 2);
     }
     var y = function(i){
-       return 32 * Math.floor(i / (data.width / 2));
+       return 32 * Math.floor(i / (gamedata.width / 2));
     }
 
     resetPanZoom = function() {
-        svg.attr("transform", "translate(" + x(gamedata.start_loc[1]) + ", " + y(gamedata.start_loc[1]) + ")" + " scale(1)")
+        myx = 4 * 64 - x(gamedata.start_loc[1])
+        myy = 4 * 32 - y(gamedata.start_loc[1])
+        // This changes the view, but then zooming or panning with mouse reesets to where it wsa
+        svg.attr("transform", "translate(" + myx + ", " + myy + ")" + " scale(1)");
+        d3.behavior.zoom().translate([myx, myy]).scale(1); // .attr("transform", "translate(" + ( - x(gamedata.start_loc[1])) + ", " + ( - y(gamedata.start_loc[1])) + ")" + " scale(1)")
+        //d3.behavior.zoom().event(svg.transition().duration(500));
     }
+    resetPanZoom();
 
     // Adds tiles to the DOM
     var tiles = svg.append('g').attr('id', 'baseTerrain')
@@ -149,8 +155,6 @@ d3.json("civmap.json", function(error, data){
     var terrainOverlay = svg.append('g').attr('id', 'terrainOverlay').attr('class', 'terroverlay');
 
     terrainOverlay.selectAll('use')
-        //.data(nonSpoilerTiles)
-        //.data(overlay, function(d){ console.log('Hi ' + (d.d.terrain & 0x0f).toString(16)); return d.d.terrain & 0xf0; })
         .data(nonSpoilerTiles.filter(function(d){ return overlay[d.d.terrain & 0xf0]; }), function(d){ return d.i; })
         .enter().append('use')
         .attr('class', 'terroverlay')
