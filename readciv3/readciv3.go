@@ -18,18 +18,16 @@ func main() {
 	}
 	defer file.Close()
 	fmt.Printf("%s opened\n", path)
+
 	header := make([]byte, 2)
 	_, err = file.Read(header)
 	if err != nil {
 		log.Fatal(err)
 	}
+	fmt.Printf("%x\n", header)
+
 	// Create bitstream reader
 	civ3Bitstream := NewReader(file)
-
-	// header, err := civ3Bitstream.ReadByte()
-	fmt.Printf("%x\n", header)
-	// header, err = civ3Bitstream.ReadByte()
-	// fmt.Printf("%x\n", header)
 
 	foo, bar := civ3Bitstream.ReadBit()
 	fmt.Printf("%v %v\n", foo, bar)
