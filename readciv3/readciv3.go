@@ -6,15 +6,13 @@ import (
 	"fmt"
 	"log"
 	"os"
-	// "./lsbitstream.go"
-	// bitstream "github.com/dgryski/go-bitstream"
 )
 
 func main() {
 	path := "/temp/civ3saves/about to win English, 1340 AD.SAV"
 
 	file, err := os.Open(path)
-	myBitstream := lsbitstream.NewReader(file)
+	myBitstream := NewReader(file)
 	if err != nil {
 		log.Fatal("Error while opening file", err)
 	}

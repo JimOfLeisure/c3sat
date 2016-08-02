@@ -2,7 +2,7 @@
 This file's contents taken from https://github.com/dgryski/go-bitstream/blob/master/bitstream.go
 and truncated for read-only and adapted to read the least-significant bit first which is backwards from the original code
 
-License noticed copied from source. Only minor bit rotation changes made by me, Jim Nelson: 
+License noticed copied from source. Only minor bit rotation changes made by me, Jim Nelson:
 
 The MIT License (MIT)
 
@@ -29,7 +29,7 @@ SOFTWARE.
 */
 
 // Package bitstream is a simple wrapper around a io.Reader and io.Writer to provide bit-level access to the stream.
-package lsbitstream
+package main
 
 import (
 	"io"
@@ -51,6 +51,7 @@ type BitReader struct {
 	b     [1]byte
 	count uint8
 }
+
 /*
 // A BitWriter writes bits to an io.Writer
 type BitWriter struct {
@@ -79,6 +80,7 @@ func (b *BitReader) ReadBit() (Bit, error) {
 	b.b[0] <<= 1
 	return d != 0, nil
 }
+
 /*
 // NewWriter returns a BitWriter that buffers bits and write the resulting bytes to 'w'
 func NewWriter(w io.Writer) *BitWriter {
@@ -188,6 +190,7 @@ func (b *BitReader) ReadBits(nbits int) (uint64, error) {
 
 	return u, nil
 }
+
 /*
 // Flush empties the currently in-process byte by filling it with 'bit'.
 func (b *BitWriter) Flush(bit Bit) error {
