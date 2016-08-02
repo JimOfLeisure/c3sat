@@ -1,4 +1,4 @@
-// Package blast is to decompress SAV and BIQ files
+// Package readciv3 is to decompress SAV and BIQ files
 // Obviously not yet complete
 package main
 
@@ -6,15 +6,15 @@ import (
 	"fmt"
 	"log"
 	"os"
-
-	bitstream "github.com/dgryski/go-bitstream"
+	// "./lsbitstream.go"
+	// bitstream "github.com/dgryski/go-bitstream"
 )
 
 func main() {
 	path := "/temp/civ3saves/about to win English, 1340 AD.SAV"
 
 	file, err := os.Open(path)
-	myBitstream := bitstream.NewReader(file)
+	myBitstream := lsbitstream.NewReader(file)
 	if err != nil {
 		log.Fatal("Error while opening file", err)
 	}
