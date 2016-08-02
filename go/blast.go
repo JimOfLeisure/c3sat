@@ -1,12 +1,14 @@
 // Package blast is to decompress SAV and BIQ files
 // Obviously not yet complete
-// Basing early steps on http://www.jonathan-petitcolas.com/2014/09/25/parsing-binary-files-in-go.html
 package main
 
 import (
 	"fmt"
 	"log"
 	"os"
+	"strings"
+
+	bitstream "github.com/dgryski/go-bitstream"
 )
 
 func main() {
@@ -20,9 +22,13 @@ func main() {
 	defer file.Close()
 
 	fmt.Printf("%s opened\n", path)
-	fmt.Printf("print me please\n")
 	header := readNextBytes(file, 2)
-	fmt.Printf("HaloooooOOooo %x\n", header)
+	fmt.Printf("%x\n", header)
+	// myBitstream := go-bitstream.NewReader(file)
+	myTest := bitstream.NewReader(strings.NewReader("Hi"))
+	// grrr := strings.NewReader("Hi")
+	foo, bar := myTest.ReadBit()
+	fmt.Printf("%v %v\n", foo, bar)
 }
 
 func readNextBytes(file *os.File, number int) []byte {
