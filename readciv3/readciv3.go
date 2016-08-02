@@ -4,6 +4,7 @@ package main
 
 import (
 	"fmt"
+	"io"
 	"log"
 	"os"
 )
@@ -29,6 +30,26 @@ func main() {
 	// Create bitstream reader
 	civ3Bitstream := NewReader(file)
 
-	foo, bar := civ3Bitstream.ReadBit()
-	fmt.Printf("%v %v\n", foo, bar)
+	for {
+		foo, err := civ3Bitstream.ReadBit()
+		if err != nil {
+			if err == io.EOF {
+				break
+			}
+		}
+		// fmt.Printf("%v %v\n", foo, err)
+		switch foo {
+		case true:
+			fmt.Println("\n\n")
+			log.Fatal("Dictionary logic not yet implemented.\n")
+		case false:
+			{
+				aByte, err := civ3Bitstream.ReadByte()
+				if err != nil {
+					log.Fatal(err)
+				}
+				fmt.Printf("%02x ", aByte)
+			}
+		}
+	}
 }

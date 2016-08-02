@@ -2,6 +2,8 @@
 This file's contents taken from https://github.com/dgryski/go-bitstream/blob/master/bitstream.go
 and truncated for read-only and adapted to read the least-significant bit first which is backwards from the original code
 
+Curiously, ReadByte didn't need to be reversed, just ReadBit (ReadBits remains to be seen)
+
 License noticed copied from source. Only minor bit rotation changes made by me, Jim Nelson:
 
 The MIT License (MIT)
