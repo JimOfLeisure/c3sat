@@ -11,33 +11,22 @@ import (
 func main() {
 	path := "/temp/civ3saves/about to win English, 1340 AD.SAV"
 
+	// Open file, hanlde errors, defer close
 	file, err := os.Open(path)
-	myBitstream := NewReader(file)
 	if err != nil {
 		log.Fatal("Error while opening file", err)
 	}
-
 	defer file.Close()
-
 	fmt.Printf("%s opened\n", path)
-	// header := readNextBytes(file, 2)
-	header, err := myBitstream.ReadByte()
+
+	//
+	civ3Bitstream := NewReader(file)
+
+	header, err := civ3Bitstream.ReadByte()
 	fmt.Printf("%x\n", header)
-	header, err = myBitstream.ReadByte()
+	header, err = civ3Bitstream.ReadByte()
 	fmt.Printf("%x\n", header)
-	// myTest := bitstream.NewReader(strings.NewReader("Hi"))
-	// grrr := strings.NewReader("Hi")
-	foo, bar := myBitstream.ReadBit()
+
+	foo, bar := civ3Bitstream.ReadBit()
 	fmt.Printf("%v %v\n", foo, bar)
-}
-
-func readNextBytes(file *os.File, number int) []byte {
-	bytes := make([]byte, number)
-
-	_, err := file.Read(bytes)
-	if err != nil {
-		log.Fatal(err)
-	}
-
-	return bytes
 }

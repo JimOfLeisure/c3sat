@@ -52,14 +52,6 @@ type BitReader struct {
 	count uint8
 }
 
-/*
-// A BitWriter writes bits to an io.Writer
-type BitWriter struct {
-	w     io.Writer
-	b     [1]byte
-	count uint8
-}
-*/
 // NewReader returns a BitReader that returns a single bit at a time from 'r'
 func NewReader(r io.Reader) *BitReader {
 	b := new(BitReader)
@@ -81,58 +73,6 @@ func (b *BitReader) ReadBit() (Bit, error) {
 	return d != 0, nil
 }
 
-/*
-// NewWriter returns a BitWriter that buffers bits and write the resulting bytes to 'w'
-func NewWriter(w io.Writer) *BitWriter {
-	b := new(BitWriter)
-	b.w = w
-	b.count = 8
-	return b
-}
-
-func (b *BitWriter) Pending() (byt byte, vals uint8) {
-	return b.b[0], b.count
-}
-
-func (b *BitWriter) Resume(data byte, count uint8) {
-	b.b[0] = data
-	b.count = count
-}
-
-// WriteBit writes a single bit to the stream, writing a new byte to 'w' if required.
-func (b *BitWriter) WriteBit(bit Bit) error {
-
-	if bit {
-		b.b[0] |= 1 << (b.count - 1)
-	}
-
-	b.count--
-
-	if b.count == 0 {
-		if n, err := b.w.Write(b.b[:]); n != 1 || err != nil {
-			return err
-		}
-		b.b[0] = 0
-		b.count = 8
-	}
-
-	return nil
-}
-
-// WriteByte writes a single byte to the stream, regardless of alignment
-func (b *BitWriter) WriteByte(byt byte) error {
-
-	// fill up b.b with b.count bits from byt
-	b.b[0] |= byt >> (8 - b.count)
-
-	if n, err := b.w.Write(b.b[:]); n != 1 || err != nil {
-		return err
-	}
-	b.b[0] = byt << b.count
-
-	return nil
-}
-*/
 // ReadByte reads a single byte from the stream, regardless of alignment
 func (b *BitReader) ReadByte() (byte, error) {
 
@@ -190,43 +130,3 @@ func (b *BitReader) ReadBits(nbits int) (uint64, error) {
 
 	return u, nil
 }
-
-/*
-// Flush empties the currently in-process byte by filling it with 'bit'.
-func (b *BitWriter) Flush(bit Bit) error {
-
-	for b.count != 8 {
-		err := b.WriteBit(bit)
-		if err != nil {
-			return err
-		}
-	}
-
-	return nil
-}
-
-// WriteBits writes the nbits least significant bits of u, most-significant-bit first.
-func (b *BitWriter) WriteBits(u uint64, nbits int) error {
-	u <<= (64 - uint(nbits))
-	for nbits >= 8 {
-		byt := byte(u >> 56)
-		err := b.WriteByte(byt)
-		if err != nil {
-			return err
-		}
-		u <<= 8
-		nbits -= 8
-	}
-
-	for nbits > 0 {
-		err := b.WriteBit((u >> 63) == 1)
-		if err != nil {
-			return err
-		}
-		u <<= 1
-		nbits--
-	}
-
-	return nil
-}
-*/
