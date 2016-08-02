@@ -6,6 +6,7 @@
 html/*.svg
 html/*.json
 html/debug/
+*.exe
 
 #python specific
 *.pyc
