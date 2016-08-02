@@ -6,7 +6,6 @@ import (
 	"fmt"
 	"log"
 	"os"
-	"strings"
 
 	bitstream "github.com/dgryski/go-bitstream"
 )
@@ -15,6 +14,7 @@ func main() {
 	path := "/temp/civ3saves/about to win English, 1340 AD.SAV"
 
 	file, err := os.Open(path)
+	myBitstream := bitstream.NewReader(file)
 	if err != nil {
 		log.Fatal("Error while opening file", err)
 	}
@@ -22,12 +22,14 @@ func main() {
 	defer file.Close()
 
 	fmt.Printf("%s opened\n", path)
-	header := readNextBytes(file, 2)
+	// header := readNextBytes(file, 2)
+	header, err := myBitstream.ReadByte()
 	fmt.Printf("%x\n", header)
-	// myBitstream := go-bitstream.NewReader(file)
-	myTest := bitstream.NewReader(strings.NewReader("Hi"))
+	header, err = myBitstream.ReadByte()
+	fmt.Printf("%x\n", header)
+	// myTest := bitstream.NewReader(strings.NewReader("Hi"))
 	// grrr := strings.NewReader("Hi")
-	foo, bar := myTest.ReadBit()
+	foo, bar := myBitstream.ReadBit()
 	fmt.Printf("%v %v\n", foo, bar)
 }
 
