@@ -70,34 +70,3 @@ func (b *BitReader) ReadBit() (Bit, error) {
 	b.b[0] >>= 1
 	return d != 0, nil
 }
-
-// ReadBits reads  nbits from the stream
-func (b *BitReader) ReadBits(nbits int) (uint64, error) {
-
-	var u uint64
-
-	for nbits >= 8 {
-		byt, err := b.ReadByte()
-		if err != nil {
-			return 0, err
-		}
-
-		u = (u << 8) | uint64(byt)
-		nbits -= 8
-	}
-
-	var err error
-	for nbits > 0 && err != io.EOF {
-		byt, err := b.ReadBit()
-		if err != nil {
-			return 0, err
-		}
-		u <<= 1
-		if byt {
-			u |= 1
-		}
-		nbits--
-	}
-
-	return u, nil
-}
