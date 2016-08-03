@@ -186,7 +186,7 @@ func (b *BitReader) lengthsequence() int {
 	var sequence bytes.Buffer
 	// TODO: Do I care about err handling? Currently using _
 	count := 0
-	for _, zpresent := lengthLookup[sequence.String()]; !zpresent && count < 8; count++ {
+	for _, keyPresent := lengthLookup[sequence.String()]; !keyPresent && count < 8; count++ {
 		bit, _ := b.ReadBit()
 		if bit {
 			sequence.WriteString("1")
@@ -194,7 +194,7 @@ func (b *BitReader) lengthsequence() int {
 			sequence.WriteString("0")
 		}
 		// hack, but not sure how to check every iteration in for params
-		_, zpresent = lengthLookup[sequence.String()]
+		_, keyPresent = lengthLookup[sequence.String()]
 	}
 	xxxes, _ := b.ReadBits(uint(lengthLookup[sequence.String()].extraBits))
 	// log.Printf("Decoded length sequence is %v, to read %v more bits", lengthLookup[sequence.String()].value, lengthLookup[sequence.String()].extraBits)
