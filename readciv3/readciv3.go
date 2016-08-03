@@ -5,7 +5,6 @@ package main
 import (
 	"bytes"
 	"encoding/hex"
-	"fmt"
 	"io"
 	"log"
 	"os"
@@ -14,13 +13,16 @@ import (
 func main() {
 	path := "/temp/civ3saves/about to win English, 1340 AD.SAV"
 
+	// Remove the date/time stamp from log lines
+	log.SetFlags(0)
+
 	// Open file, hanlde errors, defer close
 	file, err := os.Open(path)
 	if err != nil {
 		log.Fatal("Error while opening file", err)
 	}
 	defer file.Close()
-	fmt.Printf("\n%s opened\n", path)
+	log.Printf("%s opened\n", path)
 
 	header := make([]byte, 2)
 	_, err = file.Read(header)
@@ -29,7 +31,7 @@ func main() {
 	}
 	switch {
 	case header[0] == 0x00 && header[1] == 0x06:
-		fmt.Println("Compressed Civ3 file detected")
+		log.Println("Compressed Civ3 file detected")
 	case string(header) == "CI":
 		log.Fatal("Uncompressed Civ3 SAV file detected")
 	case string(header) == "BI":
@@ -49,7 +51,7 @@ func main() {
 		}
 		switch foo {
 		case true:
-			fmt.Printf("\n%s\n", hex.Dump(uncData.Bytes()))
+			log.Printf("Data hex dump:\n%s\n", hex.Dump(uncData.Bytes()))
 			log.Fatal("Dictionary logic not yet implemented.\n")
 		case false:
 			{
