@@ -2,8 +2,6 @@
 This file's contents taken from https://github.com/dgryski/go-bitstream/blob/master/bitstream.go
 and truncated for read-only and adapted to read the least-significant bit first which is backwards from the original code
 
-Curiously, ReadByte didn't need to be reversed, just ReadBit (ReadBits remains to be seen)
-
 License noticed copied from source. Only minor bit rotation changes made by me, Jim Nelson:
 
 The MIT License (MIT)
@@ -34,7 +32,6 @@ SOFTWARE.
 package main
 
 import (
-	"fmt"
 	"io"
 	"log"
 )
@@ -80,42 +77,22 @@ func (b *BitReader) ReadBit() (Bit, error) {
 // ReadByte reads a single byte from the stream, regardless of alignment
 func (b *BitReader) ReadByte() (byte, error) {
 
+	// If I init inside the loop these are out of scope
 	var byt byte = 255
 	var err error
 
+	// Shift in 8 bits, LSBit first
 	for i := 0; i < 8; i++ {
 		bit, looperr := b.ReadBit()
 		if looperr != nil {
 			log.Fatal(looperr)
 		}
-		fmt.Printf("%v ", bit)
 		byt >>= 1
 		if bit {
 			byt |= 128
 		}
 	}
-	/*
-		if b.count == 0 {
-			n, err := b.r.Read(b.b[:])
-			if n == 0 {
-				b.b[0] = 0
-			}
-			return b.b[0], err
-		}
 
-		byt := b.b[0]
-
-		var n int
-		var err error
-		n, err = b.r.Read(b.b[:])
-		if n != 1 || (err != nil && err != io.EOF) {
-			return 0, err
-		}
-
-		byt |= b.b[0] >> b.count
-
-		b.b[0] <<= (8 - b.count)
-	*/
 	return byt, err
 }
 
