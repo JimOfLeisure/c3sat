@@ -3,6 +3,7 @@
 package main
 
 import (
+	"encoding/hex"
 	"fmt"
 	"io"
 	"log"
@@ -18,17 +19,25 @@ func main() {
 		log.Fatal("Error while opening file", err)
 	}
 	defer file.Close()
-	fmt.Printf("%s opened\n", path)
+	fmt.Printf("\n%s opened\n", path)
 
 	header := make([]byte, 2)
 	_, err = file.Read(header)
 	if err != nil {
 		log.Fatal(err)
 	}
-	fmt.Printf("%x\n", header)
+	switch {
+	case header[0] == 0x00 && header[1] == 0x06:
+		fmt.Println("Compressed Civ3 file detected")
+	case string(header) == "CI":
+		log.Fatal("Uncompressed Civ3 SAV file detected")
+	case string(header) == "BI":
+		log.Fatal("Uncompressed Civ3 BIC file detected")
+	}
 
 	// Create bitstream reader
 	civ3Bitstream := NewReader(file)
+	var uncData []byte
 
 	for {
 		foo, err := civ3Bitstream.ReadBit()
@@ -37,10 +46,9 @@ func main() {
 				break
 			}
 		}
-		// fmt.Printf("%v %v\n", foo, err)
 		switch foo {
 		case true:
-			fmt.Println("\n\n")
+			fmt.Printf("\n%s\n", hex.Dump(uncData))
 			log.Fatal("Dictionary logic not yet implemented.\n")
 		case false:
 			{
@@ -48,7 +56,7 @@ func main() {
 				if err != nil {
 					log.Fatal(err)
 				}
-				fmt.Printf("%02x ", aByte)
+				uncData = append(uncData, aByte)
 			}
 		}
 	}
