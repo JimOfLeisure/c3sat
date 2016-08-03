@@ -1,5 +1,33 @@
 ## Civ3 Show-And-Tell
 
+August 2016 update: I'm embarking on another major rewrite/refactor. I have an interest in learning Go,
+and this project would benefit greatly from using Go instead of Python. I could have better modularized
+and managed the Python version, but the two big problems were that target users aren't likely to have
+Python installed, and I was unable to reasonably compile the code into an executable. Go will let me
+release native executables for Windows, Mac and Linux.
+
+So far, all the new activity is in readciv3/, and instead of immediately recoding existing functionality
+I'm writing a decompressor so external utilities won't be needed.
+
+### To Do
+
+- Finish decompressor code
+- Refactor decompressor code into package
+- Use cli package to create command line app
+- Start extracting data from file
+- Flesh out subcommands like decompress, hexdump, info (including world random seed and game/map settings)
+- Extract maps like Python code
+
+## Tagged older versions
+
+Both are in Python with an HTML/JavaScript viewer page. Lost to history is a C# version of an early save game parser, but it didn't have useful output.
+
+- [0.1](https://github.com/myjimnelson/c3sat/tree/0.1) - This version output the SVG map to file and had a jQuery/HTML viewer page to view it.
+- [0.2](https://github.com/myjimnelson/c3sat/tree/0.2) - This version output JSON map data, and a d3.js/HTML viewer rendered the map based on the JSON.
+
+-----
+## Readme from July 2015
+
 This is an attempt at an accessory map viewer for Civilization III Conquests save game files.
 
 Run `civ3tojson.py` and pass it a filename of an uncompressed save (use an autosave or decompress with dynamite) or pipe it an uncompressed save file (autosave or blast) and it will print JSON output which can be redirected to html/civmap.json and viewed as a map with html/d3.html.
