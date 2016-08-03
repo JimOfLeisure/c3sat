@@ -142,8 +142,9 @@ func main() {
 	var uncData bytes.Buffer
 	// dictionary is just a reader for the output buffer.
 	var dict = bytes.NewReader(uncData.Bytes())
+	var length int
 
-	for {
+	for length != 519 {
 		foo, err := civ3Bitstream.ReadBit()
 		if err != nil {
 			if err == io.EOF {
@@ -152,21 +153,15 @@ func main() {
 		}
 		switch foo {
 		case true:
-			length := civ3Bitstream.lengthsequence()
-			// log.Printf("Length %v", length)
-			if length == 519 {
-				log.Printf("Data hex dump:\n%s\n", hex.Dump(uncData.Bytes()))
-				log.Fatal("End of stream token reached")
-			}
-			// _ = civ3Bitstream.offsetsequence(int(header[1]))
-			offset := civ3Bitstream.offsetsequence(int(header[1]))
-			// Position dictionary/buffer reader. 2 means from end of buffer/stream
-			dict.Seek(int64(offset), 2)
-			// log.Printf("Offset %v", offset)
-			// log.Fatal("Dictionary logic not yet fully implemented.\n")
-			for i := 0; i < length; i++ {
-				byt, _ := dict.ReadByte()
-				uncData.WriteByte(byt)
+			length = civ3Bitstream.lengthsequence()
+			if length != 519 {
+				offset := civ3Bitstream.offsetsequence(int(header[1]))
+				// Position dictionary/buffer reader. 2 means from end of buffer/stream
+				dict.Seek(int64(offset), 2)
+				for i := 0; i < length; i++ {
+					byt, _ := dict.ReadByte()
+					uncData.WriteByte(byt)
+				}
 			}
 		case false:
 			{
@@ -178,6 +173,8 @@ func main() {
 			}
 		}
 	}
+	log.Printf("Data hex dump:\n%s\n", hex.Dump(uncData.Bytes()))
+
 }
 
 func (b *BitReader) lengthsequence() int {
