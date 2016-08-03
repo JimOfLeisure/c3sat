@@ -3,6 +3,7 @@
 package main
 
 import (
+	"bytes"
 	"encoding/hex"
 	"fmt"
 	"io"
@@ -37,7 +38,7 @@ func main() {
 
 	// Create bitstream reader
 	civ3Bitstream := NewReader(file)
-	var uncData []byte
+	var uncData bytes.Buffer
 
 	for {
 		foo, err := civ3Bitstream.ReadBit()
@@ -48,7 +49,7 @@ func main() {
 		}
 		switch foo {
 		case true:
-			fmt.Printf("\n%s\n", hex.Dump(uncData))
+			fmt.Printf("\n%s\n", hex.Dump(uncData.Bytes()))
 			log.Fatal("Dictionary logic not yet implemented.\n")
 		case false:
 			{
@@ -56,7 +57,7 @@ func main() {
 				if err != nil {
 					log.Fatal(err)
 				}
-				uncData = append(uncData, aByte)
+				uncData.Write([]byte{aByte})
 			}
 		}
 	}
