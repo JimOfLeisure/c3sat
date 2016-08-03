@@ -31,10 +31,7 @@ SOFTWARE.
 // Package bitstream is a simple wrapper around a io.Reader and io.Writer to provide bit-level access to the stream.
 package main
 
-import (
-	"io"
-	"log"
-)
+import "io"
 
 // A Bit is a zero or a one
 type Bit bool
@@ -72,28 +69,6 @@ func (b *BitReader) ReadBit() (Bit, error) {
 	d := (b.b[0] & 0x01)
 	b.b[0] >>= 1
 	return d != 0, nil
-}
-
-// ReadByte reads a single byte from the stream, regardless of alignment
-func (b *BitReader) ReadByte() (byte, error) {
-
-	// If I init inside the loop these are out of scope
-	var byt byte = 255
-	var err error
-
-	// Shift in 8 bits, LSBit first
-	for i := 0; i < 8; i++ {
-		bit, looperr := b.ReadBit()
-		if looperr != nil {
-			log.Fatal(looperr)
-		}
-		byt >>= 1
-		if bit {
-			byt |= 128
-		}
-	}
-
-	return byt, err
 }
 
 // ReadBits reads  nbits from the stream
