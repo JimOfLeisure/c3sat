@@ -142,8 +142,10 @@ func main() {
 	var uncData bytes.Buffer
 	// dictionary is just a reader for the output buffer.
 	var dict = bytes.NewReader(uncData.Bytes())
+	// define length here to use in for loop setup
 	var length int
 
+	// The token equating to length 519 is the end-of-stream token
 	for length != 519 {
 		foo, err := civ3Bitstream.ReadBit()
 		if err != nil {
@@ -152,8 +154,10 @@ func main() {
 			}
 		}
 		switch foo {
+		// bit 1 indicates length/offset sequences follow
 		case true:
 			length = civ3Bitstream.lengthsequence()
+			// The token equating to length 519 is the end-of-stream token
 			if length != 519 {
 				offset := civ3Bitstream.offsetsequence(int(header[1]))
 				// Position dictionary/buffer reader. 2 means from end of buffer/stream
@@ -163,6 +167,7 @@ func main() {
 					uncData.WriteByte(byt)
 				}
 			}
+		// bit 0 inticates next 8 bits are literal byte, lsb first
 		case false:
 			{
 				aByte, err := civ3Bitstream.ReadByte()
@@ -199,7 +204,7 @@ func (b *BitReader) offsetsequence(dictsize int) int {
 	var sequence bytes.Buffer
 	// TODO: Do I care about err handling? Currently using _
 	count := 0
-	for _, zpresent := offsetLookup[sequence.String()]; !zpresent && count < 8; count++ {
+	for _, keyPresent := offsetLookup[sequence.String()]; !keyPresent && count < 8; count++ {
 		bit, _ := b.ReadBit()
 		if bit {
 			sequence.WriteString("1")
@@ -207,7 +212,7 @@ func (b *BitReader) offsetsequence(dictsize int) int {
 			sequence.WriteString("0")
 		}
 		// hack, but not sure how to check every iteration in for params
-		_, zpresent = offsetLookup[sequence.String()]
+		_, keyPresent = offsetLookup[sequence.String()]
 	}
 	loworderbits, _ := b.ReadBits(uint(dictsize))
 	// log.Printf("Decoded length sequence is %v, to read %v more bits", offsetLookup[sequence.String()].value, offsetLookup[sequence.String()].extraBits)
