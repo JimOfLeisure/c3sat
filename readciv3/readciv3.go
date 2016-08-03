@@ -11,10 +11,13 @@ import (
 )
 
 func main() {
-	path := "/temp/civ3saves/about to win English, 1340 AD.SAV"
-
 	// Remove the date/time stamp from log lines
 	log.SetFlags(0)
+
+	log.Println("Early test program. Call this program with a Civ 3 SAV file or BIC/X/Q file.")
+	log.Println("It will report if the file is compressed or uncompressed,")
+	log.Println("and print the first several bytes of any compressed files in hex dump format.")
+	path := os.Args[1]
 
 	// Open file, hanlde errors, defer close
 	file, err := os.Open(path)
@@ -36,6 +39,8 @@ func main() {
 		log.Fatal("Uncompressed Civ3 SAV file detected")
 	case string(header) == "BI":
 		log.Fatal("Uncompressed Civ3 BIC file detected")
+	default:
+		log.Fatalf("Unrecognized file type. Two byte header is %v", header)
 	}
 
 	// Create bitstream reader
