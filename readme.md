@@ -14,9 +14,9 @@ And now that the decompressor code is working I'll be refactoring into the civ3s
 ### To Do
 
 - ~~Finish decompressor code~~
-- ~~Refactor decompressor code into package~~ working in readciv3, but not pretty. Eventually will split into decompressor and civ3-specific interface
-- ~~Use cli package to create command line app~~ Working in civ3sat/, but rough. Needs refinement.
-- Start extracting data from file
+- ~~Refactor decompressor code into package~~ working in decompressor, but not pretty. Presume will eventually pass file/stream pointers around.
+- ~~Use cli package to create command line app~~ Working in civ3sat/.
+- Start extracting data from file - about to begin in parseciv3/.
 - Flesh out subcommands like ~~decompress, hexdump,~~ info (including world random seed and game/map settings)
 - Extract maps like Python code
 
