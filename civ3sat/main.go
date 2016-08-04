@@ -8,6 +8,7 @@ import (
 	"os"
 
 	"github.com/myjimnelson/c3sat/civ3decompress"
+	"github.com/myjimnelson/c3sat/parseciv3"
 	"github.com/urfave/cli"
 )
 
@@ -37,6 +38,15 @@ func main() {
 			Usage:   "hex dump a Civ3 data file to stdout",
 			Action: func(c *cli.Context) error {
 				fmt.Print(hex.Dump(civ3decompress.Decompress(c.Args().First())))
+				return nil
+			},
+		},
+		{
+			Name:    "dev",
+			Aliases: []string{"z"},
+			Usage:   "Who knows? It's whatever the dev is working on right now",
+			Action: func(c *cli.Context) error {
+				parseciv3.Parseciv3(civ3decompress.Decompress(c.Args().First()))
 				return nil
 			},
 		},
