@@ -28,9 +28,38 @@ func Parseciv3(civdata []byte) {
 	}
 	r.Seek(0, 0)
 	civ3header := readBytes(r, 30)
-	log.Println(hex.Dump(civ3header))
-	log.Printf("%v", readBase(r))
-	log.Println(hex.Dump(readBytes(r, 16)))
+	_ = civ3header
+	// log.Println(hex.Dump(civ3header))
+	bicheader := readBase(r)
+	_ = bicheader
+	// log.Println(hex.Dump(bicheader.buffer.Bytes()))
+
+	// The next three values always seem to be the same in all files
+	// Best guess is that the 1 is a record count and 720 is a length,
+	// but almost all zeroes in the 720 bytes. But it does seem to lead
+	// up to the next class name "GAME"
+	bicqvernum := readBytes(r, 8)
+	if string(bicqvernum) != "BICQVER#" {
+		log.Fatal(somethingsdifferent(r))
+	}
+	bicone := readBytes(r, 4)
+	if binary.LittleEndian.Uint32(bicone) != 1 {
+		log.Fatal(somethingsdifferent(r))
+	}
+	homelesslength := int(binary.LittleEndian.Uint32(readBytes(r, 4)))
+	if homelesslength != 720 {
+		log.Fatal(somethingsdifferent(r))
+	}
+	homelessdata := readBytes(r, homelesslength)
+	_ = homelessdata
+	// Per Antal1987's Bic data structure, it looks like 28 ints then some other data is at the start of the BIC
+	// But the data doesn't seem to look like that
+	// twentyeightints := readBytes(r, 28*4)
+	// log.Println(hex.Dump(twentyeightints))
+
+	bicgame := readBase(r)
+	log.Println(bicgame.name, hex.Dump(bicgame.buffer.Bytes()))
+	log.Println(hex.Dump(readBytes(r, 1024)))
 }
 
 func check(e error) {
@@ -51,18 +80,15 @@ func readBytes(r *bytes.Reader, n int) []byte {
 }
 
 func readBase(r *bytes.Reader) (c baseClass) {
-	// err := binary.Read(r, binary.LittleEndian, c.length)
-	// check(err)
 	name := readBytes(r, 4)
 	length := readBytes(r, 4)
-	// buffer := readBytes(r, length)
-
-	// c = baseClass{
-	// name:   zname,
-	// 	length: zlength,
-	// }
 	c.name = string(name[:4])
 	c.length = binary.LittleEndian.Uint32(length[:4])
 	c.buffer.Write(readBytes(r, int(c.length)))
 	return
+}
+
+func somethingsdifferent(r *bytes.Reader) string {
+	r.Seek(-8, 2)
+	return hex.Dump(readBytes(r, 1024))
 }
