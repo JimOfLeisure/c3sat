@@ -6,6 +6,7 @@ import (
 	"bytes"
 	"encoding/hex"
 	"io"
+	"io/ioutil"
 	"log"
 	"os"
 )
@@ -158,10 +159,16 @@ func main() {
 			// log.Printf("length %v", length)
 			// The token equating to length 519 is the end-of-stream token
 			if length != 519 {
-				offset := civ3Bitstream.offsetsequence(int(header[1]))
+				// If length is 2, then only two low-order bits are read for offset
+				dictsize := header[1]
+				if length == 2 {
+					dictsize = 2
+				}
+				offset := civ3Bitstream.offsetsequence(int(dictsize))
 				// log.Printf("offset %v", offset)
 				for i := 0; i < length; i++ {
 					// dictionary is just a reader for the output buffer.
+					// since using .Bytes(), have to do this every loop...surely there is better way
 					dict := bytes.NewReader(uncData.Bytes())
 					// Position dictionary/buffer reader. 2 means from end of buffer/stream
 					// offset 0 is last byte, so using -1 -offset to position for last byte
@@ -170,6 +177,8 @@ func main() {
 					if err != nil {
 						log.Fatal(err)
 					}
+					// Wouldn't think this is necessary, but let's try
+					dict.Seek(int64(0), 2)
 					uncData.WriteByte(byt)
 					// log.Printf("byt %v", byt)
 				}
@@ -186,6 +195,8 @@ func main() {
 		}
 	}
 	log.Printf("Data hex dump:\n%s\n", hex.Dump(uncData.Bytes()))
+	err = ioutil.WriteFile("./out.sav", uncData.Bytes(), 0644)
+	check(err)
 
 }
 
@@ -193,7 +204,7 @@ func (b *BitReader) lengthsequence() int {
 	var sequence bytes.Buffer
 	// TODO: Do I care about err handling? Currently using _
 	count := 0
-	for _, keyPresent := lengthLookup[sequence.String()]; !keyPresent && count < 8; count++ {
+	for _, keyPresent := lengthLookup[sequence.String()]; !keyPresent; count++ {
 		bit, _ := b.ReadBit()
 		if bit {
 			sequence.WriteString("1")
@@ -202,16 +213,19 @@ func (b *BitReader) lengthsequence() int {
 		}
 		// hack, but not sure how to check every iteration in for params
 		_, keyPresent = lengthLookup[sequence.String()]
+		if count > 8 {
+			log.Fatal("Did not match offset sequence")
+		}
 	}
 	xxxes, _ := b.ReadBits(uint(lengthLookup[sequence.String()].extraBits))
-	// log.Printf("Decoded length sequence is %v, to read %v more bits", lengthLookup[sequence.String()].value, lengthLookup[sequence.String()].extraBits)
+	// log.Printf("Decoded length sequence is %v, to read %v more bits which are %v", lengthLookup[sequence.String()].value, lengthLookup[sequence.String()].extraBits, xxxes)
 	return lengthLookup[sequence.String()].value + int(xxxes)
 }
 func (b *BitReader) offsetsequence(dictsize int) int {
 	var sequence bytes.Buffer
 	// TODO: Do I care about err handling? Currently using _
 	count := 0
-	for _, keyPresent := offsetLookup[sequence.String()]; !keyPresent && count < 8; count++ {
+	for _, keyPresent := offsetLookup[sequence.String()]; !keyPresent; count++ {
 		bit, _ := b.ReadBit()
 		if bit {
 			sequence.WriteString("1")
@@ -220,6 +234,9 @@ func (b *BitReader) offsetsequence(dictsize int) int {
 		}
 		// hack, but not sure how to check every iteration in for params
 		_, keyPresent = offsetLookup[sequence.String()]
+		if count > 8 {
+			log.Fatal("Did not match offset sequence")
+		}
 	}
 	loworderbits, _ := b.ReadBits(uint(dictsize))
 	// log.Printf("Decoded length sequence is %v, to read %v more bits", offsetLookup[sequence.String()].value, offsetLookup[sequence.String()].extraBits)
@@ -264,4 +281,10 @@ func (b *BitReader) ReadBits(nbits uint) (uint, error) {
 	}
 
 	return value, err
+}
+
+func check(e error) {
+	if e != nil {
+		panic(e)
+	}
 }
