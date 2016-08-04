@@ -7,7 +7,7 @@ import (
 	"log"
 	"os"
 
-	"github.com/myjimnelson/c3sat/readciv3"
+	"github.com/myjimnelson/c3sat/civ3decompress"
 	"github.com/urfave/cli"
 )
 
@@ -25,7 +25,7 @@ func main() {
 			Aliases: []string{"d"},
 			Usage:   "decompress a Civ3 data file to out.sav in the current folder",
 			Action: func(c *cli.Context) error {
-				err := ioutil.WriteFile("./out.sav", readciv3.Readciv3(c.Args().First()), 0644)
+				err := ioutil.WriteFile("./out.sav", civ3decompress.Decompress(c.Args().First()), 0644)
 				check(err)
 				log.Println("Saved to out.sav in current folder")
 				return nil
@@ -36,7 +36,7 @@ func main() {
 			Aliases: []string{"x"},
 			Usage:   "hex dump a Civ3 data file to stdout",
 			Action: func(c *cli.Context) error {
-				fmt.Print(hex.Dump(readciv3.Readciv3(c.Args().First())))
+				fmt.Print(hex.Dump(civ3decompress.Decompress(c.Args().First())))
 				return nil
 			},
 		},

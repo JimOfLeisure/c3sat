@@ -1,6 +1,6 @@
 // Package readciv3 is to decompress SAV and BIQ files
 // Obviously not yet complete
-package readciv3
+package civ3decompress
 
 import (
 	"bytes"
@@ -102,7 +102,7 @@ var offsetLookup = map[string]int{
 	"00000000": 0x3f,
 }
 
-func Readciv3(path string) []byte {
+func Decompress(path string) []byte {
 	// path := os.Args[1]
 
 	// Open file, hanlde errors, defer close

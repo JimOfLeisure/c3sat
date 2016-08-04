@@ -29,7 +29,7 @@ SOFTWARE.
 */
 
 // Package bitstream is a simple wrapper around a io.Reader and io.Writer to provide bit-level access to the stream.
-package readciv3
+package civ3decompress
 
 import "io"
 
