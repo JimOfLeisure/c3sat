@@ -14,10 +14,10 @@ And now that the decompressor code is working I'll be refactoring into the civ3s
 ### To Do
 
 - ~~Finish decompressor code~~
-- Refactor decompressor code into package - in progress in readciv3, eventually to be split into decompressor and civ3-specific interface
-- Use cli package to create command line app - in progress in civ3sat/
+- ~~Refactor decompressor code into package~~ working in readciv3, but not pretty. Eventually will split into decompressor and civ3-specific interface
+- ~~Use cli package to create command line app~~ Working in civ3sat/, but rough. Needs refinement.
 - Start extracting data from file
-- Flesh out subcommands like decompress, hexdump, info (including world random seed and game/map settings)
+- Flesh out subcommands like ~~decompress, hexdump,~~ info (including world random seed and game/map settings)
 - Extract maps like Python code
 
 ## Tagged older versions

@@ -33,7 +33,7 @@ func main() {
 		},
 		{
 			Name:    "hexdump",
-			Aliases: []string{"h"},
+			Aliases: []string{"x"},
 			Usage:   "hex dump a Civ3 data file to stdout",
 			Action: func(c *cli.Context) error {
 				fmt.Print(hex.Dump(readciv3.Readciv3(c.Args().First())))
