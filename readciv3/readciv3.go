@@ -140,8 +140,6 @@ func main() {
 	civ3Bitstream := NewReader(file)
 	// Output bytes buffer
 	var uncData bytes.Buffer
-	// dictionary is just a reader for the output buffer.
-	var dict = bytes.NewReader(uncData.Bytes())
 	// define length here to use in for loop setup
 	var length int
 
@@ -157,14 +155,23 @@ func main() {
 		// bit 1 indicates length/offset sequences follow
 		case true:
 			length = civ3Bitstream.lengthsequence()
+			// log.Printf("length %v", length)
 			// The token equating to length 519 is the end-of-stream token
 			if length != 519 {
 				offset := civ3Bitstream.offsetsequence(int(header[1]))
-				// Position dictionary/buffer reader. 2 means from end of buffer/stream
-				dict.Seek(int64(offset), 2)
+				// log.Printf("offset %v", offset)
 				for i := 0; i < length; i++ {
-					byt, _ := dict.ReadByte()
+					// dictionary is just a reader for the output buffer.
+					dict := bytes.NewReader(uncData.Bytes())
+					// Position dictionary/buffer reader. 2 means from end of buffer/stream
+					// offset 0 is last byte, so using -1 -offset to position for last byte
+					dict.Seek(int64(-1-offset), 2)
+					byt, err := dict.ReadByte()
+					if err != nil {
+						log.Fatal(err)
+					}
 					uncData.WriteByte(byt)
+					// log.Printf("byt %v", byt)
 				}
 			}
 		// bit 0 inticates next 8 bits are literal byte, lsb first
