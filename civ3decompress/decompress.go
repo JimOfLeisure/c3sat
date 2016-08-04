@@ -1,16 +1,13 @@
-// Package readciv3 is to decompress SAV and BIQ files
-// Obviously not yet complete
+// Package civ3decompress is to decompress SAV and BIQ files from the game Civilization III
 package civ3decompress
 
 import (
 	"bytes"
 	"io"
+	"io/ioutil"
 	"log"
 	"os"
 )
-
-// NOTE: Do I care what the dictionary size is? If I'm buffering the whole file?
-// Answer: Yes I do care, but not because of the buffer. It's the offset bit count that matters
 
 type lengthCode struct {
 	value, extraBits int
@@ -102,9 +99,9 @@ var offsetLookup = map[string]int{
 	"00000000": 0x3f,
 }
 
+// Decompress is implemented based on the description of PKWare Data Compression Library at https://groups.google.com/forum/#!msg/comp.compression/M5P064or93o/W1ca1-ad6kgJ
+// However this is only a partial implementation; The Huffman-coded literals of header 0x01 are not implemented here as they are not needed for my purpose
 func Decompress(path string) []byte {
-	// path := os.Args[1]
-
 	// Open file, hanlde errors, defer close
 	file, err := os.Open(path)
 	if err != nil {
@@ -120,13 +117,13 @@ func Decompress(path string) []byte {
 	}
 	switch {
 	case header[0] == 0x00 && (header[1] == 0x04 || header[1] == 0x05 || header[1] == 0x06):
-		log.Println("Compressed Civ3 file detected")
-	case string(header) == "CI":
-		log.Fatal("Uncompressed Civ3 SAV file detected")
-	case string(header) == "BI":
-		log.Fatal("Uncompressed Civ3 BIC file detected")
+		log.Println("Compressed file detected")
 	default:
-		log.Fatalf("Unrecognized file type. Two byte header is %v", header)
+		log.Println("Not a compressed file. Proceeding with uncompressed stream.")
+		// TODO: I'm sure I'm doing this in a terribly inefficient way. Need to refactor everything to pass around file pointers I think
+		theseBytes, err := ioutil.ReadFile(path)
+		check(err)
+		return theseBytes
 	}
 
 	// Create bitstream reader
