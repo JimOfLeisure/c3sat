@@ -1,12 +1,10 @@
 // Package readciv3 is to decompress SAV and BIQ files
 // Obviously not yet complete
-package main
+package readciv3
 
 import (
 	"bytes"
-	"encoding/hex"
 	"io"
-	"io/ioutil"
 	"log"
 	"os"
 )
@@ -104,14 +102,8 @@ var offsetLookup = map[string]int{
 	"00000000": 0x3f,
 }
 
-func main() {
-	// Remove the date/time stamp from log lines
-	log.SetFlags(0)
-
-	log.Println("Early test program. Call this program with a Civ 3 SAV file or BIC/X/Q file.")
-	log.Println("It will report if the file is compressed or uncompressed,")
-	log.Println("and print the first several bytes of any compressed files in hex dump format.")
-	path := os.Args[1]
+func Readciv3(path string) []byte {
+	// path := os.Args[1]
 
 	// Open file, hanlde errors, defer close
 	file, err := os.Open(path)
@@ -194,9 +186,10 @@ func main() {
 			}
 		}
 	}
-	log.Printf("Data hex dump:\n%s\n", hex.Dump(uncData.Bytes()))
-	err = ioutil.WriteFile("./out.sav", uncData.Bytes(), 0644)
-	check(err)
+	// log.Printf("Data hex dump:\n%s\n", hex.Dump(uncData.Bytes()))
+	// err = ioutil.WriteFile("./out.sav", uncData.Bytes(), 0644)
+	// check(err)
+	return uncData.Bytes()
 
 }
 

@@ -9,11 +9,13 @@ release native executables for Windows, Mac and Linux.
 So far, all the new activity is in readciv3/, and instead of immediately recoding existing functionality
 I'm writing a decompressor so external utilities won't be needed.
 
+And now that the decompressor code is working I'll be refactoring into the civ3sat/ folder.
+
 ### To Do
 
-- Finish decompressor code
-- Refactor decompressor code into package
-- Use cli package to create command line app
+- ~~Finish decompressor code~~
+- Refactor decompressor code into package - in progress in readciv3, eventually to be split into decompressor and civ3-specific interface
+- Use cli package to create command line app - in progress in civ3sat/
 - Start extracting data from file
 - Flesh out subcommands like decompress, hexdump, info (including world random seed and game/map settings)
 - Extract maps like Python code
