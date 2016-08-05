@@ -1,0 +1,2292 @@
+from http://apolyton.net/showthread.php/105623-Civilization-III-BIX-BIQ-file-format
+also:
+http://apolyton.net/showthread.php/31974-Civilization-III-BIC-file-format
+http://apolyton.net/showthread.php/48062-Civilization-III-BIC-file-format-(2nd-thread)
+
+First a small FAQ on the BIC/BIX/BIQ format.
+
+Q: What are the different fileformats and versions?
+A:
+There are three fileformats, BIC, BIX and BIQ.
+The BIC file format is the original fileformat for vanilla Civ3
+The BIC format has versionnumbers from 2 to 4.01.
+The PTW BIX versions have all major version 11, and the latest version is 11.19
+C3C BIQ files start at 12.06 with C3C 1.00f, and is at 12.07 by 1.12 beta patch.
+
+Q: I tried to edit my scenario using notpad, and now it's no longer loadable in the editor. What did I do worng?
+A:
+The scenariofiles are binary files and must be edited with binary safe edtors, either hexadecimal editors or editors designed to work on the files (as the included editor)
+
+Q: I'm trying to load a BI* file in a hex-editor, but it's nothing near what's described in this thread!
+A:
+By default the scenariofiles are compressed by the editor, this can be disabled in the editor options, or you can use my SAVExpand utility to decompress the file.
+
+File Format
+
+BIX/BIQ file format for Civ3 PTW/C3C (BIX version 11.19/12.07)
+To load a PTW bix just stop reading when the length ends, and to read C3C files ignore valuesthat are maked as PTW only (set to 0 or don't load depending on the type of them)
+{start file}
+
+bytes	type		value
+
+-------------------------------------------------------
+
+TOP "BIC file indicator"
+
+  4	char		"BIC " (Civ3) or "BICX" (PTW/C3C)
+
+
+
+TOP VER# SECTION (BIC Header)
+
+  4 	char		"VER#"
+
+  4	long		number of headers (1)
+
+
+
+  For each header:
+
+    4	long		length of header (720)
+
+    4	long		0
+
+    4	long		0
+
+    4	long		BIC major version number
+
+    4	long		BIC minor version number
+
+    640	string		description 1
+
+    64	string		title
+
+
+
+TOP BLDG SECTION (Improvements and Wonders) 2
+
+  4	char		"BLDG"
+
+  4	long		number of building types
+
+
+
+  For each building type:
+
+    4	long		length of building data (266)
+
+    64	string		description (unused) 3
+
+    32	string		building name
+
+    32	string		civilopedia entry
+
+    4   long		doubles happiness of 4
+
+    4   long		gain in every city
+
+    4   long		gain in every city on continent
+
+    4   long		required building
+
+    4   long		cost
+
+    4   long		culture
+
+    4   long		bombardment defense
+
+    4   long		naval bombardment defense
+
+    4   long		defense bonus
+
+    4   long		naval defense bonus
+
+    4   long		maintenance cost
+
+    4   long		happy faces (all cities)
+
+    4   long		happy faces
+
+    4   long		unhappy faces (all cities)
+
+    4   long		unhappy faces
+
+    4   long		number of required buildings
+
+    4   long		air power
+
+    4   long		naval power
+
+    4   long		pollution
+
+    4   long		production
+
+    4   long		required government
+
+    4   long		spaceship part
+
+    4   long		required advance
+
+    4   long		rendered obsolete by
+
+    4   long		required resource #1
+
+    4   long		required resource #2
+
+    4	long		improvements (binary) 5:
+
+								00000000
+
+			center of empire			.......1
+
+			veteran	ground units			......1.
+
+			+50% research output			.....1..
+
+			+50% luxury output			....1...
+
+			+50% tax output				...1....
+
+			removes pop. pollution			..1.....
+
+			reduces bldg. pollution			.1......
+
+			resistant to bribery			1.......
+
+
+
+			reduces	corruption			.......1
+
+			doubles	city growth rate		......1.
+
+			increases luxury trade			.....1..
+
+			allows city size level 2		....1...
+
+			allows city size level 3		...1....
+
+			replaces other buildings		..1.....
+
+			must be	near water			.1......
+
+			must be	near a river			1.......
+
+
+
+			can explode or meltdown			.......1
+
+			veteran	sea units			......1.
+
+			veteran	air units			.....1..
+
+			capitalization				....1...
+
+			allows water trade			...1....
+
+			allows air trade			..1.....
+
+			reduces	war weariness			.1......
+
+			increases shields in water		1.......
+
+
+
+			increases food in water			.......1
+
+    4	long		other characteristics (binary):
+
+								00000000
+
+                        coastal	installation			.......1
+
+                        military installation			......1.
+
+                        wonder					.....1..
+
+                        small wonder				....1...
+
+                        continental mood effects		...1....
+
+                        research installation			..1.....
+
+                        trade installation			.1......
+
+                        exploration installation		1.......
+
+
+
+			place of worship			.......1
+
+			construction installation		......1.
+
+    4	long		small wonders (binary):
+
+								00000000
+
+			increases chance of leader appearance	.......1
+
+			build armies without leader		......1.
+
+			build larger armies			.....1..
+
+			treasury earns 5%			....1...
+
+			build spaceship parts			...1....
+
+			reduces corruption			..1.....
+
+			decreases success of missile attacks	.1......
+
+			allows spy missions			1.......
+
+
+
+			allows healing in enemy territory	.......1
+
+			required goods must be in city radius	......1.
+
+			requires victorious army		.....1..
+
+    4	long		wonders (binary):
+
+								00000000
+
+			safe sea travel				.......1
+
+			gain any advances owned by 2 civs	......1.
+
+			double combat strength vs. barbarians	.....1..
+
+			+1 ship movement			....1...
+
+			doubles research output			...1....
+
+			+1 trade in each trade-producing tile	..1.....
+
+			halves unit upgrade cost		.1......
+
+			pays maintenance for trade insts.	1.......
+
+
+
+			allows all civs to build nuclears	.......1
+
+			city growth causes +2 citizens		......1.
+
+			+2 free advances			.....1..
+
+			reduces war weariness in all cities	....1...
+
+			doubles city defenses			...1....
+
+			allows diplomatic victory		..1.....
+
+    4	long		number of armies required
+
+    4	long		flavors (binary)
+
+    4	long		???
+
+    4	long		Unit produced (PRTO ref)
+
+    4	long		Unit frequency
+
+
+
+TOP CTZN SECTION (Citizens)
+
+  4	char		"CTZN"
+
+  4	long		number of citizen types
+
+
+
+  For each citizen type:
+
+    4	long		length of citizen data (124)
+
+    4	long		default citizen
+
+    32	string		citizens (singular) name
+
+    32	string		civilopedia entry
+
+    32	string		plural name
+
+    4	long		prerequisite
+
+    4	long		luxuries
+
+    4	long		research
+
+    4	long		taxes
+
+    4	long		corruption
+
+    4	long		construction
+
+
+
+TOP CULT SECTION (Culture)
+
+  4	char		"CULT"
+
+  4	long		number of culture opinions
+
+
+
+  For each culture opinion:
+
+    4	long		length of culture data (88)
+
+    64	string		culture opinion name
+
+    4	long		chance of successful propaganda
+
+    4	long		culture ratio percentage (3:1 = 300, 3:4 = 75)
+
+    4	long		culture ratio denominator (e.g. the 1 in 3:1)
+
+    4	long		culture ratio numerator (e.g. the 3 in 3:1)
+
+    4	long		initial resistance chance
+
+    4	long		continued resistance chance
+
+
+
+TOP DIFF SECTION (Difficulty Levels)
+
+  4	char		"DIFF"
+
+  4	long		number of difficulty levels
+
+
+
+  For each difficulty level:
+
+    4	long		length of difficulty data (120)
+
+    64	string		difficulty level name
+
+    4	long		number of citizens born content
+
+    4	long		max. government transition time
+
+    4	long		number of defensive land units AI starts with
+
+    4	long		number of offensive land units AI starts with
+
+    4	long		extra start unit #1
+
+    4	long		extra start unit #2
+
+    4	long		additional free support
+
+    4	long		bonus for each city
+
+    4	long		attack bonus against barbarians
+
+    4	long		cost factor
+
+    4	long		percentage of optimal cities
+
+    4	long		AI to AI trade rate 
+
+    4	long		corruption (%) 
+
+    4	long		military law 
+
+
+
+TOP ERAS SECTION (Eras)
+
+  4	char		"ERAS"
+
+  4	long		number of eras
+
+
+
+  For each era:
+
+    4	long		length of era data (264)
+
+    64	string		era name
+
+    32	string		civilopedia entry
+
+    32	string		researcher #1
+
+    32	string		researcher #2
+
+    32	string		researcher #3
+
+    32	string		researcher #4
+
+    32	string		researcher #5
+
+    4	long		number of used researcher names
+
+    4	long		??? (=1)
+
+
+
+TOP ESPN SECTION (Diplomats and Spies)
+
+  4	char		"ESPN"
+
+  4	long		number of espionage missions
+
+
+
+  For each mission:
+
+    4	long		length of mission data (232)
+
+    128 string		description
+
+    64	string		diplomat/spy mission name
+
+    32	string		civilopedia entry
+
+    4	long		mission performed by (binary):
+
+					00000000
+
+			diplomat	.......1
+
+			spy		......1.
+
+    4	long		base cost
+
+
+
+TOP EXPR SECTION (Combat Experience)
+
+  4	char		"EXPR"
+
+  4	long		number of experience levels
+
+
+
+  For each experience level:
+
+    4	long		length of experience level data (40)
+
+    32	string		experience level name
+
+    4	long		base hit points
+
+    4	long		retreat bonus 
+
+
+
+TOP GOOD SECTION (Natural Resources)
+
+  4	char		"GOOD"
+
+  4	long		number of natural resources
+
+
+
+  For each resource:
+
+    4	long		length of resource data (88)
+
+    24	string		natural resource name
+
+    32	string		civilopedia entry
+
+    4	long		type
+
+    4	long		appearance ratio
+
+    4	long		disappearance probability
+
+    4	long		icon
+
+    4	long		prerequisite
+
+    4	long		food bonus
+
+    4	long		shields bonus
+
+    4	long		commerce bonus
+
+
+
+TOP GOVT SECTION (Governments)
+
+  4	char		"GOVT"
+
+  4	long		number of government types
+
+
+
+  For each government type:
+
+    4	long		length of government data
+
+    4	long		default type
+
+    4	long		transition type
+
+    4	long		requires maintenance
+
+    4	long		??? (0 for Rebublic/Democracy, 1 for rest)
+
+    4	long		standard tile penalty
+
+    4	long		standard trade bonus
+
+    64	string		government name
+
+    32	string		civilopedia entry
+
+    32	string		male ruler title #1
+
+    32	string		female ruler title #1
+
+    32	string		male ruler title #2
+
+    32	string		female ruler title #2
+
+    32	string		male ruler title #3
+
+    32	string		female ruler title #3
+
+    32	string		male ruler title #4
+
+    32	string		female ruler title #4
+
+    4	long		corruption and waste
+
+    4	long		immune to
+
+    4	long		diplomats are
+
+    4	long		spies are
+
+    4	long		number of governments
+
+
+
+    For each government type:
+
+    (performance of above goverment type versus each of the others)
+
+      4	long		can bribe this government type? (0 = no, 1 = yes)
+
+      4	long		bribery modifier vs.
+
+      4	long		resistance modifier vs.
+
+
+
+    4	long		hurrying
+
+    4	long		assimilation chance
+
+    4	long		draft limit
+
+    4	long		military police	limit
+
+    4	long		# ruler title pairs used (max is 4)
+
+    4	long		prerequisite technology index #
+
+    4	long		science rate cap (10 = 100% of gold can go to science)
+
+    4	long		worker rate
+
+    4	long		??? (-1 for Despotism/Communism, 0 for Anarchy/Monarchy, 
+
+			1 for Republic/Democracy)
+
+    4	long		??? (1 for Republic/Democracy, 0 for the rest)
+
+    4	long		???
+
+    4	long		free units  (-1 = all, >=0 number of free units)
+
+    4	long		free units per town
+
+    4	long		free units per city
+
+    4	long		free units per metropolis
+
+    4	long		cost/unit
+
+    4	long		war weariness
+
+    4	long		xenophobic
+
+    4	long		force resettle
+
+
+
+TOP RULE SECTION (General Settings)
+
+  4	char		"RULE"
+
+  4	long		"number of rules" (1)
+
+
+
+  For each rule:
+
+    4	long		length of rule data
+
+    32	long		city size level 1 name
+
+    32	long		city size level 2 name
+
+    32	long		city size level 3 name
+
+    4	long		number of spaceship parts
+
+
+
+    For each spaceship part:
+
+      4	long		number needed of this part
+
+
+
+    4	long		advanced barbarian 
+
+    4	long		basic barbarian
+
+    4	long		barbarian sea unit
+
+    4	long		cities needed to support an army
+
+    4	long		chance of rioting
+
+    4	long		turn penalty for each drafted citizen
+
+    4	long		shield cost per gold
+
+    4	long		fortress defensive bonus
+
+    4	long		citizens affected by each happy face
+
+    4	long		??? (50)
+
+    4	long		??? (2)
+
+    4	long		forest value in shields
+
+    4	long		shield value in gold
+
+    4	long		citizen value in shields
+
+    4	long		default difficulty level
+
+    4	long		battle-created unit
+
+    4	long		build-army unit
+
+    4	long		building defensive bonus
+
+    4	long		citizen defensive bonus
+
+    4	long		default money resource
+
+    4	long		chance to intercept enemy air missions
+
+    4	long		chance to intercept enemy stealth missions
+
+    4	long		starting treasury
+
+    4	long		??? (16)
+
+    4	long		food consumption/citizen
+
+    4	long		river defensive bonus
+
+    4	long		turn penalty for each hurry sacrifice
+
+    4	long		scout
+
+    4	long		slave
+
+    4	long		movement rate along roads
+
+    4	long		start unit 1
+
+    4	long		start unit 2
+
+    4	long		minimum population for we love the king
+
+    4	long		town defense bonus
+
+    4	long		city defense bonus
+
+    4	long		metropolis defense bonus
+
+    4	long		maximum level 1 city size
+
+    4	long		maximum level 2 city size
+
+    4	long		??? (1000)
+
+    4	long		fortifications defensive bonus
+
+    4	long		number of culture levels
+
+
+
+    For each culture level
+
+      64 string		culture level name
+
+
+
+    4	long		border expansion multiplier
+
+    4	long		border factor
+
+    4	long		future tech cost
+
+    4	long		golden age duration
+
+    4	long		maximum research time
+
+    4	long		minimum research time
+
+    4	long		flag unit (PRTO ref)
+
+    4	long		upgrade cost
+
+
+
+
+
+TOP PRTO SECTION (Units)
+
+  4	char		"PRTO"
+
+  4	long		number of units
+
+
+
+  For each unit:
+
+    4	long		length of unit data
+
+    4	long		zone of control
+
+    32	long		unit name
+
+    32	long		civilopedia entry
+
+    4	long		bombard strength
+
+    4   long		bombard range
+
+    4   long		capacity
+
+    4   long		shield cost
+
+    4   long		defense
+
+    4   long		icon index
+
+    4   long		attack
+
+    4   long		operational range
+
+    4   long		population cost
+
+    4   long		rate of fire
+
+    4   long		movement
+
+    4   long		required
+
+    4   long		upgrade to
+
+    4   long		required resource #1
+
+    4   long		required resource #2
+
+    4   long		required resource #3
+
+    4   long		unit abilities (binary):
+
+							00000000
+
+			wheeled				.......1
+
+			foot soldier			......1.
+
+			blitz				.....1..
+
+			cruise missile			....1...
+
+			all terrain as roads		...1....
+
+			radar				..1.....
+
+			amphibious unit			.1......
+
+			submarine			1.......
+
+
+
+			aircraft carrier		.......1
+
+			draft				......1.
+
+			immobile			.....1..
+
+			sink in sea			....1...
+
+			sink in ocean			...1....
+
+			UNUSED (was mounted)		..1.....
+
+			carry foot units only		.1......
+
+			starts golden age		1.......
+
+
+
+			nuclear	weapon			.......1
+
+			hidden nationality		......1.
+
+			army				.....1..
+
+			leader				....1...
+
+			ICBM				...1....
+
+			stealth				..1.....
+
+			can see	submarines		.1......
+
+			tactical missile		1.......
+
+
+
+			can carry tactical missiles	.......1
+
+			ranged attack animations	......1.
+
+			turn to	attack			.....1..
+
+    4	long		AI-strategy (binary):
+
+							00000000
+
+			offense				.......1
+
+			defense				......1.
+
+			artillery			.....1..
+
+			explore				....1...
+
+			army				...1....
+
+			cruise missile			..1.....
+
+			air bombard			.1......
+
+			air defense			1.......
+
+
+
+			naval power			.......1
+
+			air transport			......1.
+
+			naval transport			.....1..
+
+			naval carrier			....1...
+
+			terraform			...1....
+
+			settle				..1.....
+
+			leader				.1......
+
+			tactical nuke			1.......
+
+
+
+			ICBM				.......1
+
+			naval missile transport		......1.
+
+    4   long		available to (binary)
+
+    4   long		standard orders/special actions
+
+							00000000
+
+			skip turn			.......1
+
+			wait				......1.
+
+			fortify				.....1..
+
+			disband				....1...
+
+			go to				...1....
+
+			load				..1.....
+
+			unload				.1......
+
+			airlift				1.......
+
+
+
+			pillage				.......1
+
+			bombard				......1.
+
+			airdrop				.....1..
+
+			build army			....1...
+
+			finish improvement		...1....
+
+			upgrade				..1.....
+
+			build colony			.1......
+
+			build city			1.......
+
+
+
+			build road			.......1
+
+			build railroad			......1.
+
+			build fort			.....1..
+
+			build mine			....1...
+
+			irrigate			...1....
+
+			clear forest			..1.....
+
+			clear jungle			.1......
+
+			plant forest			1.......
+
+
+
+			clear pollution			.......1
+
+			automate			......1.
+
+			join city			.....1..
+
+    4	long		air missions (binary):
+
+			meaning			duped from6	00000000
+
+			bomb					.......1
+
+			recon					......1.
+
+			intercept				.....1..
+
+			re-base					....1...
+
+			precision bombing			...1....
+
+			(unused) 				..1.....
+
+			bombard			orders		.1......
+
+			build road		orders		1.......
+
+
+
+			build railroad		orders		.......1
+
+			build fort		orders		......1.
+
+			build mine		orders		.....1..
+
+			irrigate		orders		....1...
+
+			clear forest		orders		...1....
+
+			clear jungle		orders		..1.....
+
+			plant forest		orders		.1......
+
+			clear pollution 	orders		1.......
+
+
+
+			terraform		AI-strategy 	.......1
+
+			immobile		abilities	......1.
+
+			precision bombing	air missions	.....1..
+
+    4   long		class 0=land, 1=sea, 2=air
+
+    4   long		other strategy for unit (-1 if first strategy/not multiplie strategies)
+
+    4   long		HP bonus 
+
+    4   long		PTW standard orders (binary)
+
+							00000000
+
+			skip turn			.......1
+
+			wait				......1.
+
+			fortify				.....1..
+
+			disband				....1...
+
+			go to				...1....
+
+			explore				..1..... 
+
+ 			sentry				.1...... 
+
+    4   long		PTW special actions (binary)
+
+							00000000 (first byte)
+
+  			load				.......1 
+
+  			unload				......1. 
+
+  			airlift				.....1.. 
+
+  			pillage				....1... 
+
+  			bombard				...1.... 
+
+  			airdrop				..1..... 
+
+  			build army			.1...... 
+
+  			finish improvements		1....... 
+
+
+
+ 							00000000 (second byte)
+
+  			upgrade unit			.......1 
+
+  			capture				......1. 
+
+    4   long		PTW worker actions (binary)
+
+							00000000 (first byte)
+
+  			build colony			.......1 
+
+  			build city			......1. 
+
+  			build road			.....1..
+
+  			build railroad			....1...
+
+  			build fortress			...1....
+
+  			build mine			..1..... 
+
+  			irrigate			.1...... 
+
+  			clear forest			1....... 
+
+
+
+							00000000 (second byte)
+
+   			clear jungle			.......1 
+
+   			plant forest 			......1. 
+
+   			clear pollution 		.....1.. 
+
+   			automate 			....1... 
+
+   			join city 			...1.... 
+
+   			build airfield 			..1..... 
+
+   			build radar tower 		.1...... 
+
+   			build outpost 			1....... 
+
+    4   long		PTW air missions (binary)
+
+    							00000000 (first byte)
+
+   			bombing				.......1
+
+			recon				......1.
+
+			intercept			.....1..
+
+			re-base				....1...
+
+			precision bombing		...1....
+
+    2   short		PTW "actions mix" (binary)
+
+    		meaning			duped from8	00000000 
+
+    		sentry			std orders		.......1
+
+ 			bombard 		special actions	......1. 
+
+ 			build colony OR
+
+ 			build road 		worker actions	.....1..
+
+ 			build road		worker actions	....1...
+
+ 			build railroad	worker actions		...1....
+
+ 			build road		worker actions	..1.....
+
+ 			irrigate		worker actions	.1......
+
+ 			clear forest	worker actions		1.......
+
+
+
+ 			clear jungle	worker actions		.......1
+
+ 			clear pollution	worker actions		......1.
+
+			automate		worker actions	.....1..
+
+			automate		worker actions	....1...
+
+			bombing			air missions	...1....
+
+			precision bombing	air missions	..1....
+
+			automate		worker actions	.1......
+
+			goto			std orders OR	
+
+			rebase			air missions	1.......
+
+    2   short		??? (1)
+
+    4   long		bombard effects
+
+
+
+    For each terrain (PTW: 12 C3C: 14)   
+
+      1 byte		ignore movment cost
+
+    4   long		require support
+
+    4   long		???
+
+    4   long		???
+
+    4   long		???
+
+    4   long		???
+
+    4   long		enslave results
+
+    4   long		???
+
+    4   long		number of stealth targets
+
+
+
+    For each stealth target   
+
+      4 long		stealth target (PRTO ref)
+
+    4   long		???
+
+    4   long		???
+
+    1   byte		create craters
+
+    4   float		worker strength
+
+    4   long		???
+
+    4   long		air defense
+
+
+
+RACE SECTION (Civilizations)
+
+  4	char		"RACE"
+
+  4	long		number of civilizations
+
+
+
+  For each civilization:
+
+    4	long		length of civilization data
+
+    4	long		number of city names
+
+
+
+    For each cityname:
+
+      24 string		city name
+
+
+
+    4	long		number of leaders
+
+
+
+    For each great leader:
+
+      32 string		great leader name
+
+
+
+    32	string		leader name
+
+    24	string		leader title
+
+    32	string		civilopedia entry
+
+    40	string		adjective
+
+    40	string		civilization name
+
+    40	string		noun
+
+
+
+    For each era:
+
+      260 string	forward filename
+
+
+
+    For each era:
+
+      260 string	reverse filename
+
+
+
+    4	long		culture group
+
+    4	long		leader gender
+
+    4	long		civilization gender
+
+    4	long		aggression level (-2 to 2)
+
+    4	long		unique civilization counter
+
+    4	long		shunned government
+
+    4	long		favorite government
+
+    4	long		default color
+
+    4	long		unique color
+
+    4	long		free tech #1 index
+
+    4	long		free tech #2 index
+
+    4	long		free tech #3 index
+
+    4	long		free tech #4 index
+
+    4	long		bonuses (binary):
+
+					00000000
+
+			militaristic	.......1
+
+			commercial	......1.
+
+			expansionist	.....1..
+
+			scientific	....1...
+
+			religious	...1....
+
+			industrious	..1.....
+
+    4	long		governor settings (binary):
+
+						00000000
+
+			manage citizens		.......1
+
+			emphasize food		......1.
+
+			emphasize shields	.....1..
+
+			emphasize trade		....1...
+
+			manage production	...1....
+
+			no wonders		..1.....
+
+			no small wonders	.1......
+
+    4	long		build never (binary):
+
+						00000000
+
+			off. land units		.......1
+
+			def. land units		......1.
+
+			artillery land units	.....1..
+
+			settlers		....1...
+
+			workers			...1....
+
+			naval units		..1.....
+
+			air units		.1......
+
+			growth			1.......
+
+
+
+			production		.......1
+
+			happiness		......1.
+
+			science			.....1..
+
+			wealth			....1...
+
+			trade			...1....
+
+			explore			..1.....
+
+			culture			.1......
+
+    4	long		build often (binary, same as above)
+
+    4	long		plurality
+
+    4	long		king unit (PRTO ref)
+
+	4	long		flavors (binary)
+
+	4	long		???
+
+	4	long		diplomacy text index
+
+	4	long		number of scientific leaders
+
+
+
+    For each scientific leader:
+
+      32 string		scientific leader name
+
+
+
+TOP TECH SECTION (Civilization Advances)
+
+  4	char		"TECH"
+
+  4	long		number of advances
+
+
+
+  For each advance:
+
+    4	long		length of advance data (104)
+
+    32	string		advance name
+
+    32	string		civilopedia entry
+
+    4	long		cost
+
+    4	long		era
+
+    4	long		advance icon
+
+    4	long		x
+
+    4	long		y
+
+    4	long		prerequisite #1
+
+    4	long		prerequisite #2
+
+    4	long		prerequisite #3
+
+    4	long		prerequisite #4
+
+    4	long		flags (binary):
+
+								00000000
+
+			enables diplomats			.......1
+
+			enables irrigation without fresh water	......1.
+
+			enables bridges				.....1..
+
+			disables diseases from flood plains	....1...
+
+			enables conscription of units		...1....
+
+			enables mobilization levels		..1.....
+
+			enables recycling			.1......
+
+			enables precision bombing		1.......
+
+
+
+			enables mutual protection pacts		.......1
+
+			enables right of passage treaties	......1.
+
+			enables military alliances		.....1..
+
+			enables trade embargoes			....1...
+
+			doubles effect of (wealth) improvement	...1....
+
+			enables trade over sea tiles		..1.....
+
+			enables trade over ocean tiles		.1......
+
+			enables map trading			1.......
+
+
+
+			enables communication trading		.......1
+
+			not required for era advancement	......1.
+
+			doubles work rate (of workers)		.....1..
+
+    4	long		flavors (binary)
+
+
+
+TOP TFRM SECTION (Worker Jobs)
+
+  4	char		"TFRM"
+
+  4	long		number of worker jobs
+
+
+
+  For each job:
+
+    4	long		length of job data (112)
+
+    32 string		worker job name
+
+    32	string		civilopedia entry
+
+    4	long		turns to complete 7
+
+    4	long		required
+
+    4	long		required resource #1
+
+    4	long		required resource #2
+
+    32	string		order
+
+
+
+TOP TERR SECTION (Terrain)
+
+  4	char		"TERR"
+
+  4	long		number of terrains
+
+
+
+  For each terrain:
+
+	4	long		length of terrain data (113)
+
+	4	long		number of possible resources
+
+	*	byte[]		possible resources (binary)
+
+			1 for the corresponding indexes of the resources
+
+    32	string		terrain name
+
+    32	string		civilopedia entry
+
+    4	long		irrigation (food) bonus
+
+    4	long		mining (shields) bonus
+
+    4	long		road (commerce) bonus
+
+    4	long		defense bonus
+
+    4	long		movement cost
+
+    4	long		food
+
+    4	long		shields
+
+    4	long		commerce
+
+    4	long		worker job
+
+    4	long		pollution effect
+
+    1	byte		allow cities
+
+    1	byte		allow colonies
+
+    1	byte		impassable
+
+    1	byte		impassable by wheeled
+
+    1	byte		allow airfields
+
+    1	byte		allow forts
+
+    1	byte		allow outposts
+
+    1	byte		allow radar towers
+
+    4	long		???
+
+    1	byte		landmark enabled
+
+    4	long		landmark food
+
+    4	long		landmark shields
+
+    4	long		landmark commerce
+
+    4	long		landmark irrigation (food) bonus
+
+    4	long		landmark mining (shields) bonus
+
+    4	long		landmark road (commerce) bonus
+
+    4	long		landmark movement cost
+
+    4	long		landmark defense bonus
+
+    32	string		landmark name
+
+    32	string		landmark civilopedia entry
+
+    4	long		???
+
+    4	long		terrain flags
+
+    4	long		disease strength
+
+    
+
+TOP WSIZ SECTION (World Sizes)
+
+  4	char		"WSIZ"
+
+  4	long		number of world sizes
+
+
+
+  For each terrain:
+
+    4	long		length of world size data (80)
+
+    4	long		optimal number of cities (corruption)
+
+    4	long		tech rate
+
+    24	string		??? (empty)
+
+    32	string		world size name
+
+    4	long		height
+
+    4	long		distance between civs
+
+    4	long		number of civs
+
+    4	long		width
+
+
+
+TOP FLAV SECTION (Flavors)
+
+  4	char		"FLAV"
+
+  4	long		number of flavorgroups (1)
+
+
+
+  For each flavorgroup:
+
+    4	long		number of flavors
+
+    
+
+    For each flavor:
+
+       4   long		???
+
+       256 string		flavor name
+
+       4 long		number of flavors
+
+       
+
+       For each flavor:
+
+          4 long		relation
+
+
+
+
+
+TOP WCHR SECTION
+
+  4	char		"WCHR"
+
+  4	long		"number of world characteristics" (1)
+
+
+
+  For each world characteristic:
+
+    4	long		length of WCHR section (52)
+
+    4	long		selected climate (0-Arid, 1-Normal, 2-Wet, 3-Random)
+
+    4	long		actual climate
+
+    4	long		selected barbarian activity	(-1 None, 0-Sedentary, 1-Roaming,
+
+    4	long		actual  barbarian activity	  2-Restless, 3-Raging, 4-Random )
+
+    4	long		selected landform (0-Archipelago, 1-Continents, 2-Pangaea, 3-Random)
+
+    4	long		actual landform
+
+    4	long		selected ocean coverage (0-80%, 1-70%, 2-60%, 3-Random)
+
+    4	long		actual ocean coverage
+
+    4	long		selected temperature (0-Cool, 1-Temperate, 2-Warm, 3-Random)
+
+    4	long		actual temperature
+
+    4	long		selected age (0-3 bill yrs, 1-4 bill yrs, 2-5 bill yrs, 3-Random)
+
+    4	long		actual age
+
+    4	long		world size (WSIZ ref (affects corruption and tech rate))
+
+  
+
+
+
+TOP WMAP SECTION
+
+  4	char		"WMAP"
+
+  4	long		"number of world maps" (1)
+
+  4	long		length of WMAP section (256)
+
+  4	long		number of resources
+
+
+
+  For each resource:
+
+    4	long		resource occurence
+
+
+
+  4	long		number of continents
+
+  4	long		height
+
+  4	long		distance between civs
+
+  4	long		number of civs
+
+  4	long		???
+
+  4	long		??? (0)
+
+  4	long		width
+
+  4	long		??? (-1)
+
+  ... 			(124 bytes unknown)
+
+  4	long		map seed
+
+  4	long		flags (binary):
+
+					00000000
+
+			x-wrapping     .......1
+
+			y-wrapping     ......1.
+
+			polar ice caps	.....1..
+
+  
+
+
+
+TOP TILE SECTION
+
+  4	char		"TILE"
+
+  4	long		number of tiles (= width/2 * height)
+
+
+
+  For each tile:
+
+    4	long		length of tile data 
+
+    1	byte		river connection info  (binary)
+
+					00000000
+
+			river in north	.......1
+
+			river in west	......1.
+
+			river in east	.....1..
+
+			river in south	....1...
+
+    1	byte		border
+
+    4	long		resource
+
+    1	byte		image
+
+    1	byte		file:	0 = xtgc.pcx, 1 = xgpc.pcx, 2 = xdgc.pcx,
+
+				3 = xdpc.pcx, 4 = xdgp.pcx, 5 = xggc.pcx,
+
+				6 = wcso.pcx, 7 = wsss.pcx, 8 = wooo.pcx
+
+    2	short		??? (0)
+
+    1	byte		overlays (binary):
+
+					00000000
+
+			road		.......1
+
+			railroad	......1.
+
+			mine		.....1..
+
+			irrigation	....1...
+
+			fortress	...1....
+
+			goody huts	..1.....
+
+			pollution	.1......
+
+			barbarian camp	1.......
+
+    
+
+    1	nibble		base terrain (PTW, 0 in C3C)
+
+    1	nibble		real terrain (PTW, 0 in C3C)
+
+    1	byte		bonuses (binary):
+
+					00000000
+
+			bonus grassland .......1
+
+			player start    ....1...
+
+			snow-capped mts ...1....
+
+			pine forest     ..1.....
+
+    1	byte		river crossing data (binarry):
+
+					00000000
+
+			crossing N	.......1
+
+			crossing NE	......1.
+
+			crossing E	.....1..
+
+			crossing SE	....1...
+
+			crossing S	...1....
+
+			crossing SW	..1.....
+
+			crossing W	.1......
+
+			crossing NW	1.......
+
+    2	short		barbarian tribe (-1 = none, 75 = random)
+
+    2	short		colony (CLNY ref)
+
+    2	short		city (CITY ref)
+
+    2	short		continent (CONT ref)
+
+    1	byte		???
+
+    2	short		victory point location (0 = VPL, -1 = non VPL)
+
+    4	long		ruin
+
+    4	long		C3C overlays (binary)
+
+	1	byte		???
+
+	1	nibble		C3C base terrain
+
+    1	nibble		C3C real terrain
+
+    2	short		???
+
+    2	short		fog of war
+
+	4	long		C3C bonuses (binary)
+
+	2	short		???    
+
+
+
+TOP CONT SECTION
+
+  4	char		"CONT"
+
+  4	long		number of continents (water and land)
+
+
+
+  For each continent:
+
+    4	long		length of continent data (8)
+
+    4	long		class (0 = water, 1 = land)
+
+    4	long		number of tiles on continent
+
+
+
+TOP SLOC SECTION
+
+  4	char		"SLOC"
+
+  4	long		number of starting locations
+
+
+
+  For each starting location:
+
+    4	long		length of starting location data (16)
+
+    4	long		owner type (0=None, 1=Barbarians, 2=Civ, 3=Player)
+
+    4	long		owner (RACE ID, Player# (0=Player1 and so on) or Barbarian Tribe)
+
+    4	long		X
+
+    4	long		Y
+
+
+
+TOP CITY SECTION
+
+  4	char		"CITY"
+
+  4	long		number of cities
+
+
+
+  For each city:
+
+    4	long		length of city data (variable)
+
+    1	byte		has walls
+
+    1	byte		has palace
+
+    24	string		city name
+
+    4	long		owner type (0=None, 1=Barbarians, 2=Civ, 3=Player)
+
+    4	long		number of buildings
+
+    for each building
+
+      4 long		builning ID
+
+    4	long		culture
+
+    4	long		owner (RACE ID, Player# (0=Player1 and so on) or Barbarian Tribe)
+
+    4	long		size
+
+    4	long		X
+
+    4	long		Y
+
+    4	long		city level
+
+    4	long		border level
+
+    4	long		use auto name
+
+
+
+
+
+TOP UNIT SECTION
+
+  4	char		"UNIT"
+
+  4	long		number of units
+
+
+
+  For each unit:
+
+    4	long		length of unit data 
+
+    32	string		name
+
+    4	long		owner type (0=None, 1=Barbarians, 2=Civ, 3=Player)
+
+    4	long		experience level
+
+    4	long		owner (RACE ID, Player# (0=Player1 and so on) or Barbarian Tribe)
+
+    4	long		PRTO#
+
+    4	long		AI strategy
+
+    4	long		X
+
+    4	long		Y
+
+    57	string		PTW name (replaces name)
+
+    4	long		use civilization king
+
+
+
+
+
+TOP CLNY SECTION
+
+  4	char		"CLNY"
+
+  4	long		number of colonies
+
+
+
+  For each unit:
+
+    4	long		length of colony data (16)
+
+    4	long		owner type (0=None, 1=Barbarians, 2=Civ, 3=Player)
+
+    4	long		owner (RACE ID, Player# (0=Player1 and so on) or Barbarian Tribe)
+
+    4	long		X
+
+    4	long		Y
+
+    4	long		improvement type
+
+
+
+
+
+TOP GAME SECTION
+
+  4	char		"GAME"
+
+  4	long		number of scenario properties (1)
+
+
+
+  For each scenario property:
+
+    4	long		length of scenario property
+
+    4	long		default game rules (1=use, 0=don't use)
+
+    4	long 		default victory consitions (1=use, 0=don't use)
+
+    4	long		number of playable civs (0=all playable)
+
+    for each playable civ
+
+      4 long		id of playable civ
+
+    4	long		victory conditions and rules set (binarry):
+
+							00000000
+
+			domination victory enabled	.......1
+
+			space race victory enabled	......1.
+
+			diplomatic victory enabled	.....1..
+
+			victory by conquest enabled	....1...
+
+			cultural victory enabled	...1....
+
+			civ specific abilities enabled	..1.....
+
+			culturaly linked start		.1......
+
+			restart players			1.......
+
+
+
+			preserve random seed		.......1
+
+			accelerated production		......1.
+
+			elimination enabled		.....1..
+
+			regicide enabled		....1...
+
+			mass regicide enabled		...1....
+
+			victory locations enabled	..1.....
+
+			capture the flag enabled	.1......
+
+			allow cultural conversions	1.......
+
+    4	long		place capture units
+
+    4	long		auto place kings
+
+    4	long		auto place victory locations
+
+    4	long		debug mode
+
+    4	long		use time limit
+
+    4	long		base time unit (0-Years, 1-Months, 2-Weeks)
+
+    4	long		start month (1-January ... 12-December)
+
+    4	long		start week (1-52)
+
+    4	long		start year (negative if "BC")
+
+    4	long		minute time limit
+
+    4	long		turn time limit
+
+    28	long[7]		number of turns per timescalepart
+
+    28	long[7]		nuber of timeunits per turn
+
+    5200	string		scenario search folders
+
+    (4	long		map visible, BIX >= 11.19 ONLY, not BIQ (major=12))
+
+
+
+    for each playable civ
+
+	   4 long		alliance (0-4, 0 = none)
+
+    4	long		victory point limit
+
+    4	long		city elimination count
+
+    4	long		one city cultutre win
+
+    4	long		all cities cultutre win
+
+    4	long		domination terrain
+
+    4	long		domination population
+
+    4	long		wonder cost
+
+    4	long		defeating opposing unit cost
+
+    4	long		advancement cost 
+
+    4	long		city conquest population 
+
+    4	long		victory point scoring
+
+    4	long		capturing special unit
+
+    4	long		???
+
+    1	byte		???
+
+    256	string		alliance name #0 (blank/unallied)
+
+    256	string		alliance name #1
+
+    256	string		alliance name #2
+
+    256	string		alliance name #3
+
+    256	string		alliance name #4
+
+
+
+    For each alliance (0 to 4):
+
+       4 long		war with alliance #0 ("unallied")
+
+       4 long		war with alliance #1
+
+       4 long		war with alliance #2
+
+       4 long		war with alliance #3
+
+       4 long		war with alliance #4
+
+    4	long		alliance victory type
+
+    260	string		plauge name
+
+    1	byte		permit plauges
+
+    4	long 		plauge earliest strat
+
+    4	long 		plauge variation
+
+    4	long 		plauge duration
+
+    4	long 		plauge strength
+
+    4	long 		plauge grace period
+
+    4	long 		plauge max occurance
+
+    4	long		???
+
+    260	string		??? ("Unknown")
+
+    4	long		respawn flag units
+
+    1	byte		capture any flag
+
+    4	long		gold for capture
+
+    1	byte		map visible
+
+    1	byte		retain culture
+
+    4	long		???
+
+    4	long		eruption period
+
+    4	long		mp basetime
+
+    4	long		mp city time
+
+    4	long		mp unit time
+
+    
+
+	
+
+
+
+TOP LEAD SECTION
+
+  4	char		"LEAD"
+
+  4	long		number of players
+
+
+
+  For each player:
+
+    4	long		length of player data
+
+    4	long		custom civ data (1=use, 0=don't use)
+
+    4	long 		human player (1=yes, 0=no)
+
+    32	string		leader name
+
+    4	long 		???
+
+    4	long 		???
+
+    4	long 		number of different start unit
+
+    for each type of start units
+
+      4 long		number of start units of the type
+
+      4 long		type of start unit
+
+    4	long 		gender of leader name
+
+    4	long 		number of starting technologies
+
+    for each starting technology
+
+      4 long		technology
+
+    4	long 		difficulty
+
+    4	long 		initial era
+
+    4	long 		start cash
+
+    4	long 		government
+
+    4	long 		civ (-2=random, -3=any)
+
+    4	long 		color
+
+    4	long 		skip first turn
+
+	4	long 		???
+
+	1	byte 		start embassies
+
+{end file}

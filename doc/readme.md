@@ -19,8 +19,27 @@ August 2016: During the Go rewrite, taking more specific notes. They might as we
 - int, always 1. Count of BICs? Count of whatever the next blob is? Version number as the previous bytes label it?
 - length, always 720 / 0x2d0
 - length bytes of data
-    - 0x00 - 0xff - four ints?
-        - At least one of these must be some sort of flag indicating if there are BLDG and other sections following this block. They don't seem to be counts, so I figure flags.
+    - 0x00 - 0xcdcdcdcd or 0
+    - 0x04 - 0
+    - 0x08 - bitmask?
+        - 0x01
+        - 0x02
+        - 0x04
+        - 0x08
+        - 0x10
+        - 0x20
+        - 0x40
+        - 0x80
+    - 0x0c - bitmask?
+        - 0x01 - 1 when custom map ?
+        - 0x02 -
+        - 0x04 -
+        - 0x08 -
+        - 0x10
+        - 0x20
+        - 0x40
+        - 0x80
+        - ~~At least one of these must be some sort of flag indicating if there are BLDG and other sections following this block. They don't seem to be counts, so I figure flags.~~ No, no bits seem correlated with BLDG-EXPR sections.
     - 0x10 - string of well over 256 bytes - Description of scenario from BIQ
         - COTM0120_OPEN
         - COTM0121_OPEN
@@ -39,10 +58,12 @@ August 2016: During the Go rewrite, taking more specific notes. They might as we
 
 There must be an indicator in the file previous to this to indicate what data is present/missing. I suspect it's in the first 16 bytes of the 720-byte chunk of data.
 
+CivFanantic forum user Quintillus says that BIQ files with BLDG are due to custom rules, and WCHR is an optional custom map section.
+
 Also, PTW and vanilla data structure sizes diverge beginning with the first BLDG
 
 - "BLDG"
-- int count of 0x110-sized BLDG records
+- int count
 - count * 0x110 (272) byte records (length is different in PTW)
     - 0x44 - string - 32 bytes? display name of building
         - "Theory of Evolution"
@@ -64,4 +85,29 @@ Also, PTW and vanilla data structure sizes diverge beginning with the first BLDG
     - 0x48 - string plural
         - Entertainers
 - "CULT"
-
+- int count
+- count * 0x5c byte length relative culture levels
+    - 0x00 - int value 0x58
+    - 0x04 - display text
+        - impressed with
+        - disdainful of
+    - 0x44 - 6 * int
+- "DIFF"
+- int count
+- count * 0x7c byte length difficulty levels
+    - 0x00 - int value 0x78
+    - 0x04 - display text
+    - 0x44 - many ints
+- "ERAS"
+- int count
+- count * 0x10c byte length eras
+    - 0x00 - int value 0x108
+    - 0x04 - display text
+    - 0x44 - internal text
+    - also names like "Wise-Men", "Alchemists", etc.
+- "ESPN"
+- int count
+- count * 0xec byte length espionage actions
+- "EXPR"
+- int count
+- count * 0x2c byte length unit experience levels

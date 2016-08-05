@@ -95,7 +95,7 @@ func readbic(r *bytes.Reader) {
 	bicdescription := readBytes(r, bicdescriptionlength)
 	_ = bicdescription
 	// log.Println(hex.Dump(bicdescription))
-	log.Println(hex.Dump(bicdescription[:16]))
+	// log.Println(hex.Dump(bicdescription[:16]))
 	// log.Println(hex.Dump(bicdescription[8:12]))
 
 	// At this point, my epic SAVs have GAME, downloaded scenario-based games have BLDG
@@ -108,31 +108,73 @@ func readbic(r *bytes.Reader) {
 		numbuildings := int(binary.LittleEndian.Uint32(readBytes(r, 4)))
 		for i := 0; i < numbuildings; i++ {
 			buffernext = readBytes(r, 0x110)
-			// print building name
-			// log.Println(string(buffernext[:32]))
-			log.Println(hex.Dump(buffernext))
+			_ = buffernext
+			// log.Println(hex.Dump(buffernext))
 		}
-		log.Println(hex.Dump(buffernext))
-	}
-	bicnext = string(readBytes(r, 4))
-	switch bicnext {
-	case "CTZN":
+		// CTZN
+		bicnext = string(readBytes(r, 4))
 		log.Println(bicnext)
 		numcitizentypes := int(binary.LittleEndian.Uint32(readBytes(r, 4)))
 		for i := 0; i < numcitizentypes; i++ {
 			buffernext := readBytes(r, 0x80)
 			_ = buffernext
-			// print building name
-			// log.Println(string(buffernext[:32]))
+		}
+		// CULT
+		bicnext = string(readBytes(r, 4))
+		log.Println(bicnext)
+		numcult := int(binary.LittleEndian.Uint32(readBytes(r, 4)))
+		_ = numcult
+		for i := 0; i < numcult; i++ {
+			buffernext := readBytes(r, 0x5c)
+			_ = buffernext
+		}
+		// DIFF
+		bicnext = string(readBytes(r, 4))
+		log.Println(bicnext)
+		numdiff := int(binary.LittleEndian.Uint32(readBytes(r, 4)))
+		_ = numdiff
+		for i := 0; i < numdiff; i++ {
+			// for i := 0; i < 1; i++ {
+			buffernext := readBytes(r, 0x7c)
+			_ = buffernext
+		}
+		// ERAS
+		bicnext = string(readBytes(r, 4))
+		log.Println(bicnext)
+		numeras := int(binary.LittleEndian.Uint32(readBytes(r, 4)))
+		_ = numeras
+		for i := 0; i < numeras; i++ {
+			buffernext := readBytes(r, 0x10c)
+			_ = buffernext
+		}
+		// ESPN
+		bicnext = string(readBytes(r, 4))
+		log.Println(bicnext)
+		numespn := int(binary.LittleEndian.Uint32(readBytes(r, 4)))
+		_ = numespn
+		for i := 0; i < numespn; i++ {
+			buffernext := readBytes(r, 0xec)
+			_ = buffernext
+		}
+		// EXPR
+		bicnext = string(readBytes(r, 4))
+		log.Println(bicnext)
+		numexpr := int(binary.LittleEndian.Uint32(readBytes(r, 4)))
+		_ = numexpr
+		for i := 0; i < numexpr; i++ {
+			// for i := 0; i < 1; i++ {
+			buffernext := readBytes(r, 0x2c)
+			_ = buffernext
 			// log.Println(hex.Dump(buffernext))
 		}
 	default:
-		log.Println(bicnext)
+		log.Println("Unexpected class name: ", bicnext)
 
 	}
 
 	bicnext = string(readBytes(r, 4))
 	log.Println(bicnext)
+	log.Println(binary.LittleEndian.Uint32(readBytes(r, 4)))
 
 	// var bicgame baseClass
 	// bicgame.length = 1
@@ -142,7 +184,7 @@ func readbic(r *bytes.Reader) {
 	// 	// log.Println(bicgame.name, hex.Dump(bicgame.buffer.Bytes()))
 	// }
 
-	// log.Println(hex.Dump(readBytes(r, 0x100)))
+	log.Println(hex.Dump(readBytes(r, 0x200)))
 	log.Println("")
 
 }
