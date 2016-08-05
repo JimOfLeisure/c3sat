@@ -16,17 +16,57 @@ type baseClass struct {
 // Parseciv3 ...
 func Parseciv3(civdata []byte) {
 	r := bytes.NewReader(civdata)
+	// get the first four bytes to determine file type
 	header := readBytes(r, 4)
+	// reset pointer to parse from beginning
+	r.Seek(0, 0)
 	switch string(header) {
 	case "CIV3":
 		// log.Println("Civ3 save file detected")
+		readcivheader(r)
+		readbic(r)
 	case "BIC ", "BICX":
-		// TODO: Intelligently parse BIC if the file is a BIC
 		// log.Fatal("Civ3 BIC file detected. Currently not parsing these directly.")
+		readbic(r)
 	default:
 		log.Fatalf("Civ3 file not detected. First four bytes:\n%s", hex.Dump(header))
 	}
-	r.Seek(0, 0)
+}
+
+func check(e error) {
+	if e != nil {
+		// panic(e)
+		log.Fatalln(e)
+	}
+}
+
+// readBytes repeatedly calls bytes.Reader.ReadByte()
+func readBytes(r *bytes.Reader, n int) []byte {
+	var out bytes.Buffer
+	for i := 0; i < n; i++ {
+		byt, err := r.ReadByte()
+		check(err)
+		out.WriteByte(byt)
+	}
+	return out.Bytes()
+}
+
+func readBase(r *bytes.Reader) (c baseClass) {
+	name := readBytes(r, 4)
+	length := readBytes(r, 4)
+	c.name = string(name[:4])
+	c.length = binary.LittleEndian.Uint32(length[:4])
+	c.buffer.Write(readBytes(r, int(c.length)))
+	return
+}
+
+func somethingsdifferent(s string, r *bytes.Reader) {
+	// seeking backwards is causing EOF when I pass
+	// r.Seek(-4, 2)
+	log.Fatalf("%s\n%s\n", s, hex.Dump(readBytes(r, 1024)))
+}
+
+func readcivheader(r *bytes.Reader) {
 	civ3header := readBytes(r, 30)
 	_ = civ3header
 	/*
@@ -45,12 +85,16 @@ func Parseciv3(civdata []byte) {
 	// log.Println(bicheader.name, bicheader.length)
 	// log.Println(hex.Dump(bicheader.buffer.Bytes()))
 
+}
+
+func readbic(r *bytes.Reader) {
+
 	// log.Println(hex.Dump(readBytes(r, 1024)))
 
 	// The next three values always seem to be the same in all files
 	// Best guess is that the 1 is a record count and 720 is a length,
 	// but almost all zeroes in the 720 bytes. But it does seem to lead
-	// up to the next class name "GAME"
+	// up to the next class name "GAME" (or "BLDG" in scenario games)
 	bicqvernum := readBytes(r, 8)
 	switch string(bicqvernum) {
 	case "BICQVER#", "BICXVER#":
@@ -85,37 +129,5 @@ func Parseciv3(civdata []byte) {
 	// log.Println(hex.Dump(twentyeightints))
 
 	// log.Println(hex.Dump(readBytes(r, 1024)))
-}
 
-func check(e error) {
-	if e != nil {
-		// panic(e)
-		log.Fatalln(e)
-	}
-}
-
-// readBytes repeatedly calls bytes.Reader.ReadByte()
-func readBytes(r *bytes.Reader, n int) []byte {
-	var out bytes.Buffer
-	for i := 0; i < n; i++ {
-		byt, err := r.ReadByte()
-		check(err)
-		out.WriteByte(byt)
-	}
-	return out.Bytes()
-}
-
-func readBase(r *bytes.Reader) (c baseClass) {
-	name := readBytes(r, 4)
-	length := readBytes(r, 4)
-	c.name = string(name[:4])
-	c.length = binary.LittleEndian.Uint32(length[:4])
-	c.buffer.Write(readBytes(r, int(c.length)))
-	return
-}
-
-func somethingsdifferent(s string, r *bytes.Reader) {
-	// seeking backwards is causing EOF when I pass
-	// r.Seek(-4, 2)
-	log.Fatalf("%s\n%s\n", s, hex.Dump(readBytes(r, 1024)))
 }
