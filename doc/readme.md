@@ -42,27 +42,21 @@ There must be an indicator in the file previous to this to indicate what data is
 Also, PTW and vanilla data structure sizes diverge beginning with the first BLDG
 
 - "BLDG"
-- 72 bytes
-    - 0x00 - int count of 0x110-sized BLDG records following this
-    - 0x04 - int that seems to be 0x010c so far
-    - lots of zeroes
+- int count of 0x110-sized BLDG records
 - count * 0x110 (272) byte records (length is different in PTW)
-    - 0x00 - string - 32 bytes? display name of building
+    - 0x44 - string - 32 bytes? display name of building
         - "Theory of Evolution"
-    - 0x20 - string - 32 bytes? internal(?) name of building
+    - 0x64 - string - 32 bytes? internal(?) name of building
         - "BLDG\_Theory\_of\_Evolution"
-    - 0x40 - 0x11f - 24 ints
+    - the rest seem to be ints
         - many -1
         - many 0
         - some other values
-- 0x44 bytes
-    - 0xc: "Laborers"
-    - 0x2c: -1
-    - all other values zero
-    - seems to be header for city worker specialists
-- ? * 0x80 byte length laborer description
-    - Can't find where the count is, but mostly 5; 3 for Mesoamerica scenario
+- "CTZN"
+- int count
+- count * 0x80 byte length laborer description
     - 0x00 - int value 0x7c
+    - 0x04 - int, 1 for default laborer, 0 for the specialists
     - 0x08 - string display name
         - Entertainer
     - 0x28 - string internal name

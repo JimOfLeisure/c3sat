@@ -100,27 +100,31 @@ func readbic(r *bytes.Reader) {
 
 	// At this point, my epic SAVs have GAME, downloaded scenario-based games have BLDG
 
+	var buffernext []byte
 	bicnext := string(readBytes(r, 4))
 	switch bicnext {
 	case "BLDG":
 		log.Println(bicnext)
 		numbuildings := int(binary.LittleEndian.Uint32(readBytes(r, 4)))
-		buffernext := readBytes(r, 68)
-		log.Println(hex.Dump(buffernext))
 		for i := 0; i < numbuildings; i++ {
 			buffernext = readBytes(r, 0x110)
 			// print building name
 			// log.Println(string(buffernext[:32]))
-			// log.Println(hex.Dump(buffernext))
+			log.Println(hex.Dump(buffernext))
 		}
-		buffernext = readBytes(r, 0x44)
 		log.Println(hex.Dump(buffernext))
-		numcitizentypes := 5
+	}
+	bicnext = string(readBytes(r, 4))
+	switch bicnext {
+	case "CTZN":
+		log.Println(bicnext)
+		numcitizentypes := int(binary.LittleEndian.Uint32(readBytes(r, 4)))
 		for i := 0; i < numcitizentypes; i++ {
-			buffernext = readBytes(r, 0x80)
+			buffernext := readBytes(r, 0x80)
+			_ = buffernext
 			// print building name
 			// log.Println(string(buffernext[:32]))
-			log.Println(hex.Dump(buffernext))
+			// log.Println(hex.Dump(buffernext))
 		}
 	default:
 		log.Println(bicnext)
