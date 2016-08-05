@@ -223,7 +223,7 @@ func readbic(r *bytes.Reader) {
 	// 	// log.Println(bicgame.name, hex.Dump(bicgame.buffer.Bytes()))
 	// }
 
-	// log.Println(hex.Dump(readBytes(r, 0x200)))
+	log.Println(hex.Dump(readBytes(r, 0x200)))
 	log.Println("")
 
 }
