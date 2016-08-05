@@ -16,10 +16,11 @@ August 2016: During the Go rewrite, taking more specific notes. They might as we
 ## BIC section of SAV file. Same as BIC/X/Q file?
 
 - "BICQVER#" C3C or "BICXVER#" PTW or "BIC VER#" vanilla
-- int, always 1. Count of BICs? Count of whatever the next blob is?
+- int, always 1. Count of BICs? Count of whatever the next blob is? Version number as the previous bytes label it?
 - length, always 720 / 0x2d0
 - length bytes of data
     - 0x00 - 0xff - four ints?
+        - At least one of these must be some sort of flag indicating if there are BLDG and other sections following this block. They don't seem to be counts, so I figure flags.
     - 0x10 - string of well over 256 bytes - Description of scenario from BIQ
         - COTM0120_OPEN
         - COTM0121_OPEN
@@ -33,5 +34,40 @@ August 2016: During the Go rewrite, taking more specific notes. They might as we
         - COTM
         - Mesopotamia
     - All other seen bytes zeroes
-- "BLDG" in scenario-based saves, "GAME" in epic saves
-    - There must be an indicator in the file previous to this to indicate what data is present/missing
+
+### This part may not be present in epic game saves
+
+There must be an indicator in the file previous to this to indicate what data is present/missing. I suspect it's in the first 16 bytes of the 720-byte chunk of data.
+
+Also, PTW and vanilla data structure sizes diverge beginning with the first BLDG
+
+- "BLDG"
+- 72 bytes
+    - 0x00 - int count of 0x110-sized BLDG records following this
+    - 0x04 - int that seems to be 0x010c so far
+    - lots of zeroes
+- count * 0x110 (272) byte records (length is different in PTW)
+    - 0x00 - string - 32 bytes? display name of building
+        - "Theory of Evolution"
+    - 0x20 - string - 32 bytes? internal(?) name of building
+        - "BLDG\_Theory\_of\_Evolution"
+    - 0x40 - 0x11f - 24 ints
+        - many -1
+        - many 0
+        - some other values
+- 0x44 bytes
+    - 0xc: "Laborers"
+    - 0x2c: -1
+    - all other values zero
+    - seems to be header for city worker specialists
+- ? * 0x80 byte length laborer description
+    - Can't find where the count is, but mostly 5; 3 for Mesoamerica scenario
+    - 0x00 - int value 0x7c
+    - 0x08 - string display name
+        - Entertainer
+    - 0x28 - string internal name
+        - CTZN_Entertainer
+    - 0x48 - string plural
+        - Entertainers
+- "CULT"
+

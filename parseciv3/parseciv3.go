@@ -94,19 +94,51 @@ func readbic(r *bytes.Reader) {
 	}
 	bicdescription := readBytes(r, bicdescriptionlength)
 	_ = bicdescription
-	log.Println(hex.Dump(bicdescription))
+	// log.Println(hex.Dump(bicdescription))
+	log.Println(hex.Dump(bicdescription[:16]))
+	// log.Println(hex.Dump(bicdescription[8:12]))
 
 	// At this point, my epic SAVs have GAME, downloaded scenario-based games have BLDG
 
-	/*
-		bicgame := readBytes(r, 4)
-		if string(bicgame) != "GAME" {
-			somethingsdifferent(string(bicgame), r)
+	bicnext := string(readBytes(r, 4))
+	switch bicnext {
+	case "BLDG":
+		log.Println(bicnext)
+		numbuildings := int(binary.LittleEndian.Uint32(readBytes(r, 4)))
+		buffernext := readBytes(r, 68)
+		log.Println(hex.Dump(buffernext))
+		for i := 0; i < numbuildings; i++ {
+			buffernext = readBytes(r, 0x110)
+			// print building name
+			// log.Println(string(buffernext[:32]))
+			// log.Println(hex.Dump(buffernext))
 		}
-	*/
-	// bicgame := readBase(r)
-	// log.Println(bicgame.name, hex.Dump(bicgame.buffer.Bytes()))
+		buffernext = readBytes(r, 0x44)
+		log.Println(hex.Dump(buffernext))
+		numcitizentypes := 5
+		for i := 0; i < numcitizentypes; i++ {
+			buffernext = readBytes(r, 0x80)
+			// print building name
+			// log.Println(string(buffernext[:32]))
+			log.Println(hex.Dump(buffernext))
+		}
+	default:
+		log.Println(bicnext)
 
-	// log.Println(hex.Dump(readBytes(r, 1024)))
+	}
+
+	bicnext = string(readBytes(r, 4))
+	log.Println(bicnext)
+
+	// var bicgame baseClass
+	// bicgame.length = 1
+	// for bicgame.name != "GAME" && 0 < bicgame.length && bicgame.length < 500 {
+	// 	bicgame = readBase(r)
+	// 	log.Println(bicgame.name, bicgame.length)
+	// 	// log.Println(bicgame.name, hex.Dump(bicgame.buffer.Bytes()))
+	// }
+
+	// log.Println(hex.Dump(readBytes(r, 0x100)))
+	log.Println("")
 
 }
