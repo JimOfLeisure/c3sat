@@ -167,14 +167,52 @@ func readbic(r *bytes.Reader) {
 			_ = buffernext
 			// log.Println(hex.Dump(buffernext))
 		}
+		// FLAV
+		bicnext = string(readBytes(r, 4))
+		if (bicnext) == "FLAV" {
+			log.Println(bicnext)
+			numflavgroup := int(binary.LittleEndian.Uint32(readBytes(r, 4)))
+			for i := 0; i < numflavgroup; i++ {
+				numflavors := int(binary.LittleEndian.Uint32(readBytes(r, 4)))
+				for i := 0; i < numflavors; i++ {
+
+					// for i := 0; i < 1; i++ {
+					buffernext := readBytes(r, 0x124)
+					_ = buffernext
+				}
+			}
+			bicnext = string(readBytes(r, 4))
+		}
+		// GOOD
+		// bicnext already read because of optional FLAV
+		log.Println(bicnext)
+		numgood := int(binary.LittleEndian.Uint32(readBytes(r, 4)))
+		_ = numgood
+		for i := 0; i < numgood; i++ {
+			// for i := 0; i < 1; i++ {
+			buffernext := readBytes(r, 0x5c)
+			_ = buffernext
+			// log.Println(hex.Dump(buffernext))
+		}
+		// GOVT
+		bicnext = string(readBytes(r, 4))
+		log.Println(bicnext)
+		numgovt := int(binary.LittleEndian.Uint32(readBytes(r, 4)))
+		_ = numgovt
+		for i := 0; i < numgovt; i++ {
+			// for i := 0; i < 1; i++ {
+			buffernext := readBytes(r, 0x23c)
+			_ = buffernext
+			// log.Println(hex.Dump(buffernext))
+		}
 	default:
 		log.Println("Unexpected class name: ", bicnext)
 
 	}
 
-	bicnext = string(readBytes(r, 4))
-	log.Println(bicnext)
-	log.Println(binary.LittleEndian.Uint32(readBytes(r, 4)))
+	// bicnext = string(readBytes(r, 4))
+	// log.Println(bicnext)
+	// log.Println(binary.LittleEndian.Uint32(readBytes(r, 4)))
 
 	// var bicgame baseClass
 	// bicgame.length = 1

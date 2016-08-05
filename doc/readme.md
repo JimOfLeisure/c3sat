@@ -21,25 +21,8 @@ August 2016: During the Go rewrite, taking more specific notes. They might as we
 - length bytes of data
     - 0x00 - 0xcdcdcdcd or 0
     - 0x04 - 0
-    - 0x08 - bitmask?
-        - 0x01
-        - 0x02
-        - 0x04
-        - 0x08
-        - 0x10
-        - 0x20
-        - 0x40
-        - 0x80
-    - 0x0c - bitmask?
-        - 0x01 - 1 when custom map ?
-        - 0x02 -
-        - 0x04 -
-        - 0x08 -
-        - 0x10
-        - 0x20
-        - 0x40
-        - 0x80
-        - ~~At least one of these must be some sort of flag indicating if there are BLDG and other sections following this block. They don't seem to be counts, so I figure flags.~~ No, no bits seem correlated with BLDG-EXPR sections.
+    - 0x08 - BIC version
+    - 0x0c - BIC version
     - 0x10 - string of well over 256 bytes - Description of scenario from BIQ
         - COTM0120_OPEN
         - COTM0121_OPEN
@@ -111,3 +94,22 @@ Also, PTW and vanilla data structure sizes diverge beginning with the first BLDG
 - "EXPR"
 - int count
 - count * 0x2c byte length unit experience levels
+
+#### This may or may not be present
+
+Think I saw flavor flags in the previous custom rules. Perhaps those can be checked. 
+
+- "FLAV"
+- int count (always 1?)
+- count * flavor groups
+    - int count flavors
+    - count * 0x124 byte flavors
+
+#### Back to present for all custom rules
+
+- "GOOD"
+- int count
+- count * 0x5c byte goods/resources
+- "GOVT"
+- int count
+- count * 0x23c byte governments
