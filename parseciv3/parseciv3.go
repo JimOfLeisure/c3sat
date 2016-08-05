@@ -195,6 +195,7 @@ func readbic(r *bytes.Reader) {
 			// log.Println(hex.Dump(buffernext))
 		}
 		// GOVT
+		// apparently GOVT length changed during C3C as Mesopotamia and Mesoamerica scenario BIQs get misaligned in this parser.
 		bicnext = string(readBytes(r, 4))
 		log.Println(bicnext)
 		numgovt := int(binary.LittleEndian.Uint32(readBytes(r, 4)))
@@ -203,16 +204,16 @@ func readbic(r *bytes.Reader) {
 			// for i := 0; i < 1; i++ {
 			buffernext := readBytes(r, 0x23c)
 			_ = buffernext
-			// log.Println(hex.Dump(buffernext))
+			log.Println(hex.Dump(buffernext))
 		}
 	default:
 		log.Println("Unexpected class name: ", bicnext)
 
 	}
 
-	// bicnext = string(readBytes(r, 4))
-	// log.Println(bicnext)
-	// log.Println(binary.LittleEndian.Uint32(readBytes(r, 4)))
+	bicnext = string(readBytes(r, 4))
+	log.Println(bicnext)
+	log.Println(binary.LittleEndian.Uint32(readBytes(r, 4)))
 
 	// var bicgame baseClass
 	// bicgame.length = 1
@@ -222,7 +223,7 @@ func readbic(r *bytes.Reader) {
 	// 	// log.Println(bicgame.name, hex.Dump(bicgame.buffer.Bytes()))
 	// }
 
-	log.Println(hex.Dump(readBytes(r, 0x200)))
+	// log.Println(hex.Dump(readBytes(r, 0x200)))
 	log.Println("")
 
 }
