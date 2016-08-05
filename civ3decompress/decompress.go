@@ -108,7 +108,7 @@ func Decompress(path string) []byte {
 		log.Fatal("Error while opening file", err)
 	}
 	defer file.Close()
-	log.Printf("%s opened\n", path)
+	log.Printf("File %s\n", path)
 
 	header := make([]byte, 2)
 	_, err = file.Read(header)
@@ -117,9 +117,9 @@ func Decompress(path string) []byte {
 	}
 	switch {
 	case header[0] == 0x00 && (header[1] == 0x04 || header[1] == 0x05 || header[1] == 0x06):
-		log.Println("Compressed file detected")
+		// log.Println("Compressed file detected")
 	default:
-		log.Println("Not a compressed file. Proceeding with uncompressed stream.")
+		// log.Println("Not a compressed file. Proceeding with uncompressed stream.")
 		// TODO: I'm sure I'm doing this in a terribly inefficient way. Need to refactor everything to pass around file pointers I think
 		theseBytes, err := ioutil.ReadFile(path)
 		check(err)
