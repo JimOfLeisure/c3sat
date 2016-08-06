@@ -69,8 +69,8 @@ func main() {
 					}
 					return err
 				}
-				fmt.Println(gameData.Info())
-				fmt.Println(gameData.Debug())
+				fmt.Print(gameData.Info())
+				fmt.Print(gameData.Debug())
 				return nil
 			},
 		},

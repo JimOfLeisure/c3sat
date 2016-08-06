@@ -10,12 +10,6 @@ import (
 	"github.com/myjimnelson/c3sat/civ3decompress"
 )
 
-type baseClass struct {
-	name   string
-	length uint32
-	buffer bytes.Buffer
-}
-
 // ReadFile takes a filename and returns the decompressed file data or the raw data if it's not compressed. Also returns true if compressed.
 func ReadFile(path string) ([]byte, bool, error) {
 	// Open file, hanlde errors, defer close
@@ -104,6 +98,13 @@ func readBytes(r *bytes.Reader, n int) ([]byte, error) {
 }
 
 /*
+
+type baseClass struct {
+	name   string
+	length uint32
+	buffer bytes.Buffer
+}
+
 // oops, I spent time refactoring this for error handlnig but I'm not going to keep it
 func readBase(r *bytes.Reader) (baseClass, error) {
 	var c baseClass
