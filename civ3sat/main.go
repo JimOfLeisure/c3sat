@@ -7,7 +7,6 @@ import (
 	"log"
 	"os"
 
-	"github.com/myjimnelson/c3sat/civ3decompress"
 	"github.com/myjimnelson/c3sat/parseciv3"
 	"github.com/urfave/cli"
 )
@@ -26,7 +25,9 @@ func main() {
 			Aliases: []string{"d"},
 			Usage:   "decompress a Civ3 data file to out.sav in the current folder",
 			Action: func(c *cli.Context) error {
-				err := ioutil.WriteFile("./out.sav", civ3decompress.Decompress(c.Args().First()), 0644)
+				filedata, _, err := parseciv3.ReadFile(c.Args().First())
+				check(err)
+				err = ioutil.WriteFile("./out.sav", filedata, 0644)
 				check(err)
 				log.Println("Saved to out.sav in current folder")
 				return nil
@@ -37,7 +38,9 @@ func main() {
 			Aliases: []string{"x"},
 			Usage:   "hex dump a Civ3 data file to stdout",
 			Action: func(c *cli.Context) error {
-				fmt.Print(hex.Dump(civ3decompress.Decompress(c.Args().First())))
+				filedata, _, err := parseciv3.ReadFile(c.Args().First())
+				check(err)
+				fmt.Print(hex.Dump(filedata))
 				return nil
 			},
 		},
@@ -46,7 +49,9 @@ func main() {
 			Aliases: []string{"z"},
 			Usage:   "Who knows? It's whatever the dev is working on right now",
 			Action: func(c *cli.Context) error {
-				parseciv3.Parseciv3(civ3decompress.Decompress(c.Args().First()))
+				path := c.Args().First()
+				log.Printf("File %s\n", path)
+				parseciv3.Parseciv3(path)
 				return nil
 			},
 		},

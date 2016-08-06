@@ -2,9 +2,12 @@ package parseciv3
 
 import (
 	"bytes"
-	"encoding/binary"
 	"encoding/hex"
+	"io/ioutil"
 	"log"
+	"os"
+
+	"github.com/myjimnelson/c3sat/civ3decompress"
 )
 
 type baseClass struct {
@@ -13,21 +16,63 @@ type baseClass struct {
 	buffer bytes.Buffer
 }
 
+type Civ3Data struct{}
+
+// ReadFile takes a filename and returns the decompressed file data or the raw data if it's not compressed. Also returns true if compressed.
+func ReadFile(path string) ([]byte, bool, error) {
+	// Open file, hanlde errors, defer close
+	file, err := os.Open(path)
+	if err != nil {
+		return nil, false, ReadError{err}
+	}
+	defer file.Close()
+
+	var compressed bool
+	var data []byte
+	header := make([]byte, 2)
+	_, err = file.Read(header)
+	if err != nil {
+		return nil, false, ReadError{err}
+	}
+	switch {
+	case header[0] == 0x00 && (header[1] == 0x04 || header[1] == 0x05 || header[1] == 0x06):
+		compressed = true
+		data, err = civ3decompress.Decompress(file)
+		if err != nil {
+			return nil, false, ReadError{err}
+		}
+	default:
+		// log.Println("Not a compressed file. Proceeding with uncompressed stream.")
+		// TODO: I'm sure I'm doing this in a terribly inefficient way. Need to refactor everything to pass around file pointers I think
+		data, err = ioutil.ReadFile(path)
+		if err != nil {
+			return nil, false, ReadError{err}
+		}
+	}
+	return data, compressed, error(nil)
+
+}
+
 // Parseciv3 ...
-func Parseciv3(civdata []byte) error {
+func Parseciv3(path string) error {
+	civdata, compressed, err := ReadFile(path)
+	_ = compressed
 	r := bytes.NewReader(civdata)
 	// get the first four bytes to determine file type
-	header := readBytes(r, 4)
+	header, err := readBytes(r, 4)
+	if err != nil {
+		return ReadError{err}
+	}
 	// reset pointer to parse from beginning
 	r.Seek(0, 0)
 	switch string(header) {
 	case "CIV3":
 		// log.Println("Civ3 save file detected")
-		readcivheader(r)
-		readbic(r)
+		// readcivheader(r)
+		// readbic(r)
 	case "BIC ", "BICX":
 		// log.Fatal("Civ3 BIC file detected. Currently not parsing these directly.")
-		readbic(r)
+		// readbic(r)
 	default:
 		log.Fatalf("Civ3 file not detected. First four bytes:\n%s", hex.Dump(header))
 	}
@@ -53,6 +98,7 @@ func readBytes(r *bytes.Reader, n int) ([]byte, error) {
 	return out.Bytes(), error(nil)
 }
 
+/*
 // oops, I spent time refactoring this for error handlnig but I'm not going to keep it
 func readBase(r *bytes.Reader) (baseClass, error) {
 	var c baseClass
@@ -268,3 +314,4 @@ func readbic(r *bytes.Reader) {
 	log.Println("")
 
 }
+*/
