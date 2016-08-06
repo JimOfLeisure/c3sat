@@ -21,55 +21,52 @@ func Decompress(file io.Reader) ([]byte, error) {
 	header := make([]byte, 2)
 	_, err := file.Read(header)
 	if err != nil {
-		return nil, err
+		return nil, FileError{err}
 	}
+
 	// The token equating to length 519 is the end-of-stream token
-	for length != 519 {
-		foo, err := civ3Bitstream.ReadBit()
+	const lengthEndOfStream = 519
+	for length != lengthEndOfStream {
+		tokenFlag, err := civ3Bitstream.ReadBit()
 		if err != nil {
-			if err == io.EOF {
-				break
-			}
+			return nil, FileError{err}
 		}
-		switch foo {
+		switch tokenFlag {
 		// bit 1 indicates length/offset sequences follow
 		case true:
 			length = civ3Bitstream.lengthsequence()
 			// log.Printf("length %v", length)
 			// The token equating to length 519 is the end-of-stream token
-			if length != 519 {
+			if length != lengthEndOfStream {
 				// If length is 2, then only two low-order bits are read for offset
 				dictsize := header[1]
 				if length == 2 {
 					dictsize = 2
 				}
 				offset := civ3Bitstream.offsetsequence(int(dictsize))
-				// log.Printf("offset %v", offset)
 				for i := 0; i < length; i++ {
 					// dictionary is just a reader for the output buffer.
 					// since using .Bytes(), have to do this every loop...surely there is better way
+					// uncData bytes.Buffer does not have Seek function
 					dict := bytes.NewReader(uncData.Bytes())
 					// Position dictionary/buffer reader. 2 means from end of buffer/stream
 					// offset 0 is last byte, so using -1 -offset to position for last byte
 					dict.Seek(int64(-1-offset), 2)
 					byt, err := dict.ReadByte()
 					if err != nil {
-						log.Fatal(err)
+						return nil, FileError{err}
 					}
-					// Wouldn't think this is necessary, but let's try
-					dict.Seek(int64(0), 2)
 					uncData.WriteByte(byt)
-					// log.Printf("byt %v", byt)
 				}
 			}
 		// bit 0 inticates next 8 bits are literal byte, lsb first
 		case false:
 			{
-				aByte, err := civ3Bitstream.ReadByte()
+				literalByte, err := civ3Bitstream.ReadByte()
 				if err != nil {
-					log.Fatal(err)
+					return nil, FileError{err}
 				}
-				uncData.Write([]byte{aByte})
+				uncData.Write([]byte{literalByte})
 			}
 		}
 	}

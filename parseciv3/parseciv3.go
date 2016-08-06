@@ -34,6 +34,11 @@ func ReadFile(path string) ([]byte, bool, error) {
 	if err != nil {
 		return nil, false, ReadError{err}
 	}
+	// reset pointer to parse from beginning
+	_, err = file.Seek(0, 0)
+	if err != nil {
+		return nil, false, ReadError{err}
+	}
 	switch {
 	case header[0] == 0x00 && (header[1] == 0x04 || header[1] == 0x05 || header[1] == 0x06):
 		compressed = true
