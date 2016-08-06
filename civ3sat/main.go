@@ -59,12 +59,16 @@ func main() {
 			Aliases: []string{"z"},
 			Usage:   "Who knows? It's whatever the dev is working on right now",
 			Action: func(c *cli.Context) error {
+				var gameData parseciv3.Civ3Data
+				var err error
 				path := c.Args().First()
 				log.Printf("File %s\n", path)
-				err := parseciv3.Parseciv3(path)
+				gameData, err = parseciv3.ParseCiv3(path)
 				if err != nil {
 					return err
 				}
+				gameData.RawFile = nil
+				fmt.Printf("%v\n", gameData)
 				return nil
 			},
 		},

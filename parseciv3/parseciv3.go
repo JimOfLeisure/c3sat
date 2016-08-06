@@ -16,8 +16,6 @@ type baseClass struct {
 	buffer bytes.Buffer
 }
 
-type Civ3Data struct{}
-
 // ReadFile takes a filename and returns the decompressed file data or the raw data if it's not compressed. Also returns true if compressed.
 func ReadFile(path string) ([]byte, bool, error) {
 	// Open file, hanlde errors, defer close
@@ -58,18 +56,22 @@ func ReadFile(path string) ([]byte, bool, error) {
 
 }
 
-// Parseciv3 ...
-func Parseciv3(path string) error {
-	civdata, compressed, err := ReadFile(path)
+// ParseCiv3 ...
+func ParseCiv3(path string) (Civ3Data, error) {
+	var civ3data Civ3Data
+	var compressed bool
+	var err error
+	civ3data.FileName = path
+	civ3data.RawFile, compressed, err = ReadFile(path)
 	if err != nil {
-		return err
+		return civ3data, err
 	}
-	_ = compressed
-	r := bytes.NewReader(civdata)
+	civ3data.Compressed = compressed
+	r := bytes.NewReader(civ3data.RawFile)
 	// get the first four bytes to determine file type
 	header, err := readBytes(r, 4)
 	if err != nil {
-		return ReadError{err}
+		return civ3data, ReadError{err}
 	}
 	// reset pointer to parse from beginning
 	r.Seek(0, 0)
@@ -82,9 +84,9 @@ func Parseciv3(path string) error {
 		// log.Println("Civ3 BIC file detected.")
 		// readbic(r)
 	default:
-		return ParseError{fmt.Sprintf("Civ3 file not detected. First four bytes:\n%s", hex.Dump(header)), "CIV3", hex.Dump(header)}
+		return civ3data, ParseError{fmt.Sprintf("Civ3 file not detected. First four bytes:\n%s", hex.Dump(header)), "CIV3", hex.Dump(header)}
 	}
-	return error(nil)
+	return civ3data, nil
 }
 
 // func check(e error) {
