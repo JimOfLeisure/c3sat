@@ -3,8 +3,8 @@ package parseciv3
 import (
 	"bytes"
 	"encoding/hex"
+	"fmt"
 	"io/ioutil"
-	"log"
 	"os"
 
 	"github.com/myjimnelson/c3sat/civ3decompress"
@@ -23,7 +23,7 @@ func ReadFile(path string) ([]byte, bool, error) {
 	// Open file, hanlde errors, defer close
 	file, err := os.Open(path)
 	if err != nil {
-		return nil, false, ReadError{err}
+		return nil, false, FileError{err}
 	}
 	defer file.Close()
 
@@ -32,26 +32,26 @@ func ReadFile(path string) ([]byte, bool, error) {
 	header := make([]byte, 2)
 	_, err = file.Read(header)
 	if err != nil {
-		return nil, false, ReadError{err}
+		return nil, false, FileError{err}
 	}
 	// reset pointer to parse from beginning
 	_, err = file.Seek(0, 0)
 	if err != nil {
-		return nil, false, ReadError{err}
+		return nil, false, FileError{err}
 	}
 	switch {
 	case header[0] == 0x00 && (header[1] == 0x04 || header[1] == 0x05 || header[1] == 0x06):
 		compressed = true
 		data, err = civ3decompress.Decompress(file)
 		if err != nil {
-			return nil, false, ReadError{err}
+			return nil, false, err
 		}
 	default:
 		// log.Println("Not a compressed file. Proceeding with uncompressed stream.")
 		// TODO: I'm sure I'm doing this in a terribly inefficient way. Need to refactor everything to pass around file pointers I think
 		data, err = ioutil.ReadFile(path)
 		if err != nil {
-			return nil, false, ReadError{err}
+			return nil, false, FileError{err}
 		}
 	}
 	return data, compressed, error(nil)
@@ -61,6 +61,9 @@ func ReadFile(path string) ([]byte, bool, error) {
 // Parseciv3 ...
 func Parseciv3(path string) error {
 	civdata, compressed, err := ReadFile(path)
+	if err != nil {
+		return err
+	}
 	_ = compressed
 	r := bytes.NewReader(civdata)
 	// get the first four bytes to determine file type
@@ -76,10 +79,10 @@ func Parseciv3(path string) error {
 		// readcivheader(r)
 		// readbic(r)
 	case "BIC ", "BICX":
-		// log.Fatal("Civ3 BIC file detected. Currently not parsing these directly.")
+		// log.Println("Civ3 BIC file detected.")
 		// readbic(r)
 	default:
-		log.Fatalf("Civ3 file not detected. First four bytes:\n%s", hex.Dump(header))
+		return ParseError{fmt.Sprintf("Civ3 file not detected. First four bytes:\n%s", hex.Dump(header)), "CIV3", hex.Dump(header)}
 	}
 	return error(nil)
 }

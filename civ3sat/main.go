@@ -26,9 +26,16 @@ func main() {
 			Usage:   "decompress a Civ3 data file to out.sav in the current folder",
 			Action: func(c *cli.Context) error {
 				filedata, _, err := parseciv3.ReadFile(c.Args().First())
-				check(err)
+				if err != nil {
+					return err
+				}
+
 				err = ioutil.WriteFile("./out.sav", filedata, 0644)
-				check(err)
+				if err != nil {
+					log.Println("Error writing file")
+					return err
+				}
+
 				log.Println("Saved to out.sav in current folder")
 				return nil
 			},
@@ -39,7 +46,10 @@ func main() {
 			Usage:   "hex dump a Civ3 data file to stdout",
 			Action: func(c *cli.Context) error {
 				filedata, _, err := parseciv3.ReadFile(c.Args().First())
-				check(err)
+				if err != nil {
+					return err
+				}
+
 				fmt.Print(hex.Dump(filedata))
 				return nil
 			},
@@ -51,17 +61,14 @@ func main() {
 			Action: func(c *cli.Context) error {
 				path := c.Args().First()
 				log.Printf("File %s\n", path)
-				parseciv3.Parseciv3(path)
+				err := parseciv3.Parseciv3(path)
+				if err != nil {
+					return err
+				}
 				return nil
 			},
 		},
 	}
 
 	app.Run(os.Args)
-}
-
-func check(e error) {
-	if e != nil {
-		panic(e)
-	}
 }
