@@ -74,47 +74,66 @@ func NewCiv3Data(path string) (Civ3Data, error) {
 	// Create ReadSeeker
 	r := bytes.NewReader(rawFile)
 
-	// get the first four bytes to determine file type
-	header, err := readBytes(r, 4)
+	civ3data.Data, err = ParseCiv3(r)
 	if err != nil {
-		return civ3data, ReadError{err}
+		return civ3data, err
 	}
-	// reset pointer to parse from beginning
-	r.Seek(0, 0)
-
-	// Detect file type and proceed to parse
-	switch string(header) {
-	case "CIV3":
-		// log.Println("Civ3 save file detected")
-		civ3data.Data, err = ParseSav(r)
-		// readbic(r)
-		// return civ3data, ParseError{"testing debug output", "expected", debugHexDump(r)}
-	case "BIC ", "BICX":
-		// TODO: Should "BICQ" be an option?
-		// log.Println("Civ3 BIC file detected.")
-		// readbic(r)
-	default:
-		return civ3data, ParseError{fmt.Sprintf("Civ3 file not detected. First four bytes:\n%s", hex.Dump(header)), "CIV3", hex.Dump(header)}
-	}
-	nextData, _ := readBytes(r, debugContextBytes)
-	civ3data.Next = hex.Dump(nextData)
+	civ3data.Next = debugHexDump(r)
 	return civ3data, nil
 }
 
-// ParseSav takes raw save file data and returns a map of the parsed data
-func ParseSav(r io.ReadSeeker) (ParsedData, error) {
+// peekName is a wrapper to allow 4-char strings as a parameter to peekFour
+func peekName(r io.ReadSeeker, expected string) error {
+	var b [4]byte
+	copy(b[:], expected)
+	return peekFour(r, b)
+}
+
+// peekFour returns r with the pointer in its original location, and an error if the next bytes don't match expected
+func peekFour(r io.ReadSeeker, expected [4]byte) error {
+	var peek [4]byte
+	err := binary.Read(r, binary.LittleEndian, &peek)
+	if err != nil {
+		return ReadError{err}
+	}
+	// Back the pointer up 4 bytes
+	r.Seek(-4, 1)
+	if peek != expected {
+		dump := make([]byte, debugContextBytes)
+		_ = binary.Read(r, binary.LittleEndian, dump)
+		// Back the pointer up 4 bytes
+		r.Seek(-int64(debugContextBytes), 1)
+		return ParseError{"Parse error: Unexpected data", fmt.Sprintf("%v", expected), hex.Dump(dump)}
+	}
+	return nil
+}
+
+// ParseCiv3 takes raw save file data and returns a map of the parsed data
+func ParseCiv3(r io.ReadSeeker) (ParsedData, error) {
 	data := make(ParsedData)
-	// temp := Civ3{}
-	data["CIV3"] = &Civ3{}
-	_ = binary.Read(r, binary.LittleEndian, data["CIV3"])
+	var err error
+
+	// CIV3 section, optional if BIC file
+	err = peekName(r, "CIV3")
+	if err == nil {
+		// need to preserve parent scope's err
+		var err error
+		data["CIV3"], err = newCiv3(r)
+		if err != nil {
+			return data, err
+		}
+	} else {
+		if _, ok := err.(ParseError); ok {
+			// continue if not matched; may be a BIC/X/Q file
+		} else {
+			return data, err
+		}
+	}
+
 	return data, nil
 }
 
-// ParseBic takes raw bic/x/q file data and returns a map of the parsed data
-func ParseBic(r io.ReadSeeker) (ParsedData, error) {
-	data := make(ParsedData)
-	return data, nil
-}
+/*
 
 // readBytes repeatedly calls bytes.Reader.ReadByte()
 func readBytes(r *bytes.Reader, n int) ([]byte, error) {
@@ -128,8 +147,6 @@ func readBytes(r *bytes.Reader, n int) ([]byte, error) {
 	}
 	return out.Bytes(), error(nil)
 }
-
-/*
 
 type baseClass struct {
 	name   string

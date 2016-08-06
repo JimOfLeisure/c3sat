@@ -19,23 +19,26 @@ type Civ3Data struct {
 
 // Section is the inteface for the various structs decoded from the data files
 type Section interface {
-	parse(r io.ReadSeeker) error
+	Name() string
 }
 
 // Civ3 is the SAV file header
 type Civ3 struct {
-	Name [4]byte
+	ClassName [4]byte
 	// 28 bytes. Guessing on alignment
 	A, B, C, D, E, F uint32
 	G                uint16
 }
 
-func (me *Civ3) parse(r io.ReadSeeker) error {
-	// var temp Civ3
-	// _, err := binary.ReadSeeker
-	err := binary.Read(r, binary.LittleEndian, me)
+func (s Civ3) Name() string {
+	return string(s.ClassName[:])
+}
+
+func newCiv3(r io.ReadSeeker) (Civ3, error) {
+	var data Civ3
+	err := binary.Read(r, binary.LittleEndian, &data)
 	if err != nil {
-		return ReadError{err}
+		return data, ReadError{err}
 	}
-	return nil
+	return data, nil
 }

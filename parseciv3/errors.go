@@ -2,6 +2,7 @@ package parseciv3
 
 import (
 	"bytes"
+	"encoding/binary"
 	"encoding/hex"
 	"fmt"
 )
@@ -10,7 +11,8 @@ const debugContextBytes int = 0x200
 
 // no err return because I'm calling this from inside errors
 func debugHexDump(r *bytes.Reader) string {
-	s, _ := readBytes(r, debugContextBytes)
+	s := make([]byte, debugContextBytes)
+	_ = binary.Read(r, binary.LittleEndian, &s)
 	return hex.Dump(s)
 }
 
