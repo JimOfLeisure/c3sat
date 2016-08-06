@@ -4,7 +4,6 @@ package civ3decompress
 import (
 	"bytes"
 	"io"
-	"log"
 )
 
 // Decompress is implemented based on the description of PKWare Data Compression Library at https://groups.google.com/forum/#!msg/comp.compression/M5P064or93o/W1ca1-ad6kgJ
@@ -29,12 +28,15 @@ func Decompress(file io.Reader) ([]byte, error) {
 	for length != lengthEndOfStream {
 		tokenFlag, err := civ3Bitstream.ReadBit()
 		if err != nil {
-			return nil, FileError{err}
+			return uncData.Bytes(), FileError{err}
 		}
 		switch tokenFlag {
 		// bit 1 indicates length/offset sequences follow
 		case true:
-			length = civ3Bitstream.lengthsequence()
+			length, err = civ3Bitstream.lengthsequence()
+			if err != nil {
+				return uncData.Bytes(), err
+			}
 			// log.Printf("length %v", length)
 			// The token equating to length 519 is the end-of-stream token
 			if length != lengthEndOfStream {
@@ -43,7 +45,10 @@ func Decompress(file io.Reader) ([]byte, error) {
 				if length == 2 {
 					dictsize = 2
 				}
-				offset := civ3Bitstream.offsetsequence(int(dictsize))
+				offset, err := civ3Bitstream.offsetsequence(int(dictsize))
+				if err != nil {
+					return uncData.Bytes(), err
+				}
 				for i := 0; i < length; i++ {
 					// dictionary is just a reader for the output buffer.
 					// since using .Bytes(), have to do this every loop...surely there is better way
@@ -54,7 +59,7 @@ func Decompress(file io.Reader) ([]byte, error) {
 					dict.Seek(int64(-1-offset), 2)
 					byt, err := dict.ReadByte()
 					if err != nil {
-						return nil, FileError{err}
+						return uncData.Bytes(), FileError{err}
 					}
 					uncData.WriteByte(byt)
 				}
@@ -64,7 +69,7 @@ func Decompress(file io.Reader) ([]byte, error) {
 			{
 				literalByte, err := civ3Bitstream.ReadByte()
 				if err != nil {
-					return nil, FileError{err}
+					return uncData.Bytes(), FileError{err}
 				}
 				uncData.Write([]byte{literalByte})
 			}
@@ -77,12 +82,14 @@ func Decompress(file io.Reader) ([]byte, error) {
 
 }
 
-func (b *BitReader) lengthsequence() int {
+func (b *BitReader) lengthsequence() (int, error) {
 	var sequence bytes.Buffer
-	// TODO: Do I care about err handling? Currently using _
 	count := 0
 	for _, keyPresent := lengthLookup[sequence.String()]; !keyPresent; count++ {
-		bit, _ := b.ReadBit()
+		bit, err := b.ReadBit()
+		if err != nil {
+			return 0, FileError{err}
+		}
 		if bit {
 			sequence.WriteString("1")
 		} else {
@@ -91,19 +98,24 @@ func (b *BitReader) lengthsequence() int {
 		// hack, but not sure how to check every iteration in for params
 		_, keyPresent = lengthLookup[sequence.String()]
 		if count > 8 {
-			log.Fatal("Did not match offset sequence")
+			return 0, DecodeError{"Token did not match length sequence"}
 		}
 	}
-	xxxes, _ := b.ReadBits(uint(lengthLookup[sequence.String()].extraBits))
+	xxxes, err := b.ReadBits(uint(lengthLookup[sequence.String()].extraBits))
+	if err != nil {
+		return 0, FileError{err}
+	}
 	// log.Printf("Decoded length sequence is %v, to read %v more bits which are %v", lengthLookup[sequence.String()].value, lengthLookup[sequence.String()].extraBits, xxxes)
-	return lengthLookup[sequence.String()].value + int(xxxes)
+	return lengthLookup[sequence.String()].value + int(xxxes), nil
 }
-func (b *BitReader) offsetsequence(dictsize int) int {
+func (b *BitReader) offsetsequence(dictsize int) (int, error) {
 	var sequence bytes.Buffer
-	// TODO: Do I care about err handling? Currently using _
 	count := 0
 	for _, keyPresent := offsetLookup[sequence.String()]; !keyPresent; count++ {
-		bit, _ := b.ReadBit()
+		bit, err := b.ReadBit()
+		if err != nil {
+			return 0, FileError{err}
+		}
 		if bit {
 			sequence.WriteString("1")
 		} else {
@@ -112,26 +124,27 @@ func (b *BitReader) offsetsequence(dictsize int) int {
 		// hack, but not sure how to check every iteration in for params
 		_, keyPresent = offsetLookup[sequence.String()]
 		if count > 8 {
-			log.Fatal("Did not match offset sequence")
+			return 0, DecodeError{"Token did not match offset sequence"}
 		}
 	}
-	loworderbits, _ := b.ReadBits(uint(dictsize))
+	loworderbits, err := b.ReadBits(uint(dictsize))
+	if err != nil {
+		return 0, FileError{err}
+	}
 	// log.Printf("Decoded length sequence is %v, to read %v more bits", offsetLookup[sequence.String()].value, offsetLookup[sequence.String()].extraBits)
-	return offsetLookup[sequence.String()]<<uint(dictsize) + int(loworderbits)
+	return offsetLookup[sequence.String()]<<uint(dictsize) + int(loworderbits), nil
 }
 
 // ReadByte reads a single byte from the stream, regardless of alignment
 func (b *BitReader) ReadByte() (byte, error) {
-
-	// If I init inside the loop these are out of scope
+	// If I init inside the loop this is out of scope
 	var byt byte
-	var err error
 
 	// Shift in 8 bits, LSBit first
 	for i := 0; i < 8; i++ {
-		bit, looperr := b.ReadBit()
-		if looperr != nil {
-			log.Fatal(looperr)
+		bit, err := b.ReadBit()
+		if err != nil {
+			return 0, FileError{err}
 		}
 		byt >>= 1
 		if bit {
@@ -139,29 +152,24 @@ func (b *BitReader) ReadByte() (byte, error) {
 		}
 	}
 
-	return byt, err
+	return byt, nil
 }
 
 // ReadBits reads  nbits from the stream
 func (b *BitReader) ReadBits(nbits uint) (uint, error) {
-
-	// If I init inside the loop these are out of scope
+	// If I init inside the loop this is out of scope
 	var value uint
-	var err error
 
 	// Use power to assign bits lsb to msb
 	for i := uint(0); i < nbits; i++ {
-		bit, _ := b.ReadBit()
+		bit, err := b.ReadBit()
+		if err != nil {
+			return 0, FileError{err}
+		}
 		if bit {
 			value |= 1 << i
 		}
 	}
 
-	return value, err
-}
-
-func check(e error) {
-	if e != nil {
-		panic(e)
-	}
+	return value, nil
 }
