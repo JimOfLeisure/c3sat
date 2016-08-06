@@ -62,13 +62,15 @@ func main() {
 				var gameData parseciv3.Civ3Data
 				var err error
 				path := c.Args().First()
-				log.Printf("File %s\n", path)
 				gameData, err = parseciv3.ParseCiv3(path)
 				if err != nil {
+					if parseErr, ok := err.(parseciv3.ParseError); ok {
+						log.Printf("Expected: %s\nHex Dump:\n%s\n", parseErr.Expected, parseErr.Hexdump)
+					}
 					return err
 				}
-				gameData.RawFile = nil
-				fmt.Printf("%v\n", gameData)
+				fmt.Println(gameData.Info())
+				fmt.Println(gameData.Debug())
 				return nil
 			},
 		},

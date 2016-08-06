@@ -1,8 +1,18 @@
 package parseciv3
 
 import (
+	"bytes"
+	"encoding/hex"
 	"fmt"
 )
+
+const debugContextBytes int = 0x200
+
+// no err return because I'm calling this from inside errors
+func debugHexDump(r *bytes.Reader) string {
+	s, _ := readBytes(r, debugContextBytes)
+	return hex.Dump(s)
+}
 
 // FileError returns errors while trying to open or decompress the file. Pass it the downstream error e.g. return FileError{err}
 type FileError struct {
@@ -24,7 +34,7 @@ func (e ReadError) Error() string {
 
 // ParseError is when the data does not match an expected pattern. Pass it message string, expected value and hex dump of pertinent data.
 type ParseError struct {
-	s, expected, hexdump string
+	s, Expected, Hexdump string
 }
 
 func (e ParseError) Error() string {

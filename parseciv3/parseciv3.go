@@ -80,6 +80,7 @@ func ParseCiv3(path string) (Civ3Data, error) {
 		// log.Println("Civ3 save file detected")
 		// readcivheader(r)
 		// readbic(r)
+		// return civ3data, ParseError{"testing debug output", "expected", debugHexDump(r)}
 	case "BIC ", "BICX":
 		// log.Println("Civ3 BIC file detected.")
 		// readbic(r)
@@ -88,12 +89,6 @@ func ParseCiv3(path string) (Civ3Data, error) {
 	}
 	return civ3data, nil
 }
-
-// func check(e error) {
-// 	if e != nil {
-// 		return ReadError{err}
-// 	}
-// }
 
 // readBytes repeatedly calls bytes.Reader.ReadByte()
 func readBytes(r *bytes.Reader, n int) ([]byte, error) {
