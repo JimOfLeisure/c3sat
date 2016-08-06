@@ -4,7 +4,9 @@ package parseciv3
 type Civ3Data struct {
 	FileName   string
 	Compressed bool
-	RawFile    []byte
+	// Data map
+	Next string
+	// RawFile    []byte
 }
 
 type civ3 struct {

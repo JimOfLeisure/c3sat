@@ -50,18 +50,26 @@ func ReadFile(path string) ([]byte, bool, error) {
 
 }
 
-// ParseCiv3 ...
+// TODO: Do I really need or want rawFile in the struct?
+// A: yes, while decoding, anyway. Or maybe I can include a lookahead dumping field instead of the entire file?
+
+// ParseCiv3 takes a path to a file and returns a struct containing the parsed data and a rawFile field
 func ParseCiv3(path string) (Civ3Data, error) {
 	var civ3data Civ3Data
 	var compressed bool
 	var err error
 	civ3data.FileName = path
-	civ3data.RawFile, compressed, err = ReadFile(path)
+
+	// Load file into struct for parsing
+	rawFile, compressed, err := ReadFile(path)
 	if err != nil {
 		return civ3data, err
 	}
 	civ3data.Compressed = compressed
-	r := bytes.NewReader(civ3data.RawFile)
+
+	// Create ReadSeeker
+	r := bytes.NewReader(rawFile)
+
 	// get the first four bytes to determine file type
 	header, err := readBytes(r, 4)
 	if err != nil {
@@ -69,6 +77,8 @@ func ParseCiv3(path string) (Civ3Data, error) {
 	}
 	// reset pointer to parse from beginning
 	r.Seek(0, 0)
+
+	// Detect file type and proceed to parse
 	switch string(header) {
 	case "CIV3":
 		// log.Println("Civ3 save file detected")
@@ -76,11 +86,14 @@ func ParseCiv3(path string) (Civ3Data, error) {
 		// readbic(r)
 		// return civ3data, ParseError{"testing debug output", "expected", debugHexDump(r)}
 	case "BIC ", "BICX":
+		// TODO: Should "BICQ" be an option?
 		// log.Println("Civ3 BIC file detected.")
 		// readbic(r)
 	default:
 		return civ3data, ParseError{fmt.Sprintf("Civ3 file not detected. First four bytes:\n%s", hex.Dump(header)), "CIV3", hex.Dump(header)}
 	}
+	nextData, _ := readBytes(r, debugContextBytes)
+	civ3data.Next = hex.Dump(nextData)
 	return civ3data, nil
 }
 
