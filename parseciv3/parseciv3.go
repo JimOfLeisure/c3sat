@@ -2,8 +2,10 @@ package parseciv3
 
 import (
 	"bytes"
+	"encoding/binary"
 	"encoding/hex"
 	"fmt"
+	"io"
 	"io/ioutil"
 	"os"
 
@@ -53,8 +55,10 @@ func ReadFile(path string) ([]byte, bool, error) {
 // TODO: Do I really need or want rawFile in the struct?
 // A: yes, while decoding, anyway. Or maybe I can include a lookahead dumping field instead of the entire file?
 
-// ParseCiv3 takes a path to a file and returns a struct containing the parsed data and a rawFile field
-func ParseCiv3(path string) (Civ3Data, error) {
+// NOTE: Just changed ParseCiv3 to NewCiv3Data. It sets up the struct, and then I'll call a new ParseSav and/or ParseBic to populate the map field
+
+// NewCiv3Data takes a path to a file and returns a struct containing the parsed data and a rawFile field
+func NewCiv3Data(path string) (Civ3Data, error) {
 	var civ3data Civ3Data
 	var compressed bool
 	var err error
@@ -82,7 +86,7 @@ func ParseCiv3(path string) (Civ3Data, error) {
 	switch string(header) {
 	case "CIV3":
 		// log.Println("Civ3 save file detected")
-		// readcivheader(r)
+		civ3data.Data, err = ParseSav(r)
 		// readbic(r)
 		// return civ3data, ParseError{"testing debug output", "expected", debugHexDump(r)}
 	case "BIC ", "BICX":
@@ -95,6 +99,21 @@ func ParseCiv3(path string) (Civ3Data, error) {
 	nextData, _ := readBytes(r, debugContextBytes)
 	civ3data.Next = hex.Dump(nextData)
 	return civ3data, nil
+}
+
+// ParseSav takes raw save file data and returns a map of the parsed data
+func ParseSav(r io.ReadSeeker) (ParsedData, error) {
+	data := make(ParsedData)
+	// temp := Civ3{}
+	data["CIV3"] = &Civ3{}
+	_ = binary.Read(r, binary.LittleEndian, data["CIV3"])
+	return data, nil
+}
+
+// ParseBic takes raw bic/x/q file data and returns a map of the parsed data
+func ParseBic(r io.ReadSeeker) (ParsedData, error) {
+	data := make(ParsedData)
+	return data, nil
 }
 
 // readBytes repeatedly calls bytes.Reader.ReadByte()

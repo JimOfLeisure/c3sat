@@ -62,7 +62,7 @@ func main() {
 				var gameData parseciv3.Civ3Data
 				var err error
 				path := c.Args().First()
-				gameData, err = parseciv3.ParseCiv3(path)
+				gameData, err = parseciv3.NewCiv3Data(path)
 				if err != nil {
 					if parseErr, ok := err.(parseciv3.ParseError); ok {
 						log.Printf("Expected: %s\nHex Dump:\n%s\n", parseErr.Expected, parseErr.Hexdump)
