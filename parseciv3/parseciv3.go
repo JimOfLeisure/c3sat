@@ -14,7 +14,7 @@ type baseClass struct {
 }
 
 // Parseciv3 ...
-func Parseciv3(civdata []byte) {
+func Parseciv3(civdata []byte) error {
 	r := bytes.NewReader(civdata)
 	// get the first four bytes to determine file type
 	header := readBytes(r, 4)
@@ -31,33 +31,46 @@ func Parseciv3(civdata []byte) {
 	default:
 		log.Fatalf("Civ3 file not detected. First four bytes:\n%s", hex.Dump(header))
 	}
+	return error(nil)
 }
 
-func check(e error) {
-	if e != nil {
-		// panic(e)
-		log.Fatalln(e)
-	}
-}
+// func check(e error) {
+// 	if e != nil {
+// 		return ReadError{err}
+// 	}
+// }
 
 // readBytes repeatedly calls bytes.Reader.ReadByte()
-func readBytes(r *bytes.Reader, n int) []byte {
+func readBytes(r *bytes.Reader, n int) ([]byte, error) {
 	var out bytes.Buffer
 	for i := 0; i < n; i++ {
 		byt, err := r.ReadByte()
-		check(err)
+		if err != nil {
+			return []byte(nil), ReadError{err}
+		}
 		out.WriteByte(byt)
 	}
-	return out.Bytes()
+	return out.Bytes(), error(nil)
 }
 
-func readBase(r *bytes.Reader) (c baseClass) {
-	name := readBytes(r, 4)
-	length := readBytes(r, 4)
-	c.name = string(name[:4])
-	c.length = binary.LittleEndian.Uint32(length[:4])
-	c.buffer.Write(readBytes(r, int(c.length)))
-	return
+// oops, I spent time refactoring this for error handlnig but I'm not going to keep it
+func readBase(r *bytes.Reader) (baseClass, error) {
+	var c baseClass
+
+	buffer, err := readBytes(r, 8)
+	if err != nil {
+		return c, err
+	}
+	c.name = string(buffer[:4])
+	c.length = binary.LittleEndian.Uint32(buffer[4:4])
+
+	buffer, err = readBytes(r, int(c.length))
+	if err != nil {
+		return c, err
+	}
+	c.buffer.Write(buffer)
+
+	return c, error(nil)
 }
 
 func somethingsdifferent(s string, r *bytes.Reader) {
@@ -67,8 +80,14 @@ func somethingsdifferent(s string, r *bytes.Reader) {
 }
 
 func readcivheader(r *bytes.Reader) {
-	civ3header := readBytes(r, 30)
-	_ = civ3header
+	var civ3header civ3
+	err := binary.Read(r, binary.LittleEndian, &civ3header)
+	if err != nil {
+		return ReadError{err}
+	}
+	log.Println(civ3header)
+	// civ3header := readBytes(r, 30)
+	// _ = civ3header
 
 	// Seems to be four or five ints followed by 2 strings, relative paths to bic resources and bic file
 	bicheader := readBase(r)
@@ -204,6 +223,28 @@ func readbic(r *bytes.Reader) {
 			// for i := 0; i < 1; i++ {
 			buffernext := readBytes(r, 0x23c)
 			_ = buffernext
+			// log.Println(hex.Dump(buffernext))
+		}
+		// RULE
+		bicnext = string(readBytes(r, 4))
+		log.Println(bicnext)
+		numrule := int(binary.LittleEndian.Uint32(readBytes(r, 4)))
+		_ = numrule
+		for i := 0; i < numrule; i++ {
+			// for i := 0; i < 1; i++ {
+			buffernext := readBytes(r, 0x2d4)
+			_ = buffernext
+			// log.Println(hex.Dump(buffernext))
+		}
+		// PRTO
+		bicnext = string(readBytes(r, 4))
+		log.Println(bicnext)
+		numprto := int(binary.LittleEndian.Uint32(readBytes(r, 4)))
+		_ = numprto
+		// for i := 0; i < numprto; i++ {
+		for i := 0; i < 3; i++ {
+			buffernext := readBytes(r, 0x103)
+			_ = buffernext
 			log.Println(hex.Dump(buffernext))
 		}
 	default:
@@ -223,7 +264,7 @@ func readbic(r *bytes.Reader) {
 	// 	// log.Println(bicgame.name, hex.Dump(bicgame.buffer.Bytes()))
 	// }
 
-	log.Println(hex.Dump(readBytes(r, 0x200)))
+	log.Println(hex.Dump(readBytes(r, 0x40)))
 	log.Println("")
 
 }
