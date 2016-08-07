@@ -101,7 +101,7 @@ func peekFour(r io.ReadSeeker, expected [4]byte) error {
 	if peek != expected {
 		dump := make([]byte, debugContextBytes)
 		_ = binary.Read(r, binary.LittleEndian, dump)
-		// Back the pointer up 4 bytes
+		// Back the pointer up
 		r.Seek(-int64(debugContextBytes), 1)
 		return ParseError{"Parse error: Unexpected data", fmt.Sprintf("%v", expected), hex.Dump(dump)}
 	}
@@ -122,6 +122,11 @@ func ParseCiv3(r io.ReadSeeker) (ParsedData, error) {
 		if err != nil {
 			return data, err
 		}
+		// BIC_
+		data["BIC "], err = newBase(r)
+		if err != nil {
+			return data, err
+		}
 	} else {
 		if _, ok := err.(ParseError); ok {
 			// continue if not matched; may be a BIC/X/Q file
@@ -130,6 +135,31 @@ func ParseCiv3(r io.ReadSeeker) (ParsedData, error) {
 		}
 	}
 
+	// BIC file / section
+	bicHeader := make([]byte, 4)
+	err = binary.Read(r, binary.LittleEndian, &bicHeader)
+	if err != nil {
+		return data, err
+	}
+	switch string(bicHeader) {
+	case "BIC ", "BICX", "BICQ":
+		// continue
+	default:
+		// Back the pointer up 4 bytes
+		r.Seek(-4, 1)
+		dump := make([]byte, debugContextBytes)
+		_ = binary.Read(r, binary.LittleEndian, dump)
+		// Back the pointer up
+		r.Seek(-int64(debugContextBytes), 1)
+		return data, ParseError{"Parse error: Unexpected data", "BIC*", hex.Dump(dump)}
+
+	}
+
+	// VER#
+	data["VER#"], err = newList(r)
+	if err != nil {
+		return data, err
+	}
 	return data, nil
 }
 

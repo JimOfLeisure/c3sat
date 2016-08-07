@@ -7,7 +7,7 @@ import (
 	"fmt"
 )
 
-const debugContextBytes int = 0x200
+const debugContextBytes int = 0x10
 
 // no err return because I'm calling this from inside errors
 func debugHexDump(r *bytes.Reader) string {

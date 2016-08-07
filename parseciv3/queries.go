@@ -5,7 +5,7 @@ import "fmt"
 // Debug ...
 func (c Civ3Data) Debug() string {
 	var out string
-	out += fmt.Sprintf("\n%v\n", c.Data["CIV3"])
+	out += fmt.Sprintf("\n%v\n", c.Data["VER#"])
 	out += fmt.Sprint("\n*** Debug output. Next bytes ***\n\n")
 	out += fmt.Sprintln(c.Next)
 	return out
