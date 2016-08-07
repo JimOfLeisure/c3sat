@@ -2,6 +2,7 @@ package parseciv3
 
 import (
 	"encoding/binary"
+	"fmt"
 	"io"
 )
 
@@ -73,7 +74,6 @@ type List struct {
 	List  [][]byte
 }
 
-// Pass it a ListItem struct so it can properly build an array and parse
 func newList(r io.ReadSeeker) (List, error) {
 	var list List
 	var err error
@@ -85,24 +85,6 @@ func newList(r io.ReadSeeker) (List, error) {
 	if err != nil {
 		return list, ReadError{err}
 	}
-	// list.List = make([]ListItem, list.Count)
-	// for i := int32(0); i < list.Count; i++ {
-	// 	err = binary.Read(r, binary.LittleEndian, &e)
-	// 	list.List[i] = e
-	// 	if err != nil {
-	// 		return list, ReadError{err}
-	// 	}
-	// }
-
-	// var temp BicResources
-	// // err = binary.Read(r, binary.LittleEndian, &temp)
-	// err = binary.Read(r, binary.LittleEndian, e)
-	// if err != nil {
-	// 	return list, ReadError{err}
-	// }
-	// fmt.Printf("temp %v", temp)
-
-	// list.List = make([]ListItem, list.Count)
 	for i := int32(0); i < list.Count; i++ {
 		var length int32
 		err = binary.Read(r, binary.LittleEndian, &length)
@@ -115,8 +97,54 @@ func newList(r io.ReadSeeker) (List, error) {
 		list.List = append(list.List, temp)
 
 	}
-	// err = binary.Read(r, binary.LittleEndian, temp)
 	return list, nil
+}
+
+// Flav is one of the basic section structures of the game data
+type Flav struct {
+	Name  [4]byte
+	Count int32
+	List  [][]Flavor
+}
+
+func newFlav(r io.ReadSeeker) (Flav, error) {
+	var flav Flav
+	var err error
+	err = binary.Read(r, binary.LittleEndian, &flav.Name)
+	if err != nil {
+		return flav, ReadError{err}
+	}
+	fmt.Println(string(flav.Name[:]))
+	err = binary.Read(r, binary.LittleEndian, &flav.Count)
+	if err != nil {
+		return flav, ReadError{err}
+	}
+	fmt.Printf("%v", flav.Count)
+	for i := int32(0); i < flav.Count; i++ {
+		var count int32
+		err = binary.Read(r, binary.LittleEndian, &count)
+		if err != nil {
+			return flav, ReadError{err}
+		}
+		fmt.Println(string(count))
+		flavorGroups := make([]Flavor, count)
+		flav.List = append(flav.List, flavorGroups)
+		for j := int32(0); j < count; j++ {
+			// var length int32
+			// err = binary.Read(r, binary.LittleEndian, &length)
+			// if err != nil {
+			// 	return flav, ReadError{err}
+			// }
+
+			// temp := new(Flavor)
+			flav.List[i][j] = Flavor{}
+			err = binary.Read(r, binary.LittleEndian, &flav.List[i][j])
+			if err != nil {
+				return flav, ReadError{err}
+			}
+		}
+	}
+	return flav, nil
 }
 
 // BicResources is part of the second SAV file section. Guessing at the alignment
@@ -126,4 +154,10 @@ type BicResources struct {
 	B            int32
 	BicPath      [0x100]byte
 	C            int32
+}
+
+type Flavor struct {
+	A                      int32
+	FlavorName             [0x100]byte
+	B, C, D, E, F, G, H, I int32
 }
