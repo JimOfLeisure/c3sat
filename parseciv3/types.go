@@ -2,7 +2,6 @@ package parseciv3
 
 import (
 	"encoding/binary"
-	"fmt"
 	"io"
 )
 
@@ -124,7 +123,6 @@ func newFlav(r io.ReadSeeker) (Flav, error) {
 		if err != nil {
 			return flav, ReadError{err}
 		}
-		fmt.Println(string(count))
 		flavorGroups := make([]Flavor, count)
 		flav.List = append(flav.List, flavorGroups)
 		for j := int32(0); j < count; j++ {

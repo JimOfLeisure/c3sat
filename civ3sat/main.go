@@ -67,10 +67,11 @@ func main() {
 				if err != nil {
 					if parseErr, ok := err.(parseciv3.ParseError); ok {
 						log.Printf("Expected: %s\nHex Dump:\n%s\n", parseErr.Expected, parseErr.Hexdump)
+						return parseErr
 					}
 					return err
 				}
-				// fmt.Print(gameData.Info())
+				fmt.Print(gameData.Info())
 				fmt.Print(gameData.Debug())
 				return nil
 			},
