@@ -168,35 +168,34 @@ func ParseCiv3(r io.ReadSeeker) (ParsedData, error) {
 		var err error
 		sections := []string{"BLDG", "CTZN", "CULT", "DIFF", "ERAS", "ESPN", "EXPR"}
 		for i := range sections {
-			fmt.Println(sections[i])
 			data[sections[i]], err = newList(r)
 			if err != nil {
 				return data, err
 			}
-			// FLAV section is optional
-			err = peekName(r, "FLAV")
-			if err == nil {
-				// need to preserve parent scope's err
-				var err error
+		}
+		// FLAV section is optional
+		err = peekName(r, "FLAV")
+		if err == nil {
+			// need to preserve parent scope's err
+			var err error
 
-				dump := make([]byte, debugContextBytes)
-				_ = binary.Read(r, binary.LittleEndian, dump)
-				// Back the pointer up
-				r.Seek(-int64(debugContextBytes), 1)
-				fmt.Println(hex.Dump(dump))
-
-				data["FLAV"], err = newFlav(r)
-				if err != nil {
-					return data, err
-				}
-			} else {
-				if _, ok := err.(ParseError); ok {
-					// continue if not matched; FLAV is optional
-				} else {
-					return data, err
-				}
+			data["FLAV"], err = newFlav(r)
+			if err != nil {
+				return data, err
 			}
-
+		} else {
+			if _, ok := err.(ParseError); ok {
+				// continue if not matched; FLAV is optional
+			} else {
+				return data, err
+			}
+		}
+		sections = []string{"GOOD", "GOVT", "RULE", "PRTO", "RACE", "TECH", "TFRM", "TERR", "WSIZ"}
+		for i := range sections {
+			data[sections[i]], err = newList(r)
+			if err != nil {
+				return data, err
+			}
 		}
 	} else {
 		if _, ok := err.(ParseError); ok {

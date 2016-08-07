@@ -114,12 +114,10 @@ func newFlav(r io.ReadSeeker) (Flav, error) {
 	if err != nil {
 		return flav, ReadError{err}
 	}
-	fmt.Println(string(flav.Name[:]))
 	err = binary.Read(r, binary.LittleEndian, &flav.Count)
 	if err != nil {
 		return flav, ReadError{err}
 	}
-	fmt.Printf("%v", flav.Count)
 	for i := int32(0); i < flav.Count; i++ {
 		var count int32
 		err = binary.Read(r, binary.LittleEndian, &count)
@@ -130,13 +128,6 @@ func newFlav(r io.ReadSeeker) (Flav, error) {
 		flavorGroups := make([]Flavor, count)
 		flav.List = append(flav.List, flavorGroups)
 		for j := int32(0); j < count; j++ {
-			// var length int32
-			// err = binary.Read(r, binary.LittleEndian, &length)
-			// if err != nil {
-			// 	return flav, ReadError{err}
-			// }
-
-			// temp := new(Flavor)
 			flav.List[i][j] = Flavor{}
 			err = binary.Read(r, binary.LittleEndian, &flav.List[i][j])
 			if err != nil {
