@@ -166,15 +166,30 @@ func ParseCiv3(r io.ReadSeeker) (ParsedData, error) {
 		return data, ParseError{"Parse error: Unexpected data", "BIC*", hex.Dump(dump)}
 
 	}
-
+	var gameSectionCount int
 	// TODO: Add sections for custom world map
 	// loop sections until GAME reached
-	for name, err := peek(r); string(name[:]) != "GAME"; name, err = peek(r) {
+	// for name, err := peek(r); string(name[:]) != "GAME"; name, err = peek(r) {
+	for name, err := peek(r); gameSectionCount < 2; name, err = peek(r) {
 		if err != nil {
 			return data, err
 		}
 		switch string(name[:]) {
-		case "VER#", "BLDG", "CTZN", "CULT", "DIFF", "ERAS", "ESPN", "EXPR", "GOOD", "GOVT", "RULE", "PRTO", "RACE", "TECH", "TFRM", "TERR", "WSIZ":
+		case "GAME":
+			switch gameSectionCount {
+			case 0:
+				data["GAME"], err = newList(r)
+			case 1:
+				// this is not right
+				data["GAME2"], err = newBase(r)
+			}
+			if err != nil {
+				return data, err
+			}
+			gameSectionCount++
+			// fallthrough
+		// (Almost?) Always in this order, but have seen FLAV after EXPR in some saves and after WSIZ in others
+		case "VER#", "BLDG", "CTZN", "CULT", "DIFF", "ERAS", "ESPN", "EXPR", "GOOD", "GOVT", "RULE", "PRTO", "RACE", "TECH", "TFRM", "TERR", "WSIZ", "LEAD":
 			data[string(name[:])], err = newList(r)
 			if err != nil {
 				return data, err
