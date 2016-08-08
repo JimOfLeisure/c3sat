@@ -153,17 +153,53 @@ type Flavor struct {
 
 type Game struct {
 	Name [4]byte
-	_, RenderFlags, DifficultyLevel, _, UnitsCount, CitiesCount, _, _, GlobalWarmingLevel, _,
-	_, _, CurrentTurn, _, Random, _, CivFlags2, CivFlags1, _, _,
-	_, _, _, _ int32
-	_                               [48]int32
-	Value1                          int32
-	_                               [72]int32
-	GameLimitPoints, GameLimitTurns int32
-	_                               [50]int32
-	_, _, GameLimitDestroyedCities, GameLimitCityCulture, GameLimitPopulation, GameLimitTerritory, GameLimitWonders, GameLimitDestroyedWonders, GameLimitAdvances, GameLimitCapturedCities,
-	GameLimitVictoryPointPrice, GameLimitPrincessRansom, DefaultDate1 int32
-	_ [27]int32
+	_    int32
+	// Above two fields count for "class base"?
+	_                          [3]int32
+	RenderFlags                int32
+	DifficultyLevel            int32
+	_                          int32
+	UnitsCount                 int32
+	CitiesCount                int32
+	_                          int32
+	_                          int32
+	GlobalWarmingLevel         int32
+	_                          int32
+	_                          int32
+	_                          int32
+	CurrentTurn                int32
+	_                          int32
+	Random                     int32
+	_                          int32
+	CivFlags2                  int32
+	CivFlags1                  int32
+	_                          int32
+	_                          int32
+	_                          int32
+	_                          int32
+	_                          int32
+	_                          int32
+	_                          [48]int32
+	Value1                     int32
+	_                          [72]int32
+	GameLimitPoints            int32
+	GameLimitTurns             int32
+	_                          [50]int32
+	_                          int32
+	_                          int32
+	GameLimitDestroyedCities   int32
+	GameLimitCityCulture       int32
+	GameLimitCivCulture        int32
+	GameLimitPopulation        int32
+	GameLimitTerritory         int32
+	GameLimitWonders           int32
+	GameLimitDestroyedWonders  int32
+	GameLimitAdvances          int32
+	GameLimitCapturedCities    int32
+	GameLimitVictoryPointPrice int32
+	GameLimitPrincessRansom    int32
+	DefaultDate1               int32
+	_                          [27]int32
 }
 
 type MyTest struct {
