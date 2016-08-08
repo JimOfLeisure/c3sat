@@ -69,6 +69,7 @@ func main() {
 						log.Printf("Expected: %s\nHex Dump:\n%s\n", parseErr.Expected, parseErr.Hexdump)
 						return parseErr
 					}
+					// fmt.Print(gameData.Debug())
 					return err
 				}
 				fmt.Print(gameData.Info())

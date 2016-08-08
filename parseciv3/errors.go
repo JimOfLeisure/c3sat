@@ -1,18 +1,20 @@
 package parseciv3
 
 import (
-	"bytes"
 	"encoding/binary"
 	"encoding/hex"
 	"fmt"
+	"io"
 )
 
-const debugContextBytes int = 0x400
+const debugContextBytes int = 0x40
 
 // no err return because I'm calling this from inside errors
-func debugHexDump(r *bytes.Reader) string {
+func debugHexDump(r io.ReadSeeker) string {
 	s := make([]byte, debugContextBytes)
 	_ = binary.Read(r, binary.LittleEndian, &s)
+	// Back up pointer because I keep seeming to need to do it, and if I don't then i don't care anyway
+	r.Seek(-int64(debugContextBytes), 1)
 	return hex.Dump(s)
 }
 

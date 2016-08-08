@@ -3,7 +3,6 @@ package parseciv3
 import (
 	"bytes"
 	"encoding/binary"
-	"encoding/hex"
 	"fmt"
 	"io"
 	"io/ioutil"
@@ -79,6 +78,15 @@ func NewCiv3Data(path string) (Civ3Data, error) {
 		return civ3data, err
 	}
 	civ3data.Next = debugHexDump(r)
+
+	// // TEMP writing 2nd GAME portion out to file for analysis
+	// // from http://stackoverflow.com/questions/12518876/how-to-check-if-a-file-exists-in-go
+	// outFileName := path + ".game"
+	// if _, err := os.Stat(outFileName); os.IsNotExist(err) {
+	// 	mybytes := make([]byte, 0x1200)
+	// 	_, _ = r.Read(mybytes)
+	// 	_ = ioutil.WriteFile(outFileName, mybytes, 0644)
+	// }
 	return civ3data, nil
 }
 
@@ -111,11 +119,7 @@ func peekFour(r io.ReadSeeker, expected [4]byte) error {
 	// Back the pointer up 4 bytes
 	r.Seek(-4, 1)
 	if peek != expected {
-		dump := make([]byte, debugContextBytes)
-		_ = binary.Read(r, binary.LittleEndian, dump)
-		// Back the pointer up
-		r.Seek(-int64(debugContextBytes), 1)
-		return ParseError{"Parse error: Unexpected data", fmt.Sprintf("%v", expected), hex.Dump(dump)}
+		return ParseError{"Parse error: Unexpected data", fmt.Sprintf("%v", expected), debugHexDump(r)}
 	}
 	return nil
 }
@@ -159,18 +163,14 @@ func ParseCiv3(r io.ReadSeeker) (ParsedData, error) {
 	default:
 		// Back the pointer up 4 bytes
 		r.Seek(-4, 1)
-		dump := make([]byte, debugContextBytes)
-		_ = binary.Read(r, binary.LittleEndian, dump)
-		// Back the pointer up
-		r.Seek(-int64(debugContextBytes), 1)
-		return data, ParseError{"Parse error: Unexpected data", "BIC*", hex.Dump(dump)}
+		return data, ParseError{"Parse error: Unexpected data", "BIC*", debugHexDump(r)}
 
 	}
 	var gameSectionCount int
 	// TODO: Add sections for custom world map
 	// loop sections until GAME reached
 	// for name, err := peek(r); string(name[:]) != "GAME"; name, err = peek(r) {
-	for name, err := peek(r); gameSectionCount < 2; name, err = peek(r) {
+	for name, err := peek(r); gameSectionCount < 1 || string(name[:]) != "GAME"; name, err = peek(r) {
 		if err != nil {
 			return data, err
 		}
@@ -179,9 +179,9 @@ func ParseCiv3(r io.ReadSeeker) (ParsedData, error) {
 			switch gameSectionCount {
 			case 0:
 				data["GAME"], err = newList(r)
-			case 1:
-				// this is not right
-				data["GAME2"], err = newBase(r)
+				// case 1:
+				// 	// this is not right
+				// 	data["GAME2"], err = newBase(r)
 			}
 			if err != nil {
 				return data, err
@@ -200,13 +200,15 @@ func ParseCiv3(r io.ReadSeeker) (ParsedData, error) {
 				return data, err
 			}
 		default:
-			dump := make([]byte, debugContextBytes)
-			_ = binary.Read(r, binary.LittleEndian, dump)
-			// Back the pointer up
-			r.Seek(-int64(debugContextBytes), 1)
-			return data, ParseError{"Parse error: Unexpected data", "<known classname>", hex.Dump(dump)}
+			return data, ParseError{"Parse error: Unexpected data", "<known classname>", debugHexDump(r)}
 		}
 	}
-
+	var gameSection Game
+	// gameSection := Game{}
+	err = binary.Read(r, binary.LittleEndian, &gameSection)
+	if err != nil {
+		return data, err
+	}
+	data["GAME2"] = gameSection
 	return data, nil
 }

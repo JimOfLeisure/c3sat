@@ -150,3 +150,22 @@ type Flavor struct {
 	FlavorName             [0x100]byte
 	B, C, D, E, F, G, H, I int32
 }
+
+type Game struct {
+	Name [4]byte
+	_, RenderFlags, DifficultyLevel, _, UnitsCount, CitiesCount, _, _, GlobalWarmingLevel, _,
+	_, _, CurrentTurn, _, Random, _, CivFlags2, CivFlags1, _, _,
+	_, _, _, _ int32
+	_                               [48]int32
+	Value1                          int32
+	_                               [72]int32
+	GameLimitPoints, GameLimitTurns int32
+	_                               [50]int32
+	_, _, GameLimitDestroyedCities, GameLimitCityCulture, GameLimitPopulation, GameLimitTerritory, GameLimitWonders, GameLimitDestroyedWonders, GameLimitAdvances, GameLimitCapturedCities,
+	GameLimitVictoryPointPrice, GameLimitPrincessRansom, DefaultDate1 int32
+	_ [27]int32
+}
+
+type MyTest struct {
+	Name [4]byte
+}

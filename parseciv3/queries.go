@@ -17,10 +17,10 @@ func (c Civ3Data) Debug() string {
 	}
 	// out += fmt.Sprintf("\nLEAD Name: %s Length: %x\n", c.Data["LEAD"].Name, c.Data["LEAD"].Length)
 	// out += fmt.Sprintf("\GAME Name: %s Length: %x\n", c.Data["GAME"].Name, c.Data["GAME"].Length)
-	// out += fmt.Sprintf("\n*** GAME ***\n%s\n", hex.Dump(c.Data["GAME"].data))
+	out += fmt.Sprintf("*** GAME ***\n%#v\n", c.Data["GAME2"])
 
-	// out += fmt.Sprint("\n*** Debug output. Next bytes ***\n\n")
-	// out += fmt.Sprintln(c.Next)
+	out += fmt.Sprint("*** Debug output. Next bytes ***\n")
+	out += fmt.Sprintln(c.Next)
 	return out
 }
 
