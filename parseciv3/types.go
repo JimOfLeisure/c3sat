@@ -203,6 +203,7 @@ type Game struct {
 	DefaultDate1               int32
 }
 
+// GameNext is what Antal1987's dumps suggest is next, but I don't think so
 type GameNext struct {
 	_                     [27]int32
 	PLGI                  [10]int32
@@ -223,7 +224,7 @@ type GameNext struct {
 	DefaultGameSettings   DefaultGameSettings
 }
 
-// Date DATE section
+// Date DATE section ... I don't think this is nearly right
 type Date struct {
 	Name         [4]byte
 	Length       int32
@@ -236,6 +237,7 @@ type Date struct {
 	_            int32
 }
 
+// DefaultGameSettings from Antal1987's dump
 type DefaultGameSettings struct {
 	TurnsLimit           int32
 	PointsLimit          int32

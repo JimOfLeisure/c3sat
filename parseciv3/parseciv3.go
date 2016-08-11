@@ -3,6 +3,7 @@ package parseciv3
 import (
 	"bytes"
 	"encoding/binary"
+	"encoding/hex"
 	"fmt"
 	"io"
 	"io/ioutil"
@@ -218,13 +219,35 @@ func ParseCiv3(r io.ReadSeeker) (ParsedData, error) {
 		return data, err
 	}
 	index := bytes.Index(buffer, []byte("DATE"))
-	fmt.Println(index)
-	_, err = r.Seek(int64(index-searchLength), 1)
+	// fmt.Println(index)
+	_, err = r.Seek(int64(-searchLength), 1)
 	if err != nil {
 		return data, err
 	}
+	buffer = make([]byte, index)
+	_, err = r.Read(buffer)
+	if err != nil {
+		return data, err
+	}
+	data["WTF"] = hex.Dump(buffer)
 	// var gameNext GameNext
 	// err = binary.Read(r, binary.LittleEndian, &gameNext)
 	// data["GameNext"] = gameNext
+	for i := 1; i < 6; i++ {
+		data[string(i)], err = newBase(r)
+		if err != nil {
+			return data, err
+		}
+	}
+	intBuffer := make([]int32, 2)
+	err = binary.Read(r, binary.LittleEndian, &intBuffer)
+	if err != nil {
+		return data, err
+	}
+	data["BeforeCNSL"] = intBuffer
+	data["CNSL"], err = newBase(r)
+	if err != nil {
+		return data, err
+	}
 	return data, nil
 }
