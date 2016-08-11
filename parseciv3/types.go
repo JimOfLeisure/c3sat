@@ -145,16 +145,18 @@ type BicResources struct {
 	C            int32
 }
 
+// Flavor is the leaf element of FLAV
 type Flavor struct {
 	A                      int32
 	FlavorName             [0x100]byte
 	B, C, D, E, F, G, H, I int32
 }
 
+// Game is the first section after the BIC.
 type Game struct {
-	Name [4]byte
-	_    int32
-	// Above two fields count for "class base"?
+	// First two fields count for "class base"
+	Name                       [4]byte
+	_                          int32
 	_                          [3]int32
 	RenderFlags                int32
 	DifficultyLevel            int32
@@ -200,8 +202,35 @@ type Game struct {
 	GameLimitPrincessRansom    int32
 	DefaultDate1               int32
 	_                          [27]int32
+	PLGI                       [10]int32
+	Date2                      Date
+	Date3                      Date
+	GameAggression             int32
+	_                          int32
+	CityStatIntArray           int32
+	ResearchedAdvances         int32
+	Wonders                    int32
+	WonderFlags                int32
+	ImprovementTypesData1      int32
+	ImprovementTypesData2      int32
+	_                          int32
+	_                          int32
 }
 
+// Date DATE section
+type Date struct {
+	Name         [4]byte
+	Length       int32
+	Text         [16]byte
+	_            [12]int32
+	BaseTimeUnit int32
+	Month        int32
+	Week         int32
+	Year         int32
+	_            int32
+}
+
+// MyTest ...
 type MyTest struct {
 	Name [4]byte
 }
