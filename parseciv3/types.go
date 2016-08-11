@@ -201,20 +201,26 @@ type Game struct {
 	GameLimitVictoryPointPrice int32
 	GameLimitPrincessRansom    int32
 	DefaultDate1               int32
-	_                          [27]int32
-	PLGI                       [10]int32
-	Date2                      Date
-	Date3                      Date
-	GameAggression             int32
-	_                          int32
-	CityStatIntArray           int32
-	ResearchedAdvances         int32
-	Wonders                    int32
-	WonderFlags                int32
-	ImprovementTypesData1      int32
-	ImprovementTypesData2      int32
-	_                          int32
-	_                          int32
+}
+
+type GameNext struct {
+	_                     [27]int32
+	PLGI                  [10]int32
+	Date2                 Date
+	Date3                 Date
+	GameAggression        int32
+	_                     int32
+	CityStatIntArray      int32
+	ResearchedAdvances    int32
+	Wonders               int32
+	WonderFlags           int32
+	ImprovementTypesData1 int32
+	ImprovementTypesData2 int32
+	UnitTypesData1        int32
+	UnitTypesData2        int32
+	_                     int32
+	_                     int32
+	DefaultGameSettings   DefaultGameSettings
 }
 
 // Date DATE section
@@ -228,6 +234,23 @@ type Date struct {
 	Week         int32
 	Year         int32
 	_            int32
+}
+
+type DefaultGameSettings struct {
+	TurnsLimit           int32
+	PointsLimit          int32
+	DestroyedCitiesLimit int32
+	CityCultureLimit     int32
+	CivCultureLimit      int32
+	PopulationLimit      int32
+	TerritoryLimit       int32
+	WondersLimit         int32
+	DestroyedUnitsLimit  int32
+	AdvancesLimit        int32
+	CapturedCitiesLimit  int32
+	VictoryPointPrice    int32
+	PrincessPrice        int32
+	PrincessRansom       int32
 }
 
 // MyTest ...

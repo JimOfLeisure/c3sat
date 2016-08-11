@@ -7,7 +7,7 @@ import (
 	"io"
 )
 
-const debugContextBytes int = 0x40
+const debugContextBytes int = 0x1000
 
 // no err return because I'm calling this from inside errors
 func debugHexDump(r io.ReadSeeker) string {

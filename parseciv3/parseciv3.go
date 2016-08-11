@@ -210,5 +210,21 @@ func ParseCiv3(r io.ReadSeeker) (ParsedData, error) {
 		return data, err
 	}
 	data["GAME2"] = gameSection
+
+	searchLength := 0x1200
+	buffer := make([]byte, searchLength)
+	_, err = r.Read(buffer)
+	if err != nil {
+		return data, err
+	}
+	index := bytes.Index(buffer, []byte("DATE"))
+	fmt.Println(index)
+	_, err = r.Seek(int64(index-searchLength), 1)
+	if err != nil {
+		return data, err
+	}
+	// var gameNext GameNext
+	// err = binary.Read(r, binary.LittleEndian, &gameNext)
+	// data["GameNext"] = gameNext
 	return data, nil
 }
