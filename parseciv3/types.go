@@ -5,6 +5,44 @@ import (
 	"io"
 )
 
+/*
+The save file seems to be a simple binary dump of C++ data structures
+packed with no byte padding. Generally speaking, most of the data is in
+classes inherited from two basic classes. Both start with a 4-byte string
+which appears to be a class name closely related to its function. One class
+then has a 32-bit integer expressing the length in bytes of the data structure
+following. The other has a 32-bit integer as a count of records. Each record
+begins with a 32-bit length in bytes followed by the data. Before I knew this
+I called each labeled length a "section", so I'll sometimes use that term
+even now.
+
+Some non-conformers appear to be the inital CIV3 section, but it's at least a
+consistent length. The FLAV section is a list of lists. The second GAME section
+in the SAV (which is the first GAME section of the non-BIC info) has an
+apparently meaningless integer after the header followed by some predictable
+data and then some as-yet unpredictable data which may be integer arrays, but
+I haven't yet found the count. The length in bytes from GAME to DATE seems to
+always be odd, so there must be a lone byte or a byte array in there somewhere.
+I found a couple of stray apparent int32s after one of the DATE sections.
+
+Later after the map tile data I have yet to figure out, too.
+
+My strategy in the 2013-2015 Python version of this parser and my strategy so
+far in Go is to parse the header, length/count and the data and then interpret
+it. But several of the sections repeat with different lengths and data, especially
+TILE but also WRLD and some others. I am presuming this is due to successive
+versions of the game inheriting classes from the earlier game and adding to them,
+and it shows up in the SAV file as the inheritance chain with data from each
+generation. Mechanically parsing lenghts and counts works, but there really is
+no advantage in meaning.
+
+So I'm going to instead start making Go structs that will capture the entire
+inheritance chain in one read which should make more sense programatically.
+
+As I type this, I am mechanically parsing to WRLD but extracting little meaning
+so far. During transition I'll be reading with two different methods.
+*/
+
 // ParsedData is the structure of the parsed data
 type ParsedData map[string]Section
 
