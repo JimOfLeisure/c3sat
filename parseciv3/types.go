@@ -295,8 +295,24 @@ type DefaultGameSettings struct {
 
 // Wrld is the Conquests' 3 WRLD sections combined
 type Wrld struct {
-	Name   [4]byte
-	Length int32
+	Name                   [4]byte
+	Length                 int32
+	NumContinents          int16
+	Name2                  [4]byte
+	Length2                int32
+	OceanContinentID       int32
+	MapHeight              int32
+	DistanceBetweencivs    int32
+	MaybeCivCount          int32
+	D                      int32
+	E                      int32
+	MapWidth               int32
+	CivStartLocationTileID [32]int32
+	WorldSeed              int32
+	G                      int32
+	Name3                  [4]byte
+	Length3                int32
+	MaybeWorldGenOptions   [13]int32
 }
 
 // MyTest ...

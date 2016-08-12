@@ -280,8 +280,6 @@ func ParseCiv3(r io.ReadSeeker) (ParsedData, error) {
 		default:
 			abort = true
 		}
-		fmt.Println("Hi", abort)
-
 	}
 	return data, nil
 }
