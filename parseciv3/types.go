@@ -293,6 +293,12 @@ type DefaultGameSettings struct {
 	PrincessRansom       int32
 }
 
+// Wrld is the Conquests' 3 WRLD sections combined
+type Wrld struct {
+	Name   [4]byte
+	Length int32
+}
+
 // MyTest ...
 type MyTest struct {
 	Name [4]byte
