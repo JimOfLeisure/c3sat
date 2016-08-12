@@ -295,11 +295,11 @@ type DefaultGameSettings struct {
 
 // Wrld is the Conquests' 3 WRLD sections combined
 type Wrld struct {
-	Name                   [4]byte
-	Length                 int32
+	Name                   [4]byte `json:"-"`
+	Length                 int32   `json:"-"`
 	NumContinents          int16
-	Name2                  [4]byte
-	Length2                int32
+	Name2                  [4]byte `json:"-"`
+	Length2                int32   `json:"-"`
 	OceanContinentID       int32
 	MapHeight              int32
 	DistanceBetweencivs    int32
@@ -310,15 +310,15 @@ type Wrld struct {
 	CivStartLocationTileID [32]int32
 	WorldSeed              int32
 	G                      int32
-	Name3                  [4]byte
-	Length3                int32
+	Name3                  [4]byte `json:"-"`
+	Length3                int32   `json:"-"`
 	MaybeWorldGenOptions   [13]int32
 }
 
 // Tile is Conquests' 4 TILE sections per world tile combined
 type Tile struct {
-	Name                        [4]byte
-	Length                      int32
+	Name                        [4]byte `json:"-"`
+	Length                      int32   `json:"-"`
 	Rivers                      uint8
 	MaybeTerritoryCivID         int8
 	MaybeLandmarkTerrain        int16
@@ -333,18 +333,18 @@ type Tile struct {
 	ContinentID                 int16
 	A                           int32
 	B                           int32
-	Name2                       [4]byte
-	Length2                     int32
+	Name2                       [4]byte `json:"-"`
+	Length2                     int32   `json:"-"`
 	Improvements                int32
 	C                           int8
 	Terrain                     uint8
 	MaybeByCivBitMask           uint32
 	TerrainFeatures             uint16
-	Name3                       [4]byte
-	Length3                     int32
+	Name3                       [4]byte `json:"-"`
+	Length3                     int32   `json:"-"`
 	D                           int32
-	Name4                       [4]byte
-	Length4                     int32
+	Name4                       [4]byte `json:"-"`
+	Length4                     int32   `json:"-"`
 	VisibleToCiv                uint32
 	VisibleNowToCivUnits        uint32
 	MaybeVisibleToColonies      uint32

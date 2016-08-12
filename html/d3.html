@@ -87,7 +87,7 @@ d3.json("civmap.json", function(error, gamedata){
     // nonspoiler = data.tile.map(function(d, i){ return i % 2 == 0 ? d : null; });
     var nonSpoilerTiles = gamedata.tile
         .map(function(d, i){
-            return d.is_visible_to_flags & spoilmask ? { i: i, d: d } : null;
+            return d.VisibleToCiv & spoilmask ? { i: i, d: d } : null;
         })
         .filter(function(d){ return d != null; })
 
@@ -100,8 +100,11 @@ d3.json("civmap.json", function(error, gamedata){
     }
 
     resetPanZoom = function() {
-        myx = 4 * 64 - x(gamedata.start_loc[1])
-        myy = 4 * 32 - y(gamedata.start_loc[1])
+        // Don't currently have start locations in file
+        // myx = 4 * 64 - x(gamedata.start_loc[1])
+        // myy = 4 * 32 - y(gamedata.start_loc[1])
+        myx = 4 * 64 - 30
+        myy = 4 * 32 - 30
         // This changes the view, but then zooming or panning with mouse reesets to where it wsa
         svg.attr("transform", "translate(" + myx + ", " + myy + ")" + " scale(1)");
         d3.behavior.zoom().translate([myx, myy]).scale(1); // .attr("transform", "translate(" + ( - x(gamedata.start_loc[1])) + ", " + ( - y(gamedata.start_loc[1])) + ")" + " scale(1)")
@@ -117,12 +120,14 @@ d3.json("civmap.json", function(error, gamedata){
         .attr('points', '0,32 64,0 128,32 64,64')
         // Set transforms for tiles
         .attr('transform', function(d, i) {
+            // console.log("Hi");
+            // console.log(d);
             return 'translate(' + x(d.i).toString() + ',' + y(d.i).toString() + ')'
         })
         // Assign class based on terrain
         .attr('class', function(d, i) {
             // including itentify flood plains
-            return 'terrbase' + (d.d.terrain & 0x0F).toString() + (!(d.d.terrain & 0x0f) && d.d.rivers ? ' floodplain' : '');
+            return 'terrbase' + (d.d.Terrain & 0x0F).toString() + (!(d.d.Terrain & 0x0f) && d.d.rivers ? ' floodplain' : '');
          });
 
     // Rivers
@@ -133,7 +138,7 @@ d3.json("civmap.json", function(error, gamedata){
     var addRivers = function(selection, x1, y1, x2, y2, mask) {
         // Since running for each edge of tile, have to append a group else it will try to merge with the previous run and see the data is the same and create nothing
         selection.append('g').attr('id', 'river-0x' + mask.toString(16) ).selectAll('line')
-        .data(nonSpoilerTiles.filter(function(d){ return d.d.rivers & mask; }), function(d){ return d.i; })
+        .data(nonSpoilerTiles.filter(function(d){ return d.d.Rivers & mask; }), function(d){ return d.i; })
             .enter()
             .append('line')
             .attr('x1', function(d, i) { return x(d.i) + x1})
@@ -155,17 +160,17 @@ d3.json("civmap.json", function(error, gamedata){
     var terrainOverlay = svg.append('g').attr('id', 'terrainOverlay').attr('class', 'terroverlay');
 
     terrainOverlay.selectAll('use')
-        .data(nonSpoilerTiles.filter(function(d){ return overlay[d.d.terrain & 0xf0]; }), function(d){ return d.i; })
+        .data(nonSpoilerTiles.filter(function(d){ return overlay[d.d.Terrain & 0xf0]; }), function(d){ return d.i; })
         .enter().append('use')
         .attr('class', 'terroverlay')
-        .attr('xlink:xlink:href', function(d){ return overlay[(d.d.terrain) & 0Xf0]})
+        .attr('xlink:xlink:href', function(d){ return overlay[(d.d.Terrain) & 0Xf0]})
         .attr('x', function(d, i) { return x(d.i)})
         .attr('y', function(d, i) { return y(d.i)});
 
     var bonusGrassland = svg.append('g').attr('id', 'bonusGrassland');
     bonusGrassland.selectAll('use')
         // Select tiles with bg flag set, but omit tiles with overlay terrain (trees, hills, mountains, etc.)
-        .data(nonSpoilerTiles.filter(function(d){ return d.d.terrain_features & 0x1 & ! overlay[(d.d.terrain) & 0Xf0]; }), function(d){ return d.i; })
+        .data(nonSpoilerTiles.filter(function(d){ return d.d.TerrainFeatures & 0x1 & ! overlay[(d.d.Terrain) & 0Xf0]; }), function(d){ return d.i; })
         .enter().append('use')
         .attr('xlink:xlink:href', '#bonusgrassland')
         .attr('x', function(d, i) { return x(d.i)})
@@ -174,18 +179,18 @@ d3.json("civmap.json", function(error, gamedata){
     // Add resources to map
     var mapResources = svg.append('g').attr('id', 'resources').attr('class', 'terroverlay');
     mapResources.selectAll('text')
-        .data(nonSpoilerTiles.filter(function(d){ return resources[d.d.resource]; }), function(d){ return d.i; })
+        .data(nonSpoilerTiles.filter(function(d){ return resources[d.d.ResourceType]; }), function(d){ return d.i; })
         .enter()
         .append('text')
         .attr('class', 'resource')
         .attr('x', function(d, i) { return x(d.i) + 64})
         .attr('y', function(d, i) { return y(d.i) + 32 })
-        .text(function(d){ return resources[d.d.resource] });
+        .text(function(d){ return resources[d.d.ResourceType] });
 
     var cities = svg.append('g').attr('id', 'cities');
     cities.selectAll('use')
         // Select tiles with bg flag set, but omit tiles with overlay terrain (trees, hills, mountains, etc.)
-        .data(nonSpoilerTiles.filter(function(d){ return d.d.city_id; }), function(d){ return d.i; })
+        .data(nonSpoilerTiles.filter(function(d){ return d.d.CityID != -1; }), function(d){ return d.i; })
         .enter().append('use')
         .attr('xlink:xlink:href', '#myCity')
         .attr('x', function(d, i) { return x(d.i)})

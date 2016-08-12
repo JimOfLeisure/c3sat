@@ -55,6 +55,32 @@ func main() {
 			},
 		},
 		{
+			Name:    "map",
+			Aliases: []string{"m"},
+			Usage:   "Dump a JSON file of map data",
+			Action: func(c *cli.Context) error {
+				var gameData parseciv3.Civ3Data
+				var err error
+				path := c.Args().First()
+				fmt.Println(path)
+				gameData, err = parseciv3.NewCiv3Data(path)
+				if err != nil {
+					if parseErr, ok := err.(parseciv3.ParseError); ok {
+						return parseErr
+					}
+					return err
+				}
+				err = ioutil.WriteFile("./civmap.json", gameData.JSONMap(), 0644)
+				if err != nil {
+					log.Println("Error writing file")
+					return err
+				}
+
+				log.Println("Saved to civmap.json in current folder")
+				return nil
+			},
+		},
+		{
 			Name:    "dev",
 			Aliases: []string{"z"},
 			Usage:   "Who knows? It's whatever the dev is working on right now",

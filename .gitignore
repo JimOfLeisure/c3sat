@@ -8,6 +8,7 @@ html/*.json
 html/debug/
 *.exe
 *.csv
+*.json
 
 #python specific
 *.pyc
