@@ -317,26 +317,45 @@ type Wrld struct {
 
 // Tile is Conquests' 4 TILE sections per world tile combined
 type Tile struct {
-	Name                      [4]byte
-	Length                    int32
-	Rivers                    uint8
-	MaybeTerritoryCivID       int8
-	MaybeLandmarkTerrain      int16
-	ResourceType              int32
-	TileUnitID                int32
-	MaybeSquarePart           int16
-	MaybeVictoryPoint         int16
-	MaybePreConquestsTileInfo int32
-	BarbTribeID               int16
-	CityID                    int16
-	MaybeColonyID             int16
-	ContinentID               int16
-	// Name2                     [4]byte
-	// Length2                   int32
-	// Name3                     [4]byte
-	// Length3                   int32
-	// Name4                     [4]byte
-	// Length4                   int32
+	Name                        [4]byte
+	Length                      int32
+	Rivers                      uint8
+	MaybeTerritoryCivID         int8
+	MaybeLandmarkTerrain        int16
+	ResourceType                int32
+	TileUnitID                  int32
+	MaybeSquarePart             int16
+	MaybeVictoryPoint           int16
+	MaybePreConquestsTileInfo   int32
+	BarbTribeID                 int16
+	CityID                      int16
+	MaybeColonyID               int16
+	ContinentID                 int16
+	A                           int32
+	B                           int32
+	Name2                       [4]byte
+	Length2                     int32
+	Improvements                int32
+	C                           int8
+	Terrain                     uint8
+	MaybeByCivBitMask           uint32
+	TerrainFeatures             uint16
+	Name3                       [4]byte
+	Length3                     int32
+	D                           int32
+	Name4                       [4]byte
+	Length4                     int32
+	VisibleToCiv                uint32
+	VisibleNowToCivUnits        uint32
+	MaybeVisibleToColonies      uint32
+	VisibleToCivCulture         uint32
+	E                           int32
+	CityID2                     int16
+	TradeNetworkIDByCiv         [32]int16
+	MaybeImprovementsKnownToCiv [32]uint8
+	F                           uint16
+	G                           int32
+	H                           int32
 }
 
 // MyTest ...
