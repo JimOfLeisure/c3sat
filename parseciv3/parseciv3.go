@@ -233,7 +233,7 @@ func ParseCiv3(r io.ReadSeeker) (ParsedData, error) {
 			}
 			data["GAME2"] = gameSection
 
-			searchLength := 0x1200
+			searchLength := 0x4000
 			buffer := make([]byte, searchLength)
 			_, err = r.Read(buffer)
 			if err != nil {
@@ -283,6 +283,28 @@ func ParseCiv3(r io.ReadSeeker) (ParsedData, error) {
 			if err != nil {
 				return data, err
 			}
+			data["TILE"] = tiles
+			continents := make([]Continent, wrld.NumContinents)
+			err = binary.Read(r, binary.LittleEndian, &continents)
+			if err != nil {
+				return data, err
+			}
+			data["CONT"] = continents
+
+			// TODO: Find where resource count is
+			// Currently counting GOODs if present or using default 26 resource count
+			var numResources int
+			if resources, ok := data["GOOD"].(List); ok {
+				numResources = int(resources.Count)
+			} else {
+				numResources = 26
+			}
+			resourceCounts := make([]int32, numResources)
+			err = binary.Read(r, binary.LittleEndian, &resourceCounts)
+			if err != nil {
+				return data, err
+			}
+			data["ResourceCounts"] = resourceCounts
 		default:
 			abort = true
 		}

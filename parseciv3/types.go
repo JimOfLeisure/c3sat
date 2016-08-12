@@ -358,6 +358,16 @@ type Tile struct {
 	H                           int32
 }
 
+// Continent is the CONT section
+// Land is 1 for land, 0 for water
+// Size is number of tiles
+type Continent struct {
+	Name   [4]byte
+	Length int32
+	Land   int32
+	Size   int32
+}
+
 // MyTest ...
 type MyTest struct {
 	Name [4]byte
