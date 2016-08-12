@@ -20,7 +20,7 @@ func (c Civ3Data) Debug() string {
 	// out += fmt.Sprintf("*** GAME ***\n%#v\n", c.Data["GAME2"])
 	// out += fmt.Sprintf("\n%#v\n", c.Data["GameNext"])
 	// out += fmt.Sprintf("\n%s\n", c.Data["WTF"])
-	out += fmt.Sprintf("\n%#v\n", c.Data["WRLD"])
+	// out += fmt.Sprintf("\n%#v\n", c.Data["WRLD"])
 
 	out += fmt.Sprint("*** Debug output. Next bytes ***\n")
 	out += fmt.Sprintln(c.Next)

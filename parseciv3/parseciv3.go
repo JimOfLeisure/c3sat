@@ -277,6 +277,14 @@ func ParseCiv3(r io.ReadSeeker) (ParsedData, error) {
 				return data, err
 			}
 			data[name] = wrld
+			tileCount := wrld.MapHeight * int32(wrld.MapWidth/2)
+			_ = tileCount
+			tiles := make([]Tile, 1)
+			err = binary.Read(r, binary.LittleEndian, &tiles)
+			if err != nil {
+				return data, err
+			}
+			fmt.Printf("\n%#v\n\n", tiles)
 		default:
 			abort = true
 		}

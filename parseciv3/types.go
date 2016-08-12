@@ -315,6 +315,30 @@ type Wrld struct {
 	MaybeWorldGenOptions   [13]int32
 }
 
+// Tile is Conquests' 4 TILE sections per world tile combined
+type Tile struct {
+	Name                      [4]byte
+	Length                    int32
+	Rivers                    uint8
+	MaybeTerritoryCivID       int8
+	MaybeLandmarkTerrain      int16
+	ResourceType              int32
+	TileUnitID                int32
+	MaybeSquarePart           int16
+	MaybeVictoryPoint         int16
+	MaybePreConquestsTileInfo int32
+	BarbTribeID               int16
+	CityID                    int16
+	MaybeColonyID             int16
+	ContinentID               int16
+	// Name2                     [4]byte
+	// Length2                   int32
+	// Name3                     [4]byte
+	// Length3                   int32
+	// Name4                     [4]byte
+	// Length4                   int32
+}
+
 // MyTest ...
 type MyTest struct {
 	Name [4]byte
