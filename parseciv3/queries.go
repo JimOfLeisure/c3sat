@@ -44,9 +44,10 @@ func (c Civ3Data) Info() string {
 
 // Map ...
 type Map struct {
-	Width  int32  `json:"width"`
-	Height int32  `json:"height"`
-	Tile   []Tile `json:"tile"`
+	Width                  int32  `json:"width"`
+	Height                 int32  `json:"height"`
+	Tile                   []Tile `json:"tile"`
+	CivStartLocationTileID [32]int32
 }
 
 // JSONMap returns byte array to write to JSON file, then read with html/d3.html map reader in this repo
@@ -58,6 +59,7 @@ func (c Civ3Data) JSONMap() []byte {
 	if wrld, ok := c.Data["WRLD"].(Wrld); ok {
 		civmap.Height = wrld.MapHeight
 		civmap.Width = wrld.MapWidth
+		civmap.CivStartLocationTileID = wrld.CivStartLocationTileID
 	}
 	out, _ := json.Marshal(civmap)
 	return out

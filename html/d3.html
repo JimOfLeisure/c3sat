@@ -101,10 +101,10 @@ d3.json("civmap.json", function(error, gamedata){
 
     resetPanZoom = function() {
         // Don't currently have start locations in file
-        // myx = 4 * 64 - x(gamedata.start_loc[1])
-        // myy = 4 * 32 - y(gamedata.start_loc[1])
-        myx = 4 * 64 - 30
-        myy = 4 * 32 - 30
+        myx = 4 * 64 - x(gamedata.CivStartLocationTileID[1])
+        myy = 4 * 32 - y(gamedata.CivStartLocationTileID[1])
+        // myx = 4 * 64 - 30
+        // myy = 4 * 32 - 30
         // This changes the view, but then zooming or panning with mouse reesets to where it wsa
         svg.attr("transform", "translate(" + myx + ", " + myy + ")" + " scale(1)");
         d3.behavior.zoom().translate([myx, myy]).scale(1); // .attr("transform", "translate(" + ( - x(gamedata.start_loc[1])) + ", " + ( - y(gamedata.start_loc[1])) + ")" + " scale(1)")
@@ -189,7 +189,6 @@ d3.json("civmap.json", function(error, gamedata){
 
     var cities = svg.append('g').attr('id', 'cities');
     cities.selectAll('use')
-        // Select tiles with bg flag set, but omit tiles with overlay terrain (trees, hills, mountains, etc.)
         .data(nonSpoilerTiles.filter(function(d){ return d.d.CityID != -1; }), function(d){ return d.i; })
         .enter().append('use')
         .attr('xlink:xlink:href', '#myCity')
