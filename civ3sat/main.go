@@ -13,11 +13,9 @@ import (
 )
 
 func main() {
-	// Remove the date/time stamp from log lines
-	log.SetFlags(0)
-
 	app := cli.NewApp()
 	app.Name = "Civ3 Show-And-Tell"
+	app.Version = "0.3.0"
 	app.Usage = "A utility to extract data from Civ3 SAV and BIQ files. Provide a file name of a SAV or BIQ file after the command."
 
 	app.Commands = []cli.Command{
@@ -82,7 +80,7 @@ func main() {
 		{
 			Name:    "map",
 			Aliases: []string{"m"},
-			Usage:   "Dump a JSON file of map data",
+			Usage:   "Dump a JSON file of map data to civmap.json in the current folder",
 			Action: func(c *cli.Context) error {
 				var gameData parseciv3.Civ3Data
 				var err error
