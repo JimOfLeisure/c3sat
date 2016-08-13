@@ -318,8 +318,8 @@ type Wrld struct {
 // WorldFeatures is the map generation settings
 // Barbs: -1 is off, 0 sedendary...3 raging
 type WorldFeatures struct {
-	Aridity            int32
-	AridityFinal       int32
+	Climate            int32
+	ClimateFinal       int32
 	Barbarians         int32
 	BarbariansFinal    int32
 	Landmass           int32

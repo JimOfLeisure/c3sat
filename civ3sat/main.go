@@ -34,14 +34,14 @@ func main() {
 				if err != nil {
 					return err
 				}
-				// worldSettings := gameData.WorldSettings()
-				fmt.Printf("%#v\n", gameData.WorldSettings())
+				fmt.Println()
 				w := new(tabwriter.Writer)
 				w.Init(os.Stdout, 0, 8, 0, '\t', 0)
-				for k, v := range gameData.WorldSettings() {
-					fmt.Fprintf(w, "%s\t%s\n", k, v)
-					w.Flush()
+				settings := gameData.WorldSettings()
+				for i := range settings {
+					fmt.Fprintf(w, "%s\t%s\t%s\n", settings[i][0], settings[i][1], settings[i][2])
 				}
+				w.Flush()
 				return nil
 			},
 		},
