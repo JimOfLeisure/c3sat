@@ -391,8 +391,3 @@ type Lead struct {
 	Name [4]byte
 	A    int32
 }
-
-// MyTest ...
-type MyTest struct {
-	Name [4]byte
-}
