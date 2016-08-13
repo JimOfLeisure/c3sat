@@ -27,7 +27,6 @@ func main() {
 				var gameData parseciv3.Civ3Data
 				var err error
 				path := c.Args().First()
-				fmt.Println(path)
 				gameData, err = parseciv3.NewCiv3Data(path)
 				if err != nil {
 					return err
@@ -85,7 +84,6 @@ func main() {
 				var gameData parseciv3.Civ3Data
 				var err error
 				path := c.Args().First()
-				fmt.Println(path)
 				gameData, err = parseciv3.NewCiv3Data(path)
 				if err != nil {
 					if parseErr, ok := err.(parseciv3.ParseError); ok {
