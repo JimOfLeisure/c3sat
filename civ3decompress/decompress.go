@@ -96,9 +96,6 @@ func Decompress(file io.Reader) ([]byte, error) {
 			}
 		}
 	}
-	// log.Printf("Data hex dump:\n%s\n", hex.Dump(uncData.Bytes()))
-	// err = ioutil.WriteFile("./out.sav", uncData.Bytes(), 0644)
-	// check(err)
 	return uncData.Bytes(), error(nil)
 
 }
