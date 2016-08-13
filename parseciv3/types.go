@@ -312,7 +312,25 @@ type Wrld struct {
 	G                      int32
 	Name3                  [4]byte `json:"-"`
 	Length3                int32   `json:"-"`
-	MaybeWorldGenOptions   [13]int32
+	GenOptions             WorldFeatures
+}
+
+// WorldFeatures is the map generation settings
+// Barbs: -1 is off, 0 sedendary...3 raging
+type WorldFeatures struct {
+	Aridity            int32
+	AridityFinal       int32
+	Barbarians         int32
+	BarbariansFinal    int32
+	Landmass           int32
+	LandmassFinal      int32
+	OceanCoverage      int32
+	OceanCoverageFinal int32
+	Temperature        int32
+	TemperatureFinal   int32
+	Age                int32
+	AgeFinal           int32
+	Size               int32
 }
 
 // Tile is Conquests' 4 TILE sections per world tile combined
@@ -366,6 +384,12 @@ type Continent struct {
 	Length int32
 	Land   int32
 	Size   int32
+}
+
+// Lead is the LEAD section in the game, not the BIC
+type Lead struct {
+	Name [4]byte
+	A    int32
 }
 
 // MyTest ...

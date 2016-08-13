@@ -6,6 +6,7 @@ import (
 	"io/ioutil"
 	"log"
 	"os"
+	"text/tabwriter"
 
 	"github.com/myjimnelson/c3sat/parseciv3"
 	"github.com/urfave/cli"
@@ -20,6 +21,30 @@ func main() {
 	app.Usage = "A utility to extract data from Civ3 SAV and BIQ files. Provide a file name of a SAV or BIQ file after the command."
 
 	app.Commands = []cli.Command{
+		{
+			Name:    "seed",
+			Aliases: []string{"s"},
+			Usage:   "Show the world seed and map settings needed to generate the map, if this map was randomly generated.",
+			Action: func(c *cli.Context) error {
+				var gameData parseciv3.Civ3Data
+				var err error
+				path := c.Args().First()
+				fmt.Println(path)
+				gameData, err = parseciv3.NewCiv3Data(path)
+				if err != nil {
+					return err
+				}
+				// worldSettings := gameData.WorldSettings()
+				fmt.Printf("%#v\n", gameData.WorldSettings())
+				w := new(tabwriter.Writer)
+				w.Init(os.Stdout, 0, 8, 0, '\t', 0)
+				for k, v := range gameData.WorldSettings() {
+					fmt.Fprintf(w, "%s\t%s\n", k, v)
+					w.Flush()
+				}
+				return nil
+			},
+		},
 		{
 			Name:    "decompress",
 			Aliases: []string{"d"},
