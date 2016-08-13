@@ -100,15 +100,6 @@ func NewCiv3Data(path string) (Civ3Data, error) {
 		return civ3data, err
 	}
 	civ3data.Next = debugHexDump(r)
-
-	// // TEMP writing 2nd GAME portion out to file for analysis
-	// // from http://stackoverflow.com/questions/12518876/how-to-check-if-a-file-exists-in-go
-	// outFileName := path + ".game"
-	// if _, err := os.Stat(outFileName); os.IsNotExist(err) {
-	// 	mybytes := make([]byte, 0x1200)
-	// 	_, _ = r.Read(mybytes)
-	// 	_ = ioutil.WriteFile(outFileName, mybytes, 0644)
-	// }
 	return civ3data, nil
 }
 
