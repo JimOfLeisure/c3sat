@@ -33,12 +33,12 @@ func main() {
 				}
 				fmt.Println()
 				w := new(tabwriter.Writer)
+				defer w.Flush()
 				w.Init(os.Stdout, 0, 8, 0, '\t', 0)
 				settings := gameData.WorldSettings()
 				for i := range settings {
 					fmt.Fprintf(w, "%s\t%s\t%s\n", settings[i][0], settings[i][1], settings[i][2])
 				}
-				w.Flush()
 				return nil
 			},
 		},
@@ -76,6 +76,7 @@ func main() {
 				return nil
 			},
 		},
+		// ** DEVELOP **
 		{
 			Name:    "map",
 			Aliases: []string{"m"},
@@ -109,21 +110,21 @@ func main() {
 				var gameData parseciv3.Civ3Data
 				var err error
 				path := c.Args().First()
-				fmt.Println(path)
 				gameData, err = parseciv3.NewCiv3Data(path)
 				if err != nil {
-					if parseErr, ok := err.(parseciv3.ParseError); ok {
-						log.Printf("Expected: %s\nHex Dump:\n%s\n", parseErr.Expected, parseErr.Hexdump)
-						return parseErr
-					}
-					// fmt.Print(gameData.Debug())
-					return err
+					// 	if parseErr, ok := err.(parseciv3.ParseError); ok {
+					// 		log.Printf("Expected: %s\nHex Dump:\n%s\n", parseErr.Expected, parseErr.Hexdump)
+					// 		return parseErr
+					// 	}
+					// 	// fmt.Print(gameData.Debug())
+					// 	return err
 				}
-				fmt.Print(gameData.Info())
+				// fmt.Print(gameData.Info())
 				fmt.Print(gameData.Debug())
 				return nil
 			},
 		},
+		// ** END DEVELOP **
 	}
 
 	app.Run(os.Args)

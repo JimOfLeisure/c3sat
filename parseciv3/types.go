@@ -48,11 +48,15 @@ type ParsedData map[string]Section
 
 // Civ3Data contains the game data
 type Civ3Data struct {
-	FileName   string
-	Compressed bool
-	Data       ParsedData
-	Next       string
-	// RawFile    []byte
+	FileName      string
+	Compressed    bool
+	Data          ParsedData
+	Civ3          Civ3Header
+	BicResources  BicResources
+	BicFileHeader [4]byte
+	VerNum        []VerNum
+	Bldg          []Bldg
+	Next          string
 }
 
 // Section is the inteface for the various structs decoded from the data files
@@ -61,21 +65,83 @@ type Section interface{}
 // ListItem are the structs in a list
 type ListItem interface{}
 
-// Civ3 is the SAV file header
-type Civ3 struct {
-	Name [4]byte
-	// 28 bytes. Guessing on alignment
-	A, B, C, D, E, F uint32
-	G                uint16
+// Civ3Header is the SAV file header
+// The Gobbledygook values appear to be 16 bytes of uncorrelated data, perhaps a hash or checksum?
+type Civ3Header struct {
+	Name                                                       [4]byte
+	Always0x1a00                                               int16
+	MaybeVersionMinor, MaybeVersionMajor                       int32
+	Gobbeldygook1, Gobbeldygook2, Gobbeldygook3, Gobbeldygook4 uint32
 }
 
-func newCiv3(r io.ReadSeeker) (Civ3, error) {
-	var data Civ3
-	err := binary.Read(r, binary.LittleEndian, &data)
-	if err != nil {
-		return data, ReadError{err}
-	}
-	return data, nil
+// BicResources is part of the second SAV file section. Guessing at the alignment
+type BicResources struct {
+	Name         [4]byte
+	Length       int32
+	A            int32
+	ResourcePath [0x100]byte
+	B            int32
+	BicPath      [0x100]byte
+	C            int32
+}
+
+// ListHeader ...
+type ListHeader struct {
+	Name  [4]byte
+	Count int32
+}
+
+// VerNum ...
+type VerNum struct {
+	Length          int32
+	A, B            uint32
+	BicMajorVersion int32
+	BicMinorVersion int32
+	Description     [640]byte
+	Title           [64]byte
+}
+
+// Bldg ...
+type Bldg struct {
+	Length                     int32
+	Description                [64]byte
+	Name                       [32]byte
+	CivilopediaEntry           [32]byte
+	DoublesHappinessOf4        int32
+	GainInEveryCity            int32
+	GainInEveryCityOnContinent int32
+	RequiredBuilding           int32
+	Cost                       int32
+	Culture                    int32
+	BombardmentDefense         int32
+	NavalBombardmentDefense    int32
+	DefenseBonus               int32
+	NavalDefenseBonus          int32
+	MaintenanceCost            int32
+	HappyFacesAllCities        int32
+	HappyFaces                 int32
+	UnhappyFacesAllCities      int32
+	UnhappyFaces               int32
+	NumberOfRequiredBuildings  int32
+	AirPower                   int32
+	NavalPower                 int32
+	Pollution                  int32
+	Production                 int32
+	RequiredGovernment         int32
+	SpaceshipPart              int32
+	RequiredAdvance            int32
+	RenderedObsoleteBy         int32
+	RequiredResource1          int32
+	RequiredResource2          int32
+	ImprovementsBitMap         int32
+	OtherCharacteristicsBitMap int32
+	SmallWondersBitMap         int32
+	WondersBitMap              int32
+	NumberOfArmiesRequired     int32
+	FlavorsBitMap              int32
+	A                          int32
+	UnitProducedPRTORef        int32
+	UnitFrequency              int32
 }
 
 // Base is one of the basic section structures of the game data
@@ -172,15 +238,6 @@ func newFlav(r io.ReadSeeker) (Flav, error) {
 		}
 	}
 	return flav, nil
-}
-
-// BicResources is part of the second SAV file section. Guessing at the alignment
-type BicResources struct {
-	A            int32
-	ResourcePath [0x100]byte
-	B            int32
-	BicPath      [0x100]byte
-	C            int32
 }
 
 // Flavor is the leaf element of FLAV
