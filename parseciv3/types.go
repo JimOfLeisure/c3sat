@@ -56,9 +56,6 @@ type Civ3Data struct {
 	BicFileHeader [4]byte
 	VerNum        []VerNum
 	Bldg          []Bldg
-<<<<<<< HEAD
-	Next          string
-=======
 	Ctzn          []Ctzn
 	Cult          []Cult
 	Diff          []Difficulty
@@ -73,7 +70,6 @@ type Civ3Data struct {
 	Cont           []Continent
 	ResourceCounts []int32
 	Next           string
->>>>>>> jim
 }
 
 // Section is the inteface for the various structs decoded from the data files
@@ -159,8 +155,6 @@ type Bldg struct {
 	A                          int32
 	UnitProducedPRTORef        int32
 	UnitFrequency              int32
-<<<<<<< HEAD
-=======
 }
 
 // Ctzn ...
@@ -255,7 +249,6 @@ type Good struct {
 	FoodBonus                int32
 	ShieldsBonus             int32
 	CommerceBonus            int32
->>>>>>> jim
 }
 
 // Base is one of the basic section structures of the game data

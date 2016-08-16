@@ -97,7 +97,7 @@ func NewCiv3Data(path string) (Civ3Data, error) {
 
 	// CIV3 section, optional if BIC file
 	name, _, err := peek(r)
-<<<<<<< HEAD
+
 	if err != nil {
 		return civ3data, err
 	}
@@ -107,79 +107,6 @@ func NewCiv3Data(path string) (Civ3Data, error) {
 			return civ3data, err
 		}
 
-		// BIC_ resoruces
-		err = binary.Read(r, binary.LittleEndian, &civ3data.BicResources)
-		if err != nil {
-			return civ3data, err
-		}
-	}
-	// BIC file / section
-	err = binary.Read(r, binary.LittleEndian, &civ3data.BicFileHeader)
-	if err != nil {
-		return civ3data, err
-	}
-	switch string(civ3data.BicFileHeader[:]) {
-	case "BIC ", "BICX", "BICQ":
-		// continue
-	default:
-		return civ3data, ParseError{"Parse error: Unexpected data", "BIC*", debugHexDump(r)}
-
-	}
-	// VER#
-	err = binary.Read(r, binary.LittleEndian, &listHeader)
-	if err != nil {
-		return civ3data, err
-	}
-	civ3data.VerNum = make([]VerNum, listHeader.Count)
-	err = binary.Read(r, binary.LittleEndian, &civ3data.VerNum)
-	if err != nil {
-		return civ3data, err
-	}
-
-	// Custom rules
-	err = binary.Read(r, binary.LittleEndian, &listHeader)
-	if err != nil {
-		return civ3data, err
-	}
-	if string(listHeader.Name[:]) == "BLDG" {
-		civ3data.Bldg = make([]Bldg, listHeader.Count)
-		err = binary.Read(r, binary.LittleEndian, &civ3data.Bldg)
-		if err != nil {
-			return civ3data, err
-		}
-	}
-	// Original parseddata section
-	civ3data.Data, err = ParseCiv3(r)
-=======
->>>>>>> jim
-	if err != nil {
-		return civ3data, err
-	}
-	if string(name[:]) == "CIV3" {
-		err = binary.Read(r, binary.LittleEndian, &civ3data.Civ3)
-		if err != nil {
-			return civ3data, err
-		}
-
-<<<<<<< HEAD
-// peek returns the next 4 bytes nondestructively
-func peek(r io.ReadSeeker) ([]byte, int32, error) {
-	var b [4]byte
-	err := binary.Read(r, binary.LittleEndian, &b)
-	if err != nil {
-		return nil, 0, ReadError{err}
-	}
-	var length int32
-	err = binary.Read(r, binary.LittleEndian, &length)
-	if err != nil {
-		return b[:], 0, ReadError{err}
-	}
-	// Back the pointer up 4 bytes
-	r.Seek(-8, 1)
-	return b[:], length, nil
-}
-
-=======
 		// BIC_ resoruces
 		err = binary.Read(r, binary.LittleEndian, &civ3data.BicResources)
 		if err != nil {
@@ -377,7 +304,6 @@ func peek(r io.ReadSeeker) ([]byte, int32, error) {
 	return b[:], length, nil
 }
 
->>>>>>> jim
 // ParseCiv3 takes raw save file data and returns a map of the parsed data
 func ParseCiv3(r io.ReadSeeker) (ParsedData, error) {
 	data := make(ParsedData)
