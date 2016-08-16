@@ -116,8 +116,13 @@ func main() {
 					// 		log.Printf("Expected: %s\nHex Dump:\n%s\n", parseErr.Expected, parseErr.Hexdump)
 					// 		return parseErr
 					// 	}
+<<<<<<< HEAD
 					// 	// fmt.Print(gameData.Debug())
 					// 	return err
+=======
+					fmt.Print(gameData.Debug())
+					return err
+>>>>>>> jim
 				}
 				// fmt.Print(gameData.Info())
 				fmt.Print(gameData.Debug())

@@ -27,14 +27,29 @@ func (c Civ3Data) Debug() string {
 	// out += fmt.Sprintf("\n%#v\n", c.Data["GameNext"])
 	// out += fmt.Sprintf("\n%s\n", c.Data["WTF"])
 	// out += fmt.Sprintf("\n%#v\n", c.Data["CIV3"])
+<<<<<<< HEAD
 	jsonOut, _ := json.Marshal(c.Bldg)
 	out += string(jsonOut)
+=======
+	// jsonOut, _ := json.Marshal(c.Good)
+	jsonOut, _ := json.Marshal(c.Data["GOOD"])
+	if string(jsonOut[:]) != "null" {
+		out += string(jsonOut)
+	}
+
+>>>>>>> jim
 	// out += fmt.Sprintf("\n%#v\n", c.Data["CNSL"])
 	// out += fmt.Sprintf("\n%#v\n", c.Data["TILE"])
 	// out += fmt.Sprintf("\n%#v\n", c.Data["ResourceCounts"])
 
+<<<<<<< HEAD
 	// out += fmt.Sprint("*** Debug output. Next bytes ***\n")
 	// out += fmt.Sprintln(c.Next)
+=======
+	out += fmt.Sprint("*** Debug output. Next bytes ***\n")
+	out += fmt.Sprintln(c.FileName)
+	out += fmt.Sprintln(c.Next)
+>>>>>>> jim
 
 	// if civ3Data, ok := c.Data["WRLD"].(Wrld); ok {
 	// out += fmt.Sprintf("\n%#v\n", civ3Data.GenOptions)
