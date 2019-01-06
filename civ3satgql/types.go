@@ -11,11 +11,11 @@ var civ3Type = graphql.NewObject(graphql.ObjectConfig{
 			Type:        graphql.Int,
 			Description: "Random seed of random worlds",
 			Resolve: func(p graphql.ResolveParams) (interface{}, error) {
-				mySection, err := sectionOffset("WRLD", 1)
+				mySection, err := SectionOffset("WRLD", 1)
 				if err != nil {
 					return 0, nil
 				}
-				return readInt32(mySection+170, signed), nil
+				return ReadInt32(mySection+170, Signed), nil
 			},
 		},
 	},

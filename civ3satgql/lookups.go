@@ -6,10 +6,10 @@ import (
 )
 
 // to make calling functions readable
-const signed = true
-const unsigned = false
+const Signed = true
+const Unsigned = false
 
-func readInt32(offset int, signed bool) int {
+func ReadInt32(offset int, signed bool) int {
 	n := int(saveGame.data[offset]) +
 		int(saveGame.data[offset+1])*0x100 +
 		int(saveGame.data[offset+2])*0x10000 +
@@ -20,7 +20,7 @@ func readInt32(offset int, signed bool) int {
 	return n
 }
 
-func readInt16(offset int, signed bool) int {
+func ReadInt16(offset int, signed bool) int {
 	n := int(saveGame.data[offset]) +
 		int(saveGame.data[offset+1])*0x100
 	if signed && n > 0x8000 {
@@ -29,7 +29,7 @@ func readInt16(offset int, signed bool) int {
 	return n
 }
 
-func readInt8(offset int, signed bool) int {
+func ReadInt8(offset int, signed bool) int {
 	n := int(saveGame.data[offset])
 	if signed && n > 0x80 {
 		n = n - 0x80
@@ -37,7 +37,7 @@ func readInt8(offset int, signed bool) int {
 	return n
 }
 
-func sectionOffset(sectionName string, nth int) (int, error) {
+func SectionOffset(sectionName string, nth int) (int, error) {
 	var i, n int
 	for i < len(saveGame.sections) {
 		if saveGame.sections[i].name == sectionName {
