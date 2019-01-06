@@ -7,14 +7,20 @@ import (
 	"github.com/myjimnelson/c3sat/parseciv3"
 )
 
-var saveGame []byte
+type saveGameType struct {
+	data     []byte
+	sections []string
+}
+
+var saveGame saveGameType
 
 func Query(query, path string) (string, error) {
 	var err error
-	saveGame, _, err = parseciv3.ReadFile(path)
+	saveGame.data, _, err = parseciv3.ReadFile(path)
 	if err != nil {
 		return "", err
 	}
+	saveGame.sections = []string{"hello", "there"}
 	Schema, err := graphql.NewSchema(graphql.SchemaConfig{
 		Query: queryType,
 		// Mutation: MutationType,
