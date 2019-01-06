@@ -9,18 +9,13 @@ var civ3Type = graphql.NewObject(graphql.ObjectConfig{
 	Fields: graphql.Fields{
 		"worldSeed": &graphql.Field{
 			Type:        graphql.Int,
-			Description: "Random seed of rando worlds",
+			Description: "Random seed of random worlds",
 			Resolve: func(p graphql.ResolveParams) (interface{}, error) {
-				var i int
-				for i < len(saveGame.sections) {
-					if saveGame.sections[i].name == "WRLD" {
-						myOffset := saveGame.sections[i].offset + 174
-						foo := readInt32(myOffset, signed)
-						return foo, nil
-					}
-					i++
+				mySection, err := sectionOffset("WRLD", 1)
+				if err != nil {
+					return 0, nil
 				}
-				return 0, nil
+				return readInt32(mySection+170, signed), nil
 			},
 		},
 	},
