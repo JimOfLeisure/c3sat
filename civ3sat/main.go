@@ -13,6 +13,16 @@ import (
 	"github.com/urfave/cli"
 )
 
+var saveFilePath string
+
+var pathFlag = cli.StringFlag{
+	Name: "path, p",
+	// Value:       ".",
+	Usage:       "`FILEPATH` of save",
+	EnvVar:      "CIV3SAT_SAV",
+	Destination: &saveFilePath,
+}
+
 func main() {
 	app := cli.NewApp()
 	app.Name = "Civ3 Show-And-Tell"
@@ -23,12 +33,14 @@ func main() {
 		{
 			Name:    "seed",
 			Aliases: []string{"s"},
-			Usage:   "Show the world seed and map settings needed to generate the map, if this map was randomly generated.",
+			Usage:   "Show the world seed and map settings needed to generate the map, if was randomly generated.",
+			Flags: []cli.Flag{
+				pathFlag,
+			},
 			Action: func(c *cli.Context) error {
 				var gameData parseciv3.Civ3Data
 				var err error
-				path := c.Args().First()
-				gameData, err = parseciv3.NewCiv3Data(path)
+				gameData, err = parseciv3.NewCiv3Data(saveFilePath)
 				if err != nil {
 					return err
 				}
@@ -47,8 +59,11 @@ func main() {
 			Name:    "decompress",
 			Aliases: []string{"d"},
 			Usage:   "decompress a Civ3 data file to out.sav in the current folder",
+			Flags: []cli.Flag{
+				pathFlag,
+			},
 			Action: func(c *cli.Context) error {
-				filedata, _, err := parseciv3.ReadFile(c.Args().First())
+				filedata, _, err := parseciv3.ReadFile(saveFilePath)
 				if err != nil {
 					return err
 				}
@@ -67,8 +82,11 @@ func main() {
 			Name:    "hexdump",
 			Aliases: []string{"x"},
 			Usage:   "hex dump a Civ3 data file to stdout",
+			Flags: []cli.Flag{
+				pathFlag,
+			},
 			Action: func(c *cli.Context) error {
-				filedata, _, err := parseciv3.ReadFile(c.Args().First())
+				filedata, _, err := parseciv3.ReadFile(saveFilePath)
 				if err != nil {
 					return err
 				}
@@ -78,15 +96,18 @@ func main() {
 			},
 		},
 		{
-			Name:    "graphql",
-			Aliases: []string{"gql", "g"},
-			Usage:   "Execute GraphQL query",
+			Name:      "graphql",
+			Aliases:   []string{"gql", "g"},
+			ArgsUsage: "<query>",
+			Usage:     "Execute GraphQL query",
+			Flags: []cli.Flag{
+				pathFlag,
+			},
 			Action: func(c *cli.Context) error {
 				// var gameData parseciv3.Civ3Data
 				var err error
-				path := c.Args().First()
-				query := c.Args()[1]
-				result, err := civ3satgql.Query(query, path)
+				query := c.Args().First()
+				result, err := civ3satgql.Query(query, saveFilePath)
 				if err != nil {
 					return cli.NewExitError(err, 1)
 				}
@@ -99,6 +120,7 @@ func main() {
 			Aliases: []string{"www"},
 			Usage:   "Open save, start GraphQL API at http://127.0.0.1:8080/graphql . Control-c to exit.",
 			Flags: []cli.Flag{
+				pathFlag,
 				cli.StringFlag{
 					Name:   "addr",
 					Value:  "127.0.0.1",
@@ -114,11 +136,10 @@ func main() {
 			},
 			Action: func(c *cli.Context) error {
 				var err error
-				path := c.Args().First()
-				fmt.Println("Starting API server for save file at " + path)
+				fmt.Println("Starting API server for save file at " + saveFilePath)
 				fmt.Println("GraphQL at http://" + c.String("addr") + ":" + c.String("port") + "/graphql")
 				fmt.Println("Press control-C to exit")
-				err = civ3satgql.Server(path, c.String("addr"), c.String("port"))
+				err = civ3satgql.Server(saveFilePath, c.String("addr"), c.String("port"))
 				if err != nil {
 					return cli.NewExitError(err, 1)
 				}
@@ -130,11 +151,13 @@ func main() {
 			Name:    "map",
 			Aliases: []string{"m"},
 			Usage:   "Dump a JSON file of map data to civmap.json in the current folder",
+			Flags: []cli.Flag{
+				pathFlag,
+			},
 			Action: func(c *cli.Context) error {
 				var gameData parseciv3.Civ3Data
 				var err error
-				path := c.Args().First()
-				gameData, err = parseciv3.NewCiv3Data(path)
+				gameData, err = parseciv3.NewCiv3Data(saveFilePath)
 				if err != nil {
 					if parseErr, ok := err.(parseciv3.ParseError); ok {
 						return parseErr
@@ -155,11 +178,13 @@ func main() {
 			Name:    "dev",
 			Aliases: []string{"z"},
 			Usage:   "Who knows? It's whatever the dev is working on right now",
+			Flags: []cli.Flag{
+				pathFlag,
+			},
 			Action: func(c *cli.Context) error {
 				var gameData parseciv3.Civ3Data
 				var err error
-				path := c.Args().First()
-				gameData, err = parseciv3.NewCiv3Data(path)
+				gameData, err = parseciv3.NewCiv3Data(saveFilePath)
 				if err != nil {
 					// 	if parseErr, ok := err.(parseciv3.ParseError); ok {
 					// 		log.Printf("Expected: %s\nHex Dump:\n%s\n", parseErr.Expected, parseErr.Hexdump)
