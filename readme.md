@@ -5,6 +5,7 @@ Civ3 Show-And-Tell reads `sav` and `biq` files from Civilization III Conquests a
 - Show world seed and map settings needed to regenerate the same map
 - Decompress a `sav` or `biq` file
 - Hex dump the file data, automatically decompressing if needed
+- Return data based on GraphQL queries
 
 Other features are in development such as:
 
@@ -13,7 +14,7 @@ Other features are in development such as:
 
 ### Use
 
-`civ3sat.exe <command> <file>`
+`civ3sat.exe --path <file> <command>`
 
 This example runs the `seed` command against a save file. To generate the same
 map you must use all the choices in the "choose your world" screen as shown in
@@ -38,6 +39,8 @@ size or else the map may be different.
 
 ### Commands
 
-- `seed <file>` - Returns world map info as shown above.
-- `decompress <file>` - Writes a decompressed version of the file as `out.sav` in the current working directory.
-- `hexdump <file>` - Prints a hex dump of all game data to the console. If the file is compressed, it will automatically decompress first. 
+- `seed` - Returns world map info as shown above.
+- `decompress` - Writes a decompressed version of the file as `out.sav` in the current working directory.
+- `hexdump` - Prints a hex dump of all game data to the console. If the file is compressed, it will automatically decompress first. 
+- `graphql <query>` - Executes a GraphQL query
+- `api` - Starts http server with GraphQL API at http://127.0.0.1/graphql
