@@ -2,7 +2,6 @@ package civ3satgql
 
 import (
 	"encoding/json"
-	"fmt"
 
 	"github.com/graphql-go/graphql"
 	"github.com/myjimnelson/c3sat/parseciv3"
@@ -52,7 +51,7 @@ func Query(query, path string) (string, error) {
 		return "", err
 	}
 	findSections()
-	fmt.Println(saveGame.sections[len(saveGame.sections)-1])
+	// fmt.Println(saveGame.sections[len(saveGame.sections)-1])
 	// saveGame.sections = []string{"hello", "there"}
 	Schema, err := graphql.NewSchema(graphql.SchemaConfig{
 		Query: queryType,

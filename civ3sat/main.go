@@ -136,9 +136,12 @@ func main() {
 				query := c.Args()[1]
 				// gameData, err = parseciv3.NewCiv3Data(path)
 				if err != nil {
-					return err
+					return cli.NewExitError(err, 1)
 				}
 				result, err := civ3satgql.Query(query, path)
+				if err != nil {
+					return cli.NewExitError(err, 1)
+				}
 				fmt.Print(result)
 				return nil
 			},
