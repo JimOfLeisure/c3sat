@@ -77,6 +77,54 @@ func main() {
 				return nil
 			},
 		},
+		{
+			Name:    "graphql",
+			Aliases: []string{"gql", "g"},
+			Usage:   "Execute GraphQL query",
+			Action: func(c *cli.Context) error {
+				// var gameData parseciv3.Civ3Data
+				var err error
+				path := c.Args().First()
+				query := c.Args()[1]
+				result, err := civ3satgql.Query(query, path)
+				if err != nil {
+					return cli.NewExitError(err, 1)
+				}
+				fmt.Print(result)
+				return nil
+			},
+		},
+		{
+			Name:    "api",
+			Aliases: []string{"www"},
+			Usage:   "Open save, start GraphQL API at http://127.0.0.1:8080/graphql . Control-c to exit.",
+			Flags: []cli.Flag{
+				cli.StringFlag{
+					Name:   "addr",
+					Value:  "127.0.0.1",
+					Usage:  "`ADDRESS` on which to bind",
+					EnvVar: "CIV3SAT_ADDR",
+				},
+				cli.StringFlag{
+					Name:   "port",
+					Value:  "8080",
+					Usage:  "`PORT` on which to listen",
+					EnvVar: "CIV3SAT_PORT",
+				},
+			},
+			Action: func(c *cli.Context) error {
+				var err error
+				path := c.Args().First()
+				fmt.Println("Starting API server for save file at " + path)
+				fmt.Println("GraphQL at http://" + c.String("addr") + ":" + c.String("port") + "/graphql")
+				fmt.Println("Press control-C to exit")
+				err = civ3satgql.Server(path, c.String("addr"), c.String("port"))
+				if err != nil {
+					return cli.NewExitError(err, 1)
+				}
+				return nil
+			},
+		},
 		// ** DEVELOP **
 		{
 			Name:    "map",
@@ -122,27 +170,6 @@ func main() {
 				}
 				// fmt.Print(gameData.Info())
 				fmt.Print(gameData.Debug())
-				return nil
-			},
-		},
-		{
-			Name:    "graphql",
-			Aliases: []string{"gql", "g"},
-			Usage:   "Execute GraphQL query",
-			Action: func(c *cli.Context) error {
-				// var gameData parseciv3.Civ3Data
-				var err error
-				path := c.Args().First()
-				query := c.Args()[1]
-				// gameData, err = parseciv3.NewCiv3Data(path)
-				if err != nil {
-					return cli.NewExitError(err, 1)
-				}
-				result, err := civ3satgql.Query(query, path)
-				if err != nil {
-					return cli.NewExitError(err, 1)
-				}
-				fmt.Print(result)
 				return nil
 			},
 		},
