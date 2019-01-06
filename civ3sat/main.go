@@ -8,6 +8,7 @@ import (
 	"os"
 	"text/tabwriter"
 
+	"github.com/myjimnelson/c3sat/civ3satgql"
 	"github.com/myjimnelson/c3sat/parseciv3"
 	"github.com/urfave/cli"
 )
@@ -121,6 +122,24 @@ func main() {
 				}
 				// fmt.Print(gameData.Info())
 				fmt.Print(gameData.Debug())
+				return nil
+			},
+		},
+		{
+			Name:    "graphql",
+			Aliases: []string{"gql", "g"},
+			Usage:   "Execute GraphQL query",
+			Action: func(c *cli.Context) error {
+				// var gameData parseciv3.Civ3Data
+				var err error
+				path := c.Args().First()
+				query := c.Args()[1]
+				// gameData, err = parseciv3.NewCiv3Data(path)
+				if err != nil {
+					return err
+				}
+				result, err := civ3satgql.Query(query, path)
+				fmt.Print(result)
 				return nil
 			},
 		},
