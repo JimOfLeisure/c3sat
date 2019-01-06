@@ -26,7 +26,7 @@ var pathFlag = cli.StringFlag{
 func main() {
 	app := cli.NewApp()
 	app.Name = "Civ3 Show-And-Tell"
-	app.Version = "0.3.0"
+	app.Version = "0.4.0-alpha"
 	app.Usage = "A utility to extract data from Civ3 SAV and BIQ files. Provide a file name of a SAV or BIQ file after the command."
 
 	app.Commands = []cli.Command{
