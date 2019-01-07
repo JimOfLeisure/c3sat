@@ -38,12 +38,6 @@ func main() {
 				pathFlag,
 			},
 			Action: func(c *cli.Context) error {
-				// var gameData parseciv3.Civ3Data
-				// var err error
-				// gameData, err = parseciv3.NewCiv3Data(saveFilePath)
-				// if err != nil {
-				// 	return err
-				// }
 				fmt.Println()
 				w := new(tabwriter.Writer)
 				defer w.Flush()
