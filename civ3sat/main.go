@@ -143,60 +143,6 @@ func main() {
 				return nil
 			},
 		},
-		// ** DEVELOP **
-		{
-			Name:    "map",
-			Aliases: []string{"m"},
-			Usage:   "Dump a JSON file of map data to civmap.json in the current folder",
-			Flags: []cli.Flag{
-				pathFlag,
-			},
-			Action: func(c *cli.Context) error {
-				var gameData parseciv3.Civ3Data
-				var err error
-				gameData, err = parseciv3.NewCiv3Data(saveFilePath)
-				if err != nil {
-					if parseErr, ok := err.(parseciv3.ParseError); ok {
-						return parseErr
-					}
-					return err
-				}
-				err = ioutil.WriteFile("./civmap.json", gameData.JSONMap(), 0644)
-				if err != nil {
-					log.Println("Error writing file")
-					return err
-				}
-
-				log.Println("Saved to civmap.json in current folder")
-				return nil
-			},
-		},
-		{
-			Name:    "dev",
-			Aliases: []string{"z"},
-			Usage:   "Who knows? It's whatever the dev is working on right now",
-			Flags: []cli.Flag{
-				pathFlag,
-			},
-			Action: func(c *cli.Context) error {
-				var gameData parseciv3.Civ3Data
-				var err error
-				gameData, err = parseciv3.NewCiv3Data(saveFilePath)
-				if err != nil {
-					// 	if parseErr, ok := err.(parseciv3.ParseError); ok {
-					// 		log.Printf("Expected: %s\nHex Dump:\n%s\n", parseErr.Expected, parseErr.Hexdump)
-					// 		return parseErr
-					// 	}
-					fmt.Print(gameData.Debug())
-					return err
-				}
-				// fmt.Print(gameData.Info())
-				fmt.Print(gameData.Debug())
-				return nil
-			},
-		},
-		// ** END DEVELOP **
 	}
-
 	app.Run(os.Args)
 }
