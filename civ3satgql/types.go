@@ -8,6 +8,23 @@ type worldData struct {
 	worldOffset int
 }
 
+type WorldSettingsData struct {
+	WorldSeed          int `json:"worldSeed"`
+	Climate            int `json:"climate"`
+	ClimateFinal       int `json:"climateFinal"`
+	Barbarians         int `json:"barbarians"`
+	BarbariansFinal    int `json:"barbariansFinal"`
+	LandMass           int `json:"landMass"`
+	LandMassFinal      int `json:"landMassFinal"`
+	OceanCoverage      int `json:"oceanCoverage"`
+	OceanCoverageFinal int `json:"oceanCoverageFinal"`
+	Temperature        int `json:"temperature"`
+	TemperatureFinal   int `json:"temperatureFinal"`
+	Age                int `json:"age"`
+	AgeFinal           int `json:"ageFinal"`
+	Size               int `json:"size"`
+}
+
 var civ3Type = graphql.NewObject(graphql.ObjectConfig{
 	Name: "civ3",
 	Fields: graphql.Fields{
@@ -18,8 +35,148 @@ var civ3Type = graphql.NewObject(graphql.ObjectConfig{
 				if wdat, ok := p.Source.(worldData); ok {
 					return ReadInt32(wdat.worldOffset+170, Signed), nil
 				}
-				return 0, nil
+				return -1, nil
 			},
+		},
+		"climate": &graphql.Field{
+			Type: graphql.Int,
+			// Description: "Random seed of random worlds",
+			Resolve: func(p graphql.ResolveParams) (interface{}, error) {
+				if wdat, ok := p.Source.(worldData); ok {
+					return ReadInt32(wdat.worldOffset+186, Signed), nil
+				}
+				return -1, nil
+			},
+		},
+		"climateFinal": &graphql.Field{
+			Type: graphql.Int,
+			// Description: "Random seed of random worlds",
+			Resolve: func(p graphql.ResolveParams) (interface{}, error) {
+				if wdat, ok := p.Source.(worldData); ok {
+					return ReadInt32(wdat.worldOffset+190, Signed), nil
+				}
+				return -1, nil
+			},
+		},
+		"barbarians": &graphql.Field{
+			Type: graphql.Int,
+			// Description: "Random seed of random worlds",
+			Resolve: func(p graphql.ResolveParams) (interface{}, error) {
+				if wdat, ok := p.Source.(worldData); ok {
+					return ReadInt32(wdat.worldOffset+194, Signed), nil
+				}
+				return -1, nil
+			},
+		},
+		"barbariansFinal": &graphql.Field{
+			Type: graphql.Int,
+			// Description: "Random seed of random worlds",
+			Resolve: func(p graphql.ResolveParams) (interface{}, error) {
+				if wdat, ok := p.Source.(worldData); ok {
+					return ReadInt32(wdat.worldOffset+198, Signed), nil
+				}
+				return -1, nil
+			},
+		},
+		"landMass": &graphql.Field{
+			Type: graphql.Int,
+			// Description: "Random seed of random worlds",
+			Resolve: func(p graphql.ResolveParams) (interface{}, error) {
+				if wdat, ok := p.Source.(worldData); ok {
+					return ReadInt32(wdat.worldOffset+202, Signed), nil
+				}
+				return -1, nil
+			},
+		},
+		"landMassFinal": &graphql.Field{
+			Type: graphql.Int,
+			// Description: "Random seed of random worlds",
+			Resolve: func(p graphql.ResolveParams) (interface{}, error) {
+				if wdat, ok := p.Source.(worldData); ok {
+					return ReadInt32(wdat.worldOffset+206, Signed), nil
+				}
+				return -1, nil
+			},
+		},
+		"oceanCoverage": &graphql.Field{
+			Type: graphql.Int,
+			// Description: "Random seed of random worlds",
+			Resolve: func(p graphql.ResolveParams) (interface{}, error) {
+				if wdat, ok := p.Source.(worldData); ok {
+					return ReadInt32(wdat.worldOffset+210, Signed), nil
+				}
+				return -1, nil
+			},
+		},
+		"oceanCoverageFinal": &graphql.Field{
+			Type: graphql.Int,
+			// Description: "Random seed of random worlds",
+			Resolve: func(p graphql.ResolveParams) (interface{}, error) {
+				if wdat, ok := p.Source.(worldData); ok {
+					return ReadInt32(wdat.worldOffset+214, Signed), nil
+				}
+				return -1, nil
+			},
+		},
+		"temperature": &graphql.Field{
+			Type: graphql.Int,
+			// Description: "Random seed of random worlds",
+			Resolve: func(p graphql.ResolveParams) (interface{}, error) {
+				if wdat, ok := p.Source.(worldData); ok {
+					return ReadInt32(wdat.worldOffset+218, Signed), nil
+				}
+				return -1, nil
+			},
+		},
+		"temperatureFinal": &graphql.Field{
+			Type: graphql.Int,
+			// Description: "Random seed of random worlds",
+			Resolve: func(p graphql.ResolveParams) (interface{}, error) {
+				if wdat, ok := p.Source.(worldData); ok {
+					return ReadInt32(wdat.worldOffset+222, Signed), nil
+				}
+				return -1, nil
+			},
+		},
+		"age": &graphql.Field{
+			Type: graphql.Int,
+			// Description: "Random seed of random worlds",
+			Resolve: func(p graphql.ResolveParams) (interface{}, error) {
+				if wdat, ok := p.Source.(worldData); ok {
+					return ReadInt32(wdat.worldOffset+226, Signed), nil
+				}
+				return -1, nil
+			},
+		},
+		"ageFinal": &graphql.Field{
+			Type: graphql.Int,
+			// Description: "Random seed of random worlds",
+			Resolve: func(p graphql.ResolveParams) (interface{}, error) {
+				if wdat, ok := p.Source.(worldData); ok {
+					return ReadInt32(wdat.worldOffset+230, Signed), nil
+				}
+				return -1, nil
+			},
+		},
+		"size": &graphql.Field{
+			Type: graphql.Int,
+			// Description: "Random seed of random worlds",
+			Resolve: func(p graphql.ResolveParams) (interface{}, error) {
+				if wdat, ok := p.Source.(worldData); ok {
+					return ReadInt32(wdat.worldOffset+234, Signed), nil
+				}
+				return -1, nil
+			},
+		},
+	},
+})
+
+var worldDataType = graphql.NewObject(graphql.ObjectConfig{
+	Name: "worldSettings",
+	Fields: graphql.Fields{
+		"worldSeed": &graphql.Field{
+			Type:        graphql.Int,
+			Description: "Random seed of random worlds",
 		},
 	},
 })
