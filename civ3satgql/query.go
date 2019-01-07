@@ -11,8 +11,11 @@ var queryType = graphql.NewObject(graphql.ObjectConfig{
 			Type:        civ3Type,
 			Description: "Civ3 save data",
 			Resolve: func(p graphql.ResolveParams) (interface{}, error) {
-				// I have to return something else subfields won't return
-				return "test", nil
+				wrldSection, err := SectionOffset("WRLD", 1)
+				if err != nil {
+					return nil, err
+				}
+				return worldData{worldOffset: wrldSection}, nil
 			},
 		},
 	},

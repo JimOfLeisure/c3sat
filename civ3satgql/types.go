@@ -4,6 +4,10 @@ import (
 	"github.com/graphql-go/graphql"
 )
 
+type worldData struct {
+	worldOffset int
+}
+
 var civ3Type = graphql.NewObject(graphql.ObjectConfig{
 	Name: "civ3",
 	Fields: graphql.Fields{
@@ -11,11 +15,10 @@ var civ3Type = graphql.NewObject(graphql.ObjectConfig{
 			Type:        graphql.Int,
 			Description: "Random seed of random worlds",
 			Resolve: func(p graphql.ResolveParams) (interface{}, error) {
-				mySection, err := SectionOffset("WRLD", 1)
-				if err != nil {
-					return 0, nil
+				if wdat, ok := p.Source.(worldData); ok {
+					return ReadInt32(wdat.worldOffset+170, Signed), nil
 				}
-				return ReadInt32(mySection+170, Signed), nil
+				return 0, nil
 			},
 		},
 	},
