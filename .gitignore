@@ -1,17 +1,12 @@
+# data / output files
 *.SAV
 *.sav
-*.gz
-*.xxd
-*.bak
-html/*.svg
-html/*.json
-html/debug/
-*.exe
 *.csv
 *.json
 
-#python specific
-*.pyc
+# built executables
+civ3sat/civ3sat
+*.exe
 
 ## generic files to ignore
 *~

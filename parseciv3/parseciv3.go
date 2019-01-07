@@ -25,7 +25,6 @@ import (
 	"bytes"
 	"encoding/binary"
 	"encoding/hex"
-	"fmt"
 	"io"
 	"io/ioutil"
 	"os"
@@ -83,6 +82,7 @@ func NewCiv3Data(path string) (Civ3Data, error) {
 	var civ3data Civ3Data
 	var compressed bool
 	var err error
+	var listHeader ListHeader
 	civ3data.FileName = path
 
 	// Load file into struct for parsing
@@ -95,7 +95,191 @@ func NewCiv3Data(path string) (Civ3Data, error) {
 	// Create ReadSeeker
 	r := bytes.NewReader(rawFile)
 
+	// CIV3 section, optional if BIC file
+	name, _, err := peek(r)
+
+	if err != nil {
+		return civ3data, err
+	}
+	if string(name[:]) == "CIV3" {
+		err = binary.Read(r, binary.LittleEndian, &civ3data.Civ3)
+		if err != nil {
+			return civ3data, err
+		}
+
+		// BIC_ resoruces
+		err = binary.Read(r, binary.LittleEndian, &civ3data.BicResources)
+		if err != nil {
+			return civ3data, err
+		}
+	}
+	// BIC file / section
+	err = binary.Read(r, binary.LittleEndian, &civ3data.BicFileHeader)
+	if err != nil {
+		return civ3data, err
+	}
+	switch string(civ3data.BicFileHeader[:]) {
+	case "BIC ", "BICX", "BICQ":
+		// continue
+	default:
+		return civ3data, ParseError{"Parse error: Unexpected data", "BIC*", debugHexDump(r)}
+
+	}
+	// VER#
+	err = binary.Read(r, binary.LittleEndian, &listHeader)
+	if err != nil {
+		return civ3data, err
+	}
+	civ3data.VerNum = make([]VerNum, listHeader.Count)
+	err = binary.Read(r, binary.LittleEndian, &civ3data.VerNum)
+	if err != nil {
+		return civ3data, err
+	}
+
+	// Custom rules
+	err = binary.Read(r, binary.LittleEndian, &listHeader)
+	if err != nil {
+		return civ3data, err
+	}
+	if string(listHeader.Name[:]) == "BLDG" {
+		// BLDG
+		civ3data.Bldg = make([]Bldg, listHeader.Count)
+		err = binary.Read(r, binary.LittleEndian, &civ3data.Bldg)
+		if err != nil {
+			return civ3data, err
+		}
+		// CTZN
+		err = binary.Read(r, binary.LittleEndian, &listHeader)
+		if err != nil {
+			return civ3data, err
+		}
+		civ3data.Ctzn = make([]Ctzn, listHeader.Count)
+		err = binary.Read(r, binary.LittleEndian, &civ3data.Ctzn)
+		if err != nil {
+			return civ3data, err
+		}
+		// CULT
+		err = binary.Read(r, binary.LittleEndian, &listHeader)
+		if err != nil {
+			return civ3data, err
+		}
+		civ3data.Cult = make([]Cult, listHeader.Count)
+		err = binary.Read(r, binary.LittleEndian, &civ3data.Cult)
+		if err != nil {
+			return civ3data, err
+		}
+		// DIFF
+		err = binary.Read(r, binary.LittleEndian, &listHeader)
+		if err != nil {
+			return civ3data, err
+		}
+		civ3data.Diff = make([]Difficulty, listHeader.Count)
+		err = binary.Read(r, binary.LittleEndian, &civ3data.Diff)
+		if err != nil {
+			return civ3data, err
+		}
+		// ERAS
+		err = binary.Read(r, binary.LittleEndian, &listHeader)
+		if err != nil {
+			return civ3data, err
+		}
+		civ3data.Eras = make([]Era, listHeader.Count)
+		err = binary.Read(r, binary.LittleEndian, &civ3data.Eras)
+		if err != nil {
+			return civ3data, err
+		}
+		// ESPN
+		err = binary.Read(r, binary.LittleEndian, &listHeader)
+		if err != nil {
+			return civ3data, err
+		}
+		civ3data.Espn = make([]Espn, listHeader.Count)
+		err = binary.Read(r, binary.LittleEndian, &civ3data.Espn)
+		if err != nil {
+			return civ3data, err
+		}
+		// EXPR
+		err = binary.Read(r, binary.LittleEndian, &listHeader)
+		if err != nil {
+			return civ3data, err
+		}
+		civ3data.Expr = make([]Expr, listHeader.Count)
+		err = binary.Read(r, binary.LittleEndian, &civ3data.Expr)
+		if err != nil {
+			return civ3data, err
+		}
+		// FLAV
+		// reading this one in incrementally because it's an array of arrays, and the leaves have an array
+		err = binary.Read(r, binary.LittleEndian, &listHeader)
+		if err != nil {
+			return civ3data, err
+		}
+		civ3data.Flav = make([][]Flavor, listHeader.Count)
+		for i := range civ3data.Flav {
+			var numFlavors int32
+			err = binary.Read(r, binary.LittleEndian, &numFlavors)
+			if err != nil {
+				return civ3data, err
+			}
+			civ3data.Flav[i] = make([]Flavor, numFlavors)
+			for j := range civ3data.Flav[i] {
+				err = binary.Read(r, binary.LittleEndian, &civ3data.Flav[i][j])
+				if err != nil {
+					return civ3data, err
+				}
+			}
+		}
+		// GOOD
+		err = binary.Read(r, binary.LittleEndian, &listHeader)
+		if err != nil {
+			return civ3data, err
+		}
+		// fmt.Println(string(listHeader.Name[:]))
+		civ3data.Good = make([]Good, listHeader.Count)
+		err = binary.Read(r, binary.LittleEndian, &civ3data.Good)
+		if err != nil {
+			return civ3data, err
+		}
+	} else {
+		// No custom rules, so back up pointer before going to old parseddata function
+		_, err = r.Seek(-8, 1)
+		if err != nil {
+			return civ3data, err
+		}
+	}
+	// Original parseddata section
 	civ3data.Data, err = ParseCiv3(r)
+	if err != nil {
+		return civ3data, err
+	}
+
+	err = binary.Read(r, binary.LittleEndian, &civ3data.Wrld)
+	if err != nil {
+		return civ3data, err
+	}
+	tileCount := civ3data.Wrld.MapHeight * int32(civ3data.Wrld.MapWidth/2)
+	_ = tileCount
+	civ3data.Tile = make([]Tile, tileCount)
+	err = binary.Read(r, binary.LittleEndian, &civ3data.Tile)
+	if err != nil {
+		return civ3data, err
+	}
+	civ3data.Cont = make([]Continent, civ3data.Wrld.NumContinents)
+	err = binary.Read(r, binary.LittleEndian, &civ3data.Cont)
+	if err != nil {
+		return civ3data, err
+	}
+
+	// TODO: Find where resource count is
+	// Currently counting GOODs if present or using default 26 resource count
+	var numResources int
+	if len(civ3data.Good) > 0 {
+		numResources = len(civ3data.Good)
+	} else {
+		numResources = 26
+	}
+	civ3data.ResourceCounts = make([]int32, numResources)
+	err = binary.Read(r, binary.LittleEndian, &civ3data.ResourceCounts)
 	if err != nil {
 		return civ3data, err
 	}
@@ -104,85 +288,30 @@ func NewCiv3Data(path string) (Civ3Data, error) {
 }
 
 // peek returns the next 4 bytes nondestructively
-func peek(r io.ReadSeeker) ([]byte, error) {
+func peek(r io.ReadSeeker) ([]byte, int32, error) {
 	var b [4]byte
 	err := binary.Read(r, binary.LittleEndian, &b)
 	if err != nil {
-		return nil, ReadError{err}
+		return nil, 0, ReadError{err}
 	}
-	// Back the pointer up 4 bytes
-	r.Seek(-4, 1)
-	return b[:], nil
-}
-
-// peekName is a wrapper to allow 4-char strings as a parameter to peekFour
-func peekName(r io.ReadSeeker, expected string) error {
-	var b [4]byte
-	copy(b[:], expected)
-	return peekFour(r, b)
-}
-
-// peekFour returns r with the pointer in its original location, and an error if the next bytes don't match expected
-func peekFour(r io.ReadSeeker, expected [4]byte) error {
-	var peek [4]byte
-	err := binary.Read(r, binary.LittleEndian, &peek)
+	var length int32
+	err = binary.Read(r, binary.LittleEndian, &length)
 	if err != nil {
-		return ReadError{err}
+		return b[:], 0, ReadError{err}
 	}
 	// Back the pointer up 4 bytes
-	r.Seek(-4, 1)
-	if peek != expected {
-		return ParseError{"Parse error: Unexpected data", fmt.Sprintf("%v", expected), debugHexDump(r)}
-	}
-	return nil
+	r.Seek(-8, 1)
+	return b[:], length, nil
 }
 
 // ParseCiv3 takes raw save file data and returns a map of the parsed data
 func ParseCiv3(r io.ReadSeeker) (ParsedData, error) {
 	data := make(ParsedData)
-	var err error
-
-	// CIV3 section, optional if BIC file
-	err = peekName(r, "CIV3")
-	if err == nil {
-		// need to preserve parent scope's err
-		var err error
-		data["CIV3"], err = newCiv3(r)
-		if err != nil {
-			return data, err
-		}
-		// BIC_
-		data["BIC "], err = newBase(r)
-		if err != nil {
-			return data, err
-		}
-	} else {
-		if _, ok := err.(ParseError); ok {
-			// continue if not matched; may be a BIC/X/Q file
-		} else {
-			return data, err
-		}
-	}
-
-	// BIC file / section
-	bicHeader := make([]byte, 4)
-	err = binary.Read(r, binary.LittleEndian, &bicHeader)
-	if err != nil {
-		return data, err
-	}
-	switch string(bicHeader) {
-	case "BIC ", "BICX", "BICQ":
-		// continue
-	default:
-		// Back the pointer up 4 bytes
-		r.Seek(-4, 1)
-		return data, ParseError{"Parse error: Unexpected data", "BIC*", debugHexDump(r)}
-
-	}
 	var gameSectionCount int
 	// TODO: Add sections for custom world map
 	// loop sections until 2nd GAME reached which marks end of the BIC and beginning of game data
-	for name, err := peek(r); gameSectionCount < 1 || string(name[:]) != "GAME"; name, err = peek(r) {
+	for name, length, err := peek(r); gameSectionCount < 1 || string(name[:]) != "GAME"; name, length, err = peek(r) {
+		_ = length
 		if err != nil {
 			return data, err
 		}
@@ -194,13 +323,8 @@ func ParseCiv3(r io.ReadSeeker) (ParsedData, error) {
 			}
 			gameSectionCount++
 		// (Almost?) Always in this order, but have seen FLAV after EXPR in some saves and after WSIZ in others
-		case "VER#", "BLDG", "CTZN", "CULT", "DIFF", "ERAS", "ESPN", "EXPR", "GOOD", "GOVT", "RULE", "PRTO", "RACE", "TECH", "TFRM", "TERR", "WSIZ", "LEAD":
+		case "GOVT", "RULE", "PRTO", "RACE", "TECH", "TFRM", "TERR", "WSIZ", "LEAD":
 			data[string(name[:])], err = newList(r)
-			if err != nil {
-				return data, err
-			}
-		case "FLAV":
-			data[string(name[:])], err = newFlav(r)
 			if err != nil {
 				return data, err
 			}
@@ -210,7 +334,8 @@ func ParseCiv3(r io.ReadSeeker) (ParsedData, error) {
 	}
 	var abort bool
 	// 2nd GAME / first non-BIC GAME and beyond
-	for byteName, err := peek(r); !abort; byteName, err = peek(r) {
+	for byteName, length, err := peek(r); !abort; byteName, length, err = peek(r) {
+		_ = length
 		if err != nil {
 			return data, err
 		}
@@ -261,42 +386,6 @@ func ParseCiv3(r io.ReadSeeker) (ParsedData, error) {
 			if err != nil {
 				return data, err
 			}
-		case "WRLD":
-			var wrld Wrld
-			err = binary.Read(r, binary.LittleEndian, &wrld)
-			if err != nil {
-				return data, err
-			}
-			data[name] = wrld
-			tileCount := wrld.MapHeight * int32(wrld.MapWidth/2)
-			_ = tileCount
-			tiles := make([]Tile, tileCount)
-			err = binary.Read(r, binary.LittleEndian, &tiles)
-			if err != nil {
-				return data, err
-			}
-			data["TILE"] = tiles
-			continents := make([]Continent, wrld.NumContinents)
-			err = binary.Read(r, binary.LittleEndian, &continents)
-			if err != nil {
-				return data, err
-			}
-			data["CONT"] = continents
-
-			// TODO: Find where resource count is
-			// Currently counting GOODs if present or using default 26 resource count
-			var numResources int
-			if resources, ok := data["GOOD"].(List); ok {
-				numResources = int(resources.Count)
-			} else {
-				numResources = 26
-			}
-			resourceCounts := make([]int32, numResources)
-			err = binary.Read(r, binary.LittleEndian, &resourceCounts)
-			if err != nil {
-				return data, err
-			}
-			data["ResourceCounts"] = resourceCounts
 		default:
 			abort = true
 		}

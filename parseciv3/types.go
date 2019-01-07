@@ -48,11 +48,28 @@ type ParsedData map[string]Section
 
 // Civ3Data contains the game data
 type Civ3Data struct {
-	FileName   string
-	Compressed bool
-	Data       ParsedData
-	Next       string
-	// RawFile    []byte
+	FileName      string
+	Compressed    bool
+	Data          ParsedData
+	Civ3          Civ3Header
+	BicResources  BicResources
+	BicFileHeader [4]byte
+	VerNum        []VerNum
+	Bldg          []Bldg
+	Ctzn          []Ctzn
+	Cult          []Cult
+	Diff          []Difficulty
+	Eras          []Era
+	Espn          []Espn
+	Expr          []Expr
+	Flav          [][]Flavor
+	Good          []Good
+	//
+	Wrld           Wrld
+	Tile           []Tile
+	Cont           []Continent
+	ResourceCounts []int32
+	Next           string
 }
 
 // Section is the inteface for the various structs decoded from the data files
@@ -61,21 +78,177 @@ type Section interface{}
 // ListItem are the structs in a list
 type ListItem interface{}
 
-// Civ3 is the SAV file header
-type Civ3 struct {
-	Name [4]byte
-	// 28 bytes. Guessing on alignment
-	A, B, C, D, E, F uint32
-	G                uint16
+// Civ3Header is the SAV file header
+// The Gobbledygook values appear to be 16 bytes of uncorrelated data, perhaps a hash or checksum?
+type Civ3Header struct {
+	Name                                                       [4]byte
+	Always0x1a00                                               int16
+	MaybeVersionMinor, MaybeVersionMajor                       int32
+	Gobbeldygook1, Gobbeldygook2, Gobbeldygook3, Gobbeldygook4 uint32
 }
 
-func newCiv3(r io.ReadSeeker) (Civ3, error) {
-	var data Civ3
-	err := binary.Read(r, binary.LittleEndian, &data)
-	if err != nil {
-		return data, ReadError{err}
-	}
-	return data, nil
+// BicResources is part of the second SAV file section. Guessing at the alignment
+type BicResources struct {
+	Name         [4]byte
+	Length       int32
+	A            int32
+	ResourcePath [0x100]byte
+	B            int32
+	BicPath      [0x100]byte
+	C            int32
+}
+
+// ListHeader ...
+type ListHeader struct {
+	Name  [4]byte
+	Count int32
+}
+
+// VerNum ...
+type VerNum struct {
+	Length          int32
+	A, B            uint32
+	BicMajorVersion int32
+	BicMinorVersion int32
+	Description     [640]byte
+	Title           [64]byte
+}
+
+// Bldg ...
+type Bldg struct {
+	Length                     int32
+	Description                [64]byte
+	Name                       [32]byte
+	CivilopediaEntry           [32]byte
+	DoublesHappinessOf4        int32
+	GainInEveryCity            int32
+	GainInEveryCityOnContinent int32
+	RequiredBuilding           int32
+	Cost                       int32
+	Culture                    int32
+	BombardmentDefense         int32
+	NavalBombardmentDefense    int32
+	DefenseBonus               int32
+	NavalDefenseBonus          int32
+	MaintenanceCost            int32
+	HappyFacesAllCities        int32
+	HappyFaces                 int32
+	UnhappyFacesAllCities      int32
+	UnhappyFaces               int32
+	NumberOfRequiredBuildings  int32
+	AirPower                   int32
+	NavalPower                 int32
+	Pollution                  int32
+	Production                 int32
+	RequiredGovernment         int32
+	SpaceshipPart              int32
+	RequiredAdvance            int32
+	RenderedObsoleteBy         int32
+	RequiredResource1          int32
+	RequiredResource2          int32
+	ImprovementsBitMap         int32
+	OtherCharacteristicsBitMap int32
+	SmallWondersBitMap         int32
+	WondersBitMap              int32
+	NumberOfArmiesRequired     int32
+	FlavorsBitMap              int32
+	A                          int32
+	UnitProducedPRTORef        int32
+	UnitFrequency              int32
+}
+
+// Ctzn ...
+type Ctzn struct {
+	Length               int32
+	DefaultCitizen       int32
+	CitizensSingularName [32]byte
+	CivilopediaEntry     [32]byte
+	PluralName           [32]byte
+	Prerequisite         int32
+	Luxuries             int32
+	Research             int32
+	Taxes                int32
+	Corruption           int32
+	Construction         int32
+}
+
+// Cult ...
+type Cult struct {
+	Length                       int32
+	CultureOpinionName           [64]byte
+	ChanceOfSuccessfulPropaganda int32
+	CultureRatioPercentage       int32
+	CultureRatioDenominator      int32
+	CultureRatioNumerator        int32
+	InitialResistanceChance      int32
+	ContinuedResistanceChance    int32
+}
+
+// Difficulty ...
+type Difficulty struct {
+	Length                                 int32
+	DifficultyLevelName                    [64]byte
+	NumberOfCitizensBornContent            int32
+	MaxGovernmentTransitionTime            int32
+	NumberOfDefensiveLandUnitsAIStartsWith int32
+	NumberOfOffensiveLandUnitsAIStartsWith int32
+	ExtraStartUnit1                        int32
+	ExtraStartUnit2                        int32
+	AdditionalFreeSupport                  int32
+	BonusForEachCity                       int32
+	AttackBonusAgainstBarbarians           int32
+	CostFactor                             int32
+	PercentageOfOptimalCities              int32
+	AIToAITradeRate                        int32
+	CorruptionPct                          int32
+	MilitaryLaw                            int32
+}
+
+// Era ...
+type Era struct {
+	Length                      int32
+	EraName                     [64]byte
+	CivilopediaEntry            [32]byte
+	Researcher1                 [32]byte
+	Researcher2                 [32]byte
+	Researcher3                 [32]byte
+	Researcher4                 [32]byte
+	Researcher5                 [32]byte
+	NumberOfUsedResearcherNames int32
+	A                           int32
+}
+
+// Espn ...
+type Espn struct {
+	Length                   int32
+	Description              [128]byte
+	MissionName              [64]byte
+	CivilopediaEntry         [32]byte
+	MissionPerformedByBitMap int32
+	BaseCost                 int32
+}
+
+// Expr ...
+type Expr struct {
+	Length              int32
+	ExperienceLevelName [32]byte
+	BaseHitPoints       int32
+	RetreatBonus        int32
+}
+
+// Good are the resource types
+type Good struct {
+	LengthOfResourceData88   int32
+	NaturalResourceName      [24]byte
+	CivilopediaEntry         [32]byte
+	Type                     int32
+	AppearanceRatio          int32
+	DisappearanceProbability int32
+	Icon                     int32
+	Prerequisite             int32
+	FoodBonus                int32
+	ShieldsBonus             int32
+	CommerceBonus            int32
 }
 
 // Base is one of the basic section structures of the game data
@@ -174,20 +347,13 @@ func newFlav(r io.ReadSeeker) (Flav, error) {
 	return flav, nil
 }
 
-// BicResources is part of the second SAV file section. Guessing at the alignment
-type BicResources struct {
-	A            int32
-	ResourcePath [0x100]byte
-	B            int32
-	BicPath      [0x100]byte
-	C            int32
-}
-
 // Flavor is the leaf element of FLAV
+// Hard-coding FlavorRelations at 7. Hopefully that always works
 type Flavor struct {
-	A                      int32
-	FlavorName             [0x100]byte
-	B, C, D, E, F, G, H, I int32
+	A                  int32
+	FlavorName         [0x100]byte
+	NumFlavorRelations int32
+	FlavorRelations    [7]int32
 }
 
 // Game is the first section after the BIC.
