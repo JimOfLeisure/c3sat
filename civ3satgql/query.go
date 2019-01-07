@@ -159,7 +159,7 @@ var queryType = graphql.NewObject(graphql.ObjectConfig{
 		},
 		"int32s": &graphql.Field{
 			Type:        graphql.NewList(graphql.Int),
-			Description: "Int16 array",
+			Description: "Int32 array",
 			Args: graphql.FieldConfigArgument{
 				"section": &graphql.ArgumentConfig{
 					Type:        graphql.NewNonNull(graphql.String),
