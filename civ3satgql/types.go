@@ -8,23 +8,6 @@ type worldData struct {
 	worldOffset int
 }
 
-type WorldSettingsData struct {
-	WorldSeed          int `json:"worldSeed"`
-	Climate            int `json:"climate"`
-	ClimateFinal       int `json:"climateFinal"`
-	Barbarians         int `json:"barbarians"`
-	BarbariansFinal    int `json:"barbariansFinal"`
-	LandMass           int `json:"landMass"`
-	LandMassFinal      int `json:"landMassFinal"`
-	OceanCoverage      int `json:"oceanCoverage"`
-	OceanCoverageFinal int `json:"oceanCoverageFinal"`
-	Temperature        int `json:"temperature"`
-	TemperatureFinal   int `json:"temperatureFinal"`
-	Age                int `json:"age"`
-	AgeFinal           int `json:"ageFinal"`
-	Size               int `json:"size"`
-}
-
 var civ3Type = graphql.NewObject(graphql.ObjectConfig{
 	Name: "civ3",
 	Fields: graphql.Fields{
@@ -167,16 +150,6 @@ var civ3Type = graphql.NewObject(graphql.ObjectConfig{
 				}
 				return -1, nil
 			},
-		},
-	},
-})
-
-var worldDataType = graphql.NewObject(graphql.ObjectConfig{
-	Name: "worldSettings",
-	Fields: graphql.Fields{
-		"worldSeed": &graphql.Field{
-			Type:        graphql.Int,
-			Description: "Random seed of random worlds",
 		},
 	},
 })
