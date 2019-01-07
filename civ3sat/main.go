@@ -38,17 +38,20 @@ func main() {
 				pathFlag,
 			},
 			Action: func(c *cli.Context) error {
-				var gameData parseciv3.Civ3Data
-				var err error
-				gameData, err = parseciv3.NewCiv3Data(saveFilePath)
-				if err != nil {
-					return err
-				}
+				// var gameData parseciv3.Civ3Data
+				// var err error
+				// gameData, err = parseciv3.NewCiv3Data(saveFilePath)
+				// if err != nil {
+				// 	return err
+				// }
 				fmt.Println()
 				w := new(tabwriter.Writer)
 				defer w.Flush()
 				w.Init(os.Stdout, 0, 8, 0, '\t', 0)
-				settings := gameData.WorldSettings()
+				settings, err := civ3satgql.WorldSettings(saveFilePath)
+				if err != nil {
+					return cli.NewExitError(err, 1)
+				}
 				for i := range settings {
 					fmt.Fprintf(w, "%s\t%s\t%s\n", settings[i][0], settings[i][1], settings[i][2])
 				}
