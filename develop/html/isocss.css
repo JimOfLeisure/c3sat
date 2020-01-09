@@ -1,0 +1,25 @@
+div#map {
+    display: flex;
+}
+map-tile {
+    box-sizing: border-box;
+    margin: 0 1.84em;
+    position: relative;
+    width: 10em;
+    height: 10em;
+}
+div.isotile {
+    display: flex;
+    box-sizing: border-box;
+    margin: 0 0;
+    background-color: green;
+    transform: rotateX(60deg) rotateY(0deg) rotateZ(-45deg);
+}
+.isotile, .tiletext {
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
