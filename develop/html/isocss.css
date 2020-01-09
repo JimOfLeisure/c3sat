@@ -1,8 +1,7 @@
 :root {
-    --tile-size: 10em;
-    /* --tile-side: calc(‭var(--tile-size) * 2) */
-    --tile-side: ‭var(--tile-size);
-    /* --tile-side: 1.84em; */
+    --tile-width: 10em;
+    --tile-height: 5em;
+    --tile-color: green;
 }
 div#map {
     /* display: flex; */
@@ -12,26 +11,35 @@ div#map {
 }
 .row:nth-child(even) {
     /* margin-left: 6.83em; */
-    margin-left: calc(var(--tile-size) * 0.707);
+    margin-left: calc(var(--tile-width) / 2);
 }
 map-tile {
     box-sizing: border-box;
-    /* margin: -3.2em 1.84em; */
-    /* margin: -3.2em var(--tile-side); */
-    /* margin-left: calc(var(--tile-size) * 0.366); */
-    margin-left: 0;
-    /* margin-bottom: -6.4em; */
-    margin-bottom: calc(var(--tile-size) * -0.65);
+    margin: 0 0;
     position: relative;
-    width: calc(var(--tile-size) * 1.414);
-    height: var(--tile-size);
+
 }
 div.isotile {
     display: flex;
     box-sizing: border-box;
     margin: 0 0;
-    background-color: green;
-    transform: rotateX(60deg) rotateY(0deg) rotateZ(-45deg);
+    /* background-color: green; */
+    width: 0;
+    height: 0;
+    border: calc(var(--tile-width) / 2) solid transparent;
+    border-bottom: calc(var(--tile-height) / 2) solid var(--tile-color);
+    position: relative;
+    top: calc(var(--tile-height) / -2);
+}
+div.isotile:after {
+    content: '';
+    position: absolute;
+    left: calc(var(--tile-width) / -2);
+    top: calc(var(--tile-height) / 2);
+    width: 0;
+    height: 0;
+    border: calc(var(--tile-width) / 2) solid transparent;
+    border-top: calc(var(--tile-height) / 2) solid var(--tile-color);
 }
 .isotile, .tiletext {
     position: absolute;
