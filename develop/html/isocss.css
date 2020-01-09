@@ -1,12 +1,30 @@
+:root {
+    --tile-size: 10em;
+    /* --tile-side: calc(‭var(--tile-size) * 2) */
+    --tile-side: ‭var(--tile-size);
+    /* --tile-side: 1.84em; */
+}
 div#map {
+    /* display: flex; */
+}
+.row {
     display: flex;
+}
+.row:nth-child(even) {
+    /* margin-left: 6.83em; */
+    margin-left: calc(var(--tile-size) * 0.707);
 }
 map-tile {
     box-sizing: border-box;
-    margin: 0 1.84em;
+    /* margin: -3.2em 1.84em; */
+    /* margin: -3.2em var(--tile-side); */
+    /* margin-left: calc(var(--tile-size) * 0.366); */
+    margin-left: 0;
+    /* margin-bottom: -6.4em; */
+    margin-bottom: calc(var(--tile-size) * -0.65);
     position: relative;
-    width: 10em;
-    height: 10em;
+    width: calc(var(--tile-size) * 1.414);
+    height: var(--tile-size);
 }
 div.isotile {
     display: flex;
@@ -17,8 +35,10 @@ div.isotile {
 }
 .isotile, .tiletext {
     position: absolute;
-    width: 100%;
-    height: 100%;
+    /* width: 100%;
+    height: 100%; */
+    width: var(--tile-size);
+    height: var(--tile-size);
     display: flex;
     justify-content: center;
     align-items: center;
