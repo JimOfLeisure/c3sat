@@ -9,7 +9,7 @@ class MapTile extends HTMLElement {
         this.appendChild(textDiv);
         tileDiv.classList.add('isotile');
         textDiv.classList.add('tiletext');
-        textDiv.innerText = "🌲🌲🌲";
+        textDiv.innerText = "🌲⛰️🌴🌳";
 	}
 }
 // TODO: put this in try/catch with friendly output for non-web-component browsers
