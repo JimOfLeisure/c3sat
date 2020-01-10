@@ -11,8 +11,9 @@ xhr.onload = () => {
             row.classList += 'row';
             for (let i=0; i < tilesWide; i++) {
                 const tile = document.createElement('map-tile');
-                // tile.setAttribute('data-tile', JSON.stringify(mapData.data.map.tiles[i]));
-                tile.setAttribute('data-terrain', mapData.data.map.tiles[i + j * tilesWide].hexTerrain);
+                const index = i + j * tilesWide;
+                tile.setAttribute('data-terrain', mapData.data.map.tiles[index].hexTerrain);
+                tile.setAttribute('data-chopped', mapData.data.map.tiles[index].chopped);
                 row.appendChild(tile);
             }
             map.appendChild(row);
@@ -39,6 +40,7 @@ query = `{
         tileSetHeight
         tiles {
             hexTerrain
+            chopped
         }
     } 
 }`;
@@ -93,11 +95,15 @@ class MapTile extends HTMLElement {
             if (baseTerrainCss[this.dataset.terrain[1]]) {
                 this.style.setProperty('--tile-color', `var(--${baseTerrainCss[this.dataset.terrain[1]]})`);
             }
+
             if (overlayTerrain[this.dataset.terrain[0]]) {
                 textDiv.innerText = overlayTerrain[this.dataset.terrain[0]];
             }
         } else {
             textDiv.innerText = "🌲⛰️🌴🌳";
+        }
+        if (this.dataset.chopped == 'true') {
+            textDiv.innerText += "C";
         }
 	}
 }

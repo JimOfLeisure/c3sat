@@ -49,6 +49,16 @@ var mapTileType = graphql.NewObject(graphql.ObjectConfig{
 				return "foo", nil
 			},
 		},
+		"chopped": &graphql.Field{
+			Type:        graphql.Boolean,
+			Description: "True if a forest has previously been harvested from this tile",
+			Resolve: func(p graphql.ResolveParams) (interface{}, error) {
+				if offset, ok := p.Source.(int); ok {
+					return ((ReadInt16(offset+62, Unsigned) & 0x1000) != 0), nil
+				}
+				return "foo", nil
+			},
+		},
 	},
 })
 
