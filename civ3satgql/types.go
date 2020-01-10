@@ -8,6 +8,48 @@ type worldData struct {
 	worldOffset int
 }
 
+type mapData struct {
+	mapWidth      int
+	mapHeight     int
+	tileSetWidth  int
+	tileSetHeight int
+	tileSetX      int
+	tileSetY      int
+	tilesData     [][]byte
+}
+
+func (m *mapData) tileCount() int {
+	return m.mapWidth * m.mapHeight
+}
+
+var mapType = graphql.NewObject(graphql.ObjectConfig{
+	Name: "map",
+	Fields: graphql.Fields{
+		"mapWidth": &graphql.Field{
+			Type:        graphql.Int,
+			Description: "Width of the game map in tiles",
+			Resolve: func(p graphql.ResolveParams) (interface{}, error) {
+				if mdat, ok := p.Source.(mapData); ok {
+					return mdat.mapWidth, nil
+				}
+				// TODO: better logic error handling?
+				return -1, nil
+			},
+		},
+		"mapHeight": &graphql.Field{
+			Type:        graphql.Int,
+			Description: "Height of the game map in tiles",
+			Resolve: func(p graphql.ResolveParams) (interface{}, error) {
+				if mdat, ok := p.Source.(mapData); ok {
+					return mdat.mapHeight, nil
+				}
+				// TODO: better logic error handling?
+				return -1, nil
+			},
+		},
+	},
+})
+
 var civ3Type = graphql.NewObject(graphql.ObjectConfig{
 	Name: "civ3",
 	Fields: graphql.Fields{

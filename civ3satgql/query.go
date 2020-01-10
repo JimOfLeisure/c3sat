@@ -21,6 +21,32 @@ var queryType = graphql.NewObject(graphql.ObjectConfig{
 				return worldData{worldOffset: wrldSection}, nil
 			},
 		},
+		"map": &graphql.Field{
+			Type:        mapType,
+			Description: "Current Game Map",
+			Args: graphql.FieldConfigArgument{
+				"playerSpoiler": &graphql.ArgumentConfig{
+					Type:        graphql.Int,
+					Description: "Bitmask of map tile spoilers; default is 0x2",
+				},
+			},
+			Resolve: func(p graphql.ResolveParams) (interface{}, error) {
+				var playerSpoiler int32
+				var ok bool
+				var mdata mapData
+				if playerSpoiler, ok = p.Args["playerSpoiler"].(int32); !ok {
+					playerSpoiler = 0x2
+				}
+				_ = playerSpoiler
+				// wrldSection, err := SectionOffset("WRLD", 1)
+				// if err != nil {
+				// 	return nil, err
+				// }
+				mdata.mapHeight = 4
+				mdata.mapWidth = 3
+				return mdata, nil
+			},
+		},
 		"bytes": &graphql.Field{
 			Type:        graphql.NewList(graphql.Int),
 			Description: "Byte array",
