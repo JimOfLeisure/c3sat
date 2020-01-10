@@ -132,7 +132,7 @@ var mapType = graphql.NewObject(graphql.ObjectConfig{
 					var tileCount = tileRowLength * mdat.tileSetHeight
 					offsets := make([]int, tileCount)
 					for i := 0; i < tileCount; i++ {
-						offsets[i] = mdat.tilesOffset - 4 + (mdat.tileSetY+i/tileRowLength)*mapRowLength*tileBytes + (mdat.tileSetX+i%mdat.tileSetWidth)*tileBytes
+						offsets[i] = mdat.tilesOffset - 4 + (mdat.tileSetY+i/tileRowLength)*mapRowLength*tileBytes + (mdat.tileSetX+i%tileRowLength)*tileBytes
 					}
 					return offsets, nil
 				}
