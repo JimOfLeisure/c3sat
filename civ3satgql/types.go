@@ -1,6 +1,8 @@
 package civ3satgql
 
 import (
+	"encoding/hex"
+
 	"github.com/graphql-go/graphql"
 )
 
@@ -9,18 +11,46 @@ type worldData struct {
 }
 
 type mapData struct {
-	mapWidth      int
-	mapHeight     int
-	tileSetWidth  int
-	tileSetHeight int
-	tileSetX      int
-	tileSetY      int
-	tilesData     [][]byte
+	mapWidth          int
+	mapHeight         int
+	tileSetWidth      int
+	tileSetHeight     int
+	tileSetX          int
+	tileSetY          int
+	playerSpoilerMask int32
+	tilesOffset       int
 }
 
-func (m *mapData) tileCount() int {
-	return m.mapWidth * m.mapHeight
-}
+// no longer needed
+// func (m *mapData) tileCount() int {
+// 	return m.mapWidth * m.mapHeight
+// }
+
+var mapTileType = graphql.NewObject(graphql.ObjectConfig{
+	Name: "tile",
+	Fields: graphql.Fields{
+		"foo": &graphql.Field{
+			Type:        graphql.String,
+			Description: "foo",
+			Resolve: func(p graphql.ResolveParams) (interface{}, error) {
+				if offset, ok := p.Source.(int); ok {
+					return string(saveGame.data[offset:offset+4]) + string(saveGame.data[offset+212:offset+216]), nil
+				}
+				return "foo", nil
+			},
+		},
+		"hexTerrain": &graphql.Field{
+			Type:        graphql.String,
+			Description: "Byte value. High nybble is overlay, low nybble is base terrain",
+			Resolve: func(p graphql.ResolveParams) (interface{}, error) {
+				if offset, ok := p.Source.(int); ok {
+					return hex.EncodeToString(saveGame.data[offset+57 : offset+58]), nil
+				}
+				return "foo", nil
+			},
+		},
+	},
+})
 
 var mapType = graphql.NewObject(graphql.ObjectConfig{
 	Name: "map",
@@ -45,6 +75,68 @@ var mapType = graphql.NewObject(graphql.ObjectConfig{
 				}
 				// TODO: better logic error handling?
 				return -1, nil
+			},
+		},
+		"tileSetWidth": &graphql.Field{
+			Type:        graphql.Int,
+			Description: "Width of the currently visible map in tiles",
+			Resolve: func(p graphql.ResolveParams) (interface{}, error) {
+				if mdat, ok := p.Source.(mapData); ok {
+					return mdat.tileSetWidth, nil
+				}
+				// TODO: better logic error handling?
+				return -1, nil
+			},
+		},
+		"tileSetHeight": &graphql.Field{
+			Type:        graphql.Int,
+			Description: "Height of the currently visible map in tiles",
+			Resolve: func(p graphql.ResolveParams) (interface{}, error) {
+				if mdat, ok := p.Source.(mapData); ok {
+					return mdat.tileSetHeight, nil
+				}
+				// TODO: better logic error handling?
+				return -1, nil
+			},
+		},
+		"tileSetX": &graphql.Field{
+			Type:        graphql.Int,
+			Description: "World map X coordinate of top-left tile set tile",
+			Resolve: func(p graphql.ResolveParams) (interface{}, error) {
+				if mdat, ok := p.Source.(mapData); ok {
+					return mdat.tileSetX, nil
+				}
+				// TODO: better logic error handling?
+				return -1, nil
+			},
+		},
+		"tileSetY": &graphql.Field{
+			Type:        graphql.Int,
+			Description: "World map Y coordinate of top-left tile set tile",
+			Resolve: func(p graphql.ResolveParams) (interface{}, error) {
+				if mdat, ok := p.Source.(mapData); ok {
+					return mdat.tileSetY, nil
+				}
+				// TODO: better logic error handling?
+				return -1, nil
+			},
+		},
+		"tiles": &graphql.Field{
+			Type:        graphql.NewList(mapTileType),
+			Description: "Height of the currently visible map in tiles",
+			Resolve: func(p graphql.ResolveParams) (interface{}, error) {
+				if mdat, ok := p.Source.(mapData); ok {
+					const tileBytes = 212
+					var tileRowLength = mdat.tileSetWidth / 2
+					var mapRowLength = mdat.mapWidth / 2
+					var tileCount = tileRowLength * mdat.tileSetHeight
+					offsets := make([]int, tileCount)
+					for i := 0; i < tileCount; i++ {
+						offsets[i] = mdat.tilesOffset - 4 + (mdat.tileSetY+i/tileRowLength)*mapRowLength*tileBytes + (mdat.tileSetX+i%mdat.tileSetWidth)*tileBytes
+					}
+					return offsets, nil
+				}
+				return nil, nil
 			},
 		},
 	},

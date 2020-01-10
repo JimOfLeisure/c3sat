@@ -25,25 +25,62 @@ var queryType = graphql.NewObject(graphql.ObjectConfig{
 			Type:        mapType,
 			Description: "Current Game Map",
 			Args: graphql.FieldConfigArgument{
-				"playerSpoiler": &graphql.ArgumentConfig{
+				"playerSpoilerMask": &graphql.ArgumentConfig{
 					Type:        graphql.Int,
-					Description: "Bitmask of map tile spoilers; default is 0x2",
+					Description: "Bitmask of map tile per-player spoilers; default is 0x2 to show first human player. Set to 0 to return all map tiles.",
 				},
 			},
 			Resolve: func(p graphql.ResolveParams) (interface{}, error) {
-				var playerSpoiler int32
 				var ok bool
 				var mdata mapData
-				if playerSpoiler, ok = p.Args["playerSpoiler"].(int32); !ok {
-					playerSpoiler = 0x2
+				if mdata.playerSpoilerMask, ok = p.Args["playerSpoilerMask"].(int32); !ok {
+					mdata.playerSpoilerMask = 0x2
 				}
-				_ = playerSpoiler
-				// wrldSection, err := SectionOffset("WRLD", 1)
-				// if err != nil {
-				// 	return nil, err
+				// Get 2nd WRLD offset
+				section, err := SectionOffset("WRLD", 2)
+				if err != nil {
+					return nil, err
+				}
+				// Reading 6 int32s at offset 8; first is height, last is Width
+				intList := make([]int, 6)
+				for i := 0; i < 6; i++ {
+					intList[i] = ReadInt32(section+8+4*i, Signed)
+				}
+				mdata.mapHeight = intList[0]
+				mdata.mapWidth = intList[5]
+				// mdata.tilesData = make([][]byte, mdata.tileCount())
+				// Read raw tile data
+				mdata.tilesOffset, err = SectionOffset("TILE", 1)
+				if err != nil {
+					return nil, err
+				}
+				//  TODO: figure out how to handle wrapping, including oddball settings like Y wrap or no X wrap
+				// 		Because I realized minX and maxX are inadequate in the case of a partial world across the wrap boundary
+				// var minX, minY, maxX, maxY int
+				// if playerSpoilerMask != 0 {
+				// 	minX = mdata.mapWidth - 1
+				// 	minY = mdata.mapHeight - 1
+				// } else {
+				// 	maxX = mdata.mapWidth - 1
+				// 	maxY = mdata.mapHeight - 1
 				// }
-				mdata.mapHeight = 4
-				mdata.mapWidth = 3
+				//  *** TODO: and actually I don't need to read tile data into a buffer because saveGame.data exists in package context; use math during tile generation
+				// for i := 0; i < mdata.tileCount(); i++ {
+				// 	mdata.tilesData[i] = saveGame.data[section+i*196 : section+i*196+196]
+				// 	// minX/etc logic goes here, use playerSpoilerMask and tile offset 68 I think / first value of 4th TILE / TILE128
+				// }
+				// mdata.tileSetX = minX
+				// mdata.tileSetY = minY
+				// mdata.tileSetWidth = maxX - minX + 1
+				// mdata.tileSetHeight = maxY - minY + 1
+				mdata.tileSetX = 0
+				mdata.tileSetY = 0
+				mdata.tileSetWidth = mdata.mapWidth
+				mdata.tileSetHeight = mdata.mapHeight
+				// mdata.tileSetX = mdata.mapWidth/2 - 5
+				// mdata.tileSetY = 15
+				// mdata.tileSetWidth = mdata.mapWidth / 2
+				// mdata.tileSetHeight = mdata.mapHeight - 15
 				return mdata, nil
 			},
 		},

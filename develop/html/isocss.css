@@ -1,10 +1,14 @@
 :root {
-    --tile-width: 10em;
+    --tile-width: 5em;
     --tile-height: calc(var(--tile-width) / 2);
     /* --tile-width: 128px;
     --tile-height: 64px; */
     --tile-color: green;
     --map-width: 3;
+
+    --ocean: seagreen;
+    --sea: mediumseagreen;
+    --coast: lightseagreen;
 }
 div#map {
     /* display: flex; */
