@@ -3,12 +3,16 @@
     --tile-height: calc(var(--tile-width) / 2);
     /* --tile-width: 128px;
     --tile-height: 64px; */
-    --tile-color: green;
+    --tile-color: red;
     --map-width: 3;
 
-    --ocean: seagreen;
-    --sea: mediumseagreen;
+    --desert: khaki;
+    --plains: goldenrod;
+    --grassland: yellowgreen;
+    --tundra: white;
     --coast: lightseagreen;
+    --sea: mediumseagreen;
+    --ocean: seagreen;
 }
 div#map {
     /* display: flex; */

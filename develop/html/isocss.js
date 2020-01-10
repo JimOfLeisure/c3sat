@@ -64,6 +64,24 @@ class MapTile extends HTMLElement {
 		this.render();
 	}
 	render () {
+        const baseTerrainCss = {
+            '0': 'desert',
+            '1': 'plains',
+            '2': 'grassland',
+            '3': 'tundra',
+            'b': 'coast',
+            'c': 'sea',
+            'd': 'ocean'
+        }
+        const overlayTerrain = {
+            '4': 'FP',
+            '5': 'hill',
+            '6': '⛰️',
+            '7': '🌲',
+            '8': '🌴',
+            '9': 'marsh',
+            'a': '🌋'
+        }
 		const tileDiv = document.createElement('div');
 		const textDiv = document.createElement('div');
         this.appendChild(tileDiv);
@@ -71,17 +89,12 @@ class MapTile extends HTMLElement {
         tileDiv.classList.add('isotile');
         textDiv.classList.add('tiletext');
         if (this.dataset.terrain) {
-            textDiv.innerText = this.dataset.terrain;
-            switch(this.dataset.terrain[1]) {
-                case 'd':
-                    this.style.setProperty('--tile-color', 'var(--ocean)');
-                    break;
-                case 'c':
-                    this.style.setProperty('--tile-color', 'var(--sea)');
-                    break;
-                    case 'b':
-                    this.style.setProperty('--tile-color', 'var(--coast)');
-                    break;
+            // textDiv.innerText = this.dataset.terrain;
+            if (baseTerrainCss[this.dataset.terrain[1]]) {
+                this.style.setProperty('--tile-color', `var(--${baseTerrainCss[this.dataset.terrain[1]]})`);
+            }
+            if (overlayTerrain[this.dataset.terrain[0]]) {
+                textDiv.innerText = overlayTerrain[this.dataset.terrain[0]];
             }
         } else {
             textDiv.innerText = "🌲⛰️🌴🌳";
