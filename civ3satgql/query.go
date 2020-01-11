@@ -31,7 +31,6 @@ var queryType = graphql.NewObject(graphql.ObjectConfig{
 				},
 			},
 			Resolve: func(p graphql.ResolveParams) (interface{}, error) {
-				// var ok bool
 				var mdata mapData
 				if spoilerMask, ok := p.Args["playerSpoilerMask"].(int); ok {
 					mdata.playerSpoilerMask = int32(spoilerMask)
@@ -50,41 +49,12 @@ var queryType = graphql.NewObject(graphql.ObjectConfig{
 				}
 				mdata.mapHeight = intList[0]
 				mdata.mapWidth = intList[5]
-				// mdata.tilesData = make([][]byte, mdata.tileCount())
-				// Read raw tile data
 				mdata.tilesOffset, err = SectionOffset("TILE", 1)
 				if err != nil {
 					return nil, err
 				}
 				//  TODO: figure out how to handle wrapping, including oddball settings like Y wrap or no X wrap
 				// 		Because I realized minX and maxX are inadequate in the case of a partial world across the wrap boundary
-				// var minX, minY, maxX, maxY int
-				// if playerSpoilerMask != 0 {
-				// 	minX = mdata.mapWidth - 1
-				// 	minY = mdata.mapHeight - 1
-				// } else {
-				// 	maxX = mdata.mapWidth - 1
-				// 	maxY = mdata.mapHeight - 1
-				// }
-				//  *** TODO: and actually I don't need to read tile data into a buffer because saveGame.data exists in package context; use math during tile generation
-				// for i := 0; i < mdata.tileCount(); i++ {
-				// 	mdata.tilesData[i] = saveGame.data[section+i*196 : section+i*196+196]
-				// 	// minX/etc logic goes here, use playerSpoilerMask and tile offset 68 I think / first value of 4th TILE / TILE128
-				// }
-				// mdata.tileSetX = minX
-				// mdata.tileSetY = minY
-				// mdata.tileSetWidth = maxX - minX + 1
-				// mdata.tileSetHeight = maxY - minY + 1
-				// mdata.tileSetX = 0
-				// mdata.tileSetY = 0
-				// mdata.tileSetWidth = mdata.mapWidth
-				// mdata.tileSetHeight = mdata.mapHeight
-				// mdata.tileSetX = mdata.mapWidth/2 - 5
-				// mdata.tileSetY = 15
-				// mdata.tileSetWidth = mdata.mapWidth / 2
-				// mdata.tileSetHeight = mdata.mapHeight - 15
-
-				// var tileRowLength = mdat.tileSetWidth / 2
 				var mapRowLength = mdata.mapWidth / 2
 				var mapTileCount = mapRowLength * mdata.mapHeight
 				mdata.mapTileOffsets = make([]int, mapTileCount)
@@ -122,22 +92,12 @@ var queryType = graphql.NewObject(graphql.ObjectConfig{
 				mdata.tileSetX = minX * 2
 				mdata.tileSetHeight = maxY - minY + 1
 				mdata.tileSetY = minY
-
-				// mdata.tileSetX = 0
-				// mdata.tileSetY = 0
-				// mdata.tileSetWidth = mdata.mapWidth
-				// mdata.tileSetHeight = mdata.mapHeight
-
 				var tileSetRowLength = mdata.tileSetWidth / 2
 				var tileSetCount = tileSetRowLength * mdata.tileSetHeight
-				// if tileSetCount < mapTileCount {
 				mdata.tileSetOffsets = make([]int, tileSetCount)
 				for i := 0; i < tileSetCount; i++ {
 					mdata.tileSetOffsets[i] = mdata.mapTileOffsets[(i/tileSetRowLength+minY)*mdata.mapWidth/2+(i%tileSetRowLength+minX)]
-					// mdata.tileSetOffsets[i] = mdata.mapTileOffsets[minX+i%tileSetRowLength]
-					// mdata.tileSetOffsets[i] = mdata.tilesOffset - 4
 				}
-				// }
 				return mdata, nil
 			},
 		},
