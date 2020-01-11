@@ -26,27 +26,26 @@ type mapData struct {
 // 	return m.mapWidth * m.mapHeight
 // }
 
+func (m *mapData) spoilerFree(offset int) bool {
+	if m.playerSpoilerMask == 0 || int(m.playerSpoilerMask)&ReadInt32(offset+84, Unsigned) != 0 {
+		return true
+	}
+	return false
+}
+
 var mapTileType = graphql.NewObject(graphql.ObjectConfig{
 	Name: "tile",
 	Fields: graphql.Fields{
-		"foo": &graphql.Field{
-			Type:        graphql.String,
-			Description: "foo",
-			Resolve: func(p graphql.ResolveParams) (interface{}, error) {
-				if offset, ok := p.Source.(int); ok {
-					return string(saveGame.data[offset:offset+4]) + string(saveGame.data[offset+212:offset+216]), nil
-				}
-				return "foo", nil
-			},
-		},
 		"hexTerrain": &graphql.Field{
 			Type:        graphql.String,
 			Description: "Byte value. High nybble is overlay, low nybble is base terrain",
 			Resolve: func(p graphql.ResolveParams) (interface{}, error) {
 				if offset, ok := p.Source.(int); ok {
-					return hex.EncodeToString(saveGame.data[offset+57 : offset+58]), nil
+					if offset > 0 {
+						return hex.EncodeToString(saveGame.data[offset+57 : offset+58]), nil
+					}
 				}
-				return "foo", nil
+				return nil, nil
 			},
 		},
 		"chopped": &graphql.Field{
@@ -54,9 +53,11 @@ var mapTileType = graphql.NewObject(graphql.ObjectConfig{
 			Description: "True if a forest has previously been harvested from this tile",
 			Resolve: func(p graphql.ResolveParams) (interface{}, error) {
 				if offset, ok := p.Source.(int); ok {
-					return ((ReadInt16(offset+62, Unsigned) & 0x1000) != 0), nil
+					if offset > 0 {
+						return ((ReadInt16(offset+62, Unsigned) & 0x1000) != 0), nil
+					}
 				}
-				return "foo", nil
+				return nil, nil
 			},
 		},
 	},
@@ -142,7 +143,13 @@ var mapType = graphql.NewObject(graphql.ObjectConfig{
 					var tileCount = tileRowLength * mdat.tileSetHeight
 					offsets := make([]int, tileCount)
 					for i := 0; i < tileCount; i++ {
-						offsets[i] = mdat.tilesOffset - 4 + (mdat.tileSetY+i/tileRowLength)*mapRowLength*tileBytes + (mdat.tileSetX+i%tileRowLength)*tileBytes
+						tileOffset := mdat.tilesOffset - 4 + (mdat.tileSetY+i/tileRowLength)*mapRowLength*tileBytes + (mdat.tileSetX+i%tileRowLength)*tileBytes
+						if mdat.spoilerFree(tileOffset) {
+							offsets[i] = tileOffset
+						} else {
+							// tile elements will return null if offset <= 0
+							offsets[i] = -1
+						}
 					}
 					return offsets, nil
 				}

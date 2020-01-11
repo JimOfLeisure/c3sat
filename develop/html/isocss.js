@@ -9,22 +9,28 @@ xhr.onload = () => {
         for (let j = 0, l = mapData.data.map.tileSetHeight; j < l; j++) {
             const row = document.createElement('div');
             row.classList += 'row';
+            map.appendChild(row);
             for (let i=0; i < tilesWide; i++) {
                 const tile = document.createElement('map-tile');
                 const index = i + j * tilesWide;
-                tile.setAttribute('data-terrain', mapData.data.map.tiles[index].hexTerrain);
-                tile.setAttribute('data-chopped', mapData.data.map.tiles[index].chopped);
+                if (mapData.data.map.tiles[index].hexTerrain) {
+                    tile.setAttribute('data-terrain', mapData.data.map.tiles[index].hexTerrain);
+                }
+                if (mapData.data.map.tiles[index].chopped) {
+                    tile.setAttribute('data-chopped', 'true');
+                }
                 row.appendChild(tile);
             }
-            map.appendChild(row);
         }
 	} else {
 		console.error(xhr.status, 'Data fetch failed. Response text follows.');
 		console.log(xhr.responseText);
 	}
 }
+
+let spoilerMask = 0x2;
 let query = `{
-    map(playerSpoilerMask: 6) {
+    map(playerSpoilerMask: ${spoilerMask}) {
         tileSetWidth
         tileSetHeight
         tiles {
@@ -68,28 +74,31 @@ class MapTile extends HTMLElement {
             'a': '🌋'
         }
 		const tileDiv = document.createElement('div');
-		const textDiv = document.createElement('div');
         this.appendChild(tileDiv);
-        this.appendChild(textDiv);
         tileDiv.classList.add('isotile');
-        textDiv.classList.add('tiletext');
         if (this.dataset.chopped == 'true') {
             const chopDiv = document.createElement('div');
             chopDiv.classList.add('chopped');
             this.appendChild(chopDiv);
-            // textDiv.innerText += "C";
         }
         let terr = this.dataset.terrain;
         if (terr) {
             if (baseTerrainCss[terr[1]]) {
                 this.style.setProperty('--tile-color', `var(--${baseTerrainCss[terr[1]]})`);
             }
-
             if (overlayTerrain[terr[0]]) {
-                textDiv.innerText = overlayTerrain[terr[0]];
+                const terrOverlayDiv = document.createElement('div');
+                this.appendChild(terrOverlayDiv);
+                terrOverlayDiv.className = 'terrain-overlay';
+                terrOverlayDiv.innerText = overlayTerrain[terr[0]];
             }
-        } else {
-            textDiv.innerText = "🌲⛰️🌴🌳";
+        }
+        let text = this.dataset.text;
+        if (text) {
+            const textDiv = document.createElement('div');
+            textDiv.classList.add('tiletext');
+            this.appendChild(textDiv);
+
         }
 	}
 }

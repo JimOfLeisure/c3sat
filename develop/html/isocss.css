@@ -1,9 +1,7 @@
 :root {
     --tile-width: 5em;
     --tile-height: calc(var(--tile-width) / 2);
-    /* --tile-width: 128px;
-    --tile-height: 64px; */
-    --tile-color: red;
+    --tile-color: black;
     --map-width: 3;
 
     --desert: khaki;
@@ -13,6 +11,9 @@
     --coast: lightseagreen;
     --sea: mediumseagreen;
     --ocean: seagreen;
+}
+div#error {
+    color: red;
 }
 div#map {
     /* display: flex; */
@@ -63,7 +64,7 @@ div.isotile:after {
     border: calc(var(--tile-width) / 2) solid transparent;
     border-top: calc(var(--tile-height) / 2) solid var(--tile-color);
 }
-.tiletext {
+.tiletext, .terrain-overlay {
     position: absolute;
     width: var(--tile-width);
     height: var(--tile-height);
@@ -72,13 +73,8 @@ div.isotile:after {
     align-items: center;
 }
 .chopped {
-    /* --circle-diameter: calc(var(--tile-height) * 0.9); */
     --size-ratio: 0.7;
     position: absolute;
-    /* left: calc(var(--tile-width) / 2 - calc(var(--circle-diameter) / 2));
-    top: calc(var(--tile-height) / 2 - calc(var(--circle-diameter) / 2));
-    width: var(--circle-diameter);
-    height: var(--circle-diameter); */
     left: calc(var(--tile-width) / 2 - calc(var(--size-ratio) * var(--tile-width) / 2));
     top: calc(var(--tile-height) / 2 - calc(var(--size-ratio) * var(--tile-height) / 2));
     width: calc(var(--size-ratio) * var(--tile-width));

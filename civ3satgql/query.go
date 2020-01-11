@@ -31,10 +31,12 @@ var queryType = graphql.NewObject(graphql.ObjectConfig{
 				},
 			},
 			Resolve: func(p graphql.ResolveParams) (interface{}, error) {
-				var ok bool
+				// var ok bool
 				var mdata mapData
-				if mdata.playerSpoilerMask, ok = p.Args["playerSpoilerMask"].(int32); !ok {
-					mdata.playerSpoilerMask = 0x2
+				if spoilerMask, ok := p.Args["playerSpoilerMask"].(int); ok {
+					mdata.playerSpoilerMask = int32(spoilerMask)
+				} else {
+					mdata.playerSpoilerMask = int32(0x2)
 				}
 				// Get 2nd WRLD offset
 				section, err := SectionOffset("WRLD", 2)
