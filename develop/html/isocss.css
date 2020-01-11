@@ -22,7 +22,7 @@ div#map {
     display: flex;
     margin-bottom: calc(var(--tile-height) * -0.5);
     width: calc(var(--map-width) * var(--tile-width));
-    background-color: lightgray;
+    background-color: black;
 }
 .row:nth-child(even) {
     /* for indenting even rows */
