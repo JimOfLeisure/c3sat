@@ -53,32 +53,25 @@ var queryType = graphql.NewObject(graphql.ObjectConfig{
 				if err != nil {
 					return nil, err
 				}
-				//  TODO: figure out how to handle wrapping, including oddball settings like Y wrap or no X wrap
-				// 		Because I realized minX and maxX are inadequate in the case of a partial world across the wrap boundary
 				var mapRowLength = mdata.mapWidth / 2
 				var mapTileCount = mapRowLength * mdata.mapHeight
 				mdata.mapTileOffsets = make([]int, mapTileCount)
-				var minX, minY, maxX, maxY int
-				minX = mdata.mapWidth - 1
+				var minY, maxY int
+				var mapXVisible = make([]bool, mapRowLength)
 				minY = mdata.mapHeight - 1
 				for i := 0; i < mapTileCount; i++ {
 					tileOffset := mdata.tilesOffset - 4 + (mdata.tileSetY+i/mapRowLength)*mapRowLength*tileBytes + (mdata.tileSetX+i%mapRowLength)*tileBytes
 					if mdata.spoilerFree(tileOffset) {
+						mdata.mapTileOffsets[i] = tileOffset
 						x := i % mapRowLength
+						mapXVisible[x] = true
 						y := i / mapRowLength
-						if x < minX {
-							minX = x
-						}
-						if x > maxX {
-							maxX = x
-						}
 						if y < minY {
 							minY = y
 						}
 						if y > maxY {
 							maxY = y
 						}
-						mdata.mapTileOffsets[i] = tileOffset
 					} else {
 						// tile elements will return null if offset <= 0
 						mdata.mapTileOffsets[i] = -1
@@ -88,15 +81,32 @@ var queryType = graphql.NewObject(graphql.ObjectConfig{
 				if minY%2 != 0 {
 					minY -= 1
 				}
-				mdata.tileSetWidth = (maxX - minX + 1) * 2
-				mdata.tileSetX = minX * 2
+				// See if it makes sense to wrap around X
+				var longestBlank int
+				var blankLength int
+				// loop through width twice to ensure find the longest run of blanks, if any
+				for i := 0; i < mapRowLength*2; i++ {
+					if mapXVisible[i%mapRowLength] {
+						if blankLength > 0 {
+							if blankLength > longestBlank {
+								longestBlank = blankLength
+								mdata.tileSetX = (i % mapRowLength) * 2
+							}
+							blankLength = 0
+						}
+					} else {
+						blankLength++
+					}
+				}
+				mdata.tileSetWidth = (mapRowLength - longestBlank) * 2
 				mdata.tileSetHeight = maxY - minY + 1
 				mdata.tileSetY = minY
 				var tileSetRowLength = mdata.tileSetWidth / 2
 				var tileSetCount = tileSetRowLength * mdata.tileSetHeight
+				var minX = mdata.tileSetX / 2
 				mdata.tileSetOffsets = make([]int, tileSetCount)
 				for i := 0; i < tileSetCount; i++ {
-					mdata.tileSetOffsets[i] = mdata.mapTileOffsets[(i/tileSetRowLength+minY)*mdata.mapWidth/2+(i%tileSetRowLength+minX)]
+					mdata.tileSetOffsets[i] = mdata.mapTileOffsets[(i/tileSetRowLength+minY)*mdata.mapWidth/2+(i%tileSetRowLength+minX)%(mdata.mapWidth/2)]
 				}
 				return mdata, nil
 			},
