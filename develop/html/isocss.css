@@ -71,3 +71,19 @@ div.isotile:after {
     justify-content: center;
     align-items: center;
 }
+.chopped {
+    /* --circle-diameter: calc(var(--tile-height) * 0.9); */
+    --size-ratio: 0.7;
+    position: absolute;
+    /* left: calc(var(--tile-width) / 2 - calc(var(--circle-diameter) / 2));
+    top: calc(var(--tile-height) / 2 - calc(var(--circle-diameter) / 2));
+    width: var(--circle-diameter);
+    height: var(--circle-diameter); */
+    left: calc(var(--tile-width) / 2 - calc(var(--size-ratio) * var(--tile-width) / 2));
+    top: calc(var(--tile-height) / 2 - calc(var(--size-ratio) * var(--tile-height) / 2));
+    width: calc(var(--size-ratio) * var(--tile-width));
+    height: calc(var(--size-ratio) * var(--tile-height));
+    background: red;
+    border-radius: 50%;
+    opacity: 0.3;
+  }

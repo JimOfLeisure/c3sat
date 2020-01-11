@@ -6,7 +6,7 @@ xhr.onload = () => {
         mapData = JSON.parse(xhr.responseText);
         let tilesWide = Math.floor(mapData.data.map.tileSetWidth / 2);
         map.style.setProperty('--map-width', tilesWide);
-        for (let j = 0; j < mapData.data.map.tileSetHeight; j++) {
+        for (let j = 0, l = mapData.data.map.tileSetHeight; j < l; j++) {
             const row = document.createElement('div');
             row.classList += 'row';
             for (let i=0; i < tilesWide; i++) {
@@ -24,25 +24,14 @@ xhr.onload = () => {
 	}
 }
 let query = `{
-map(playerSpoilerMask: 6) {
-    tileSetWidth
-    tileSetHeight
-    tiles {
-      hexTerrain
-    }
-}`;
-
-query = `{
-    map {
-        mapWidth
-        mapHeight
+    map(playerSpoilerMask: 6) {
         tileSetWidth
         tileSetHeight
         tiles {
             hexTerrain
             chopped
         }
-    } 
+    }
 }`;
 
 let body = {
@@ -51,15 +40,9 @@ let body = {
     'query' : query
 };
 
-// body = '{"query":"# Write your query or mutation here\n# Trade network ID by civ; nth should be a multiple of 4\n# {\n#   int16s(section: \"TILE\", nth: 4, offset: 26, count: 32)\n# }\n\n# # Starting locations of players\n# {\n#   int32s(section: \"WRLD\", nth: 2, offset: 36, count: 32)\n# }\n\n{\n  hexString(section:\"TILE\", nth: 1, offset:208, count: 4)\n  map(playerSpoilerMask: 6) {\n    mapWidth\n    mapHeight\n    tileSetWidth\n    tileSetHeight\n    tileSetX\n    tileSetY\n    tiles {\n      foo\n      hexTerrain\n    }\n  }\n \tint32s(section: \"WRLD\", nth: 2, offset: 8, count: 6)\n\n}\n"}';
-// body = `{"query":"{ hexString(section:\"TILE\", nth: 1, offset:208, count: 4)}"}`;
-// body = {"query":"{ map { mapWidth} }"};
-
 xhr.open('POST', 'http://127.0.0.1:8080/graphql');
 xhr.setRequestHeader('Content-Type', 'application/json');
 xhr.send(JSON.stringify(body));
-// xhr.send(body);
-// console.log(body);
 
 class MapTile extends HTMLElement {
 	connectedCallback () {
@@ -76,7 +59,7 @@ class MapTile extends HTMLElement {
             'd': 'ocean'
         }
         const overlayTerrain = {
-            '4': 'FP',
+            '4': 'fp',
             '5': 'hill',
             '6': '⛰️',
             '7': '🌲',
@@ -90,20 +73,23 @@ class MapTile extends HTMLElement {
         this.appendChild(textDiv);
         tileDiv.classList.add('isotile');
         textDiv.classList.add('tiletext');
-        if (this.dataset.terrain) {
-            // textDiv.innerText = this.dataset.terrain;
-            if (baseTerrainCss[this.dataset.terrain[1]]) {
-                this.style.setProperty('--tile-color', `var(--${baseTerrainCss[this.dataset.terrain[1]]})`);
+        if (this.dataset.chopped == 'true') {
+            const chopDiv = document.createElement('div');
+            chopDiv.classList.add('chopped');
+            this.appendChild(chopDiv);
+            // textDiv.innerText += "C";
+        }
+        let terr = this.dataset.terrain;
+        if (terr) {
+            if (baseTerrainCss[terr[1]]) {
+                this.style.setProperty('--tile-color', `var(--${baseTerrainCss[terr[1]]})`);
             }
 
-            if (overlayTerrain[this.dataset.terrain[0]]) {
-                textDiv.innerText = overlayTerrain[this.dataset.terrain[0]];
+            if (overlayTerrain[terr[0]]) {
+                textDiv.innerText = overlayTerrain[terr[0]];
             }
         } else {
             textDiv.innerText = "🌲⛰️🌴🌳";
-        }
-        if (this.dataset.chopped == 'true') {
-            textDiv.innerText += "C";
         }
 	}
 }
