@@ -75,14 +75,69 @@ var queryType = graphql.NewObject(graphql.ObjectConfig{
 				// mdata.tileSetY = minY
 				// mdata.tileSetWidth = maxX - minX + 1
 				// mdata.tileSetHeight = maxY - minY + 1
-				mdata.tileSetX = 0
-				mdata.tileSetY = 0
-				mdata.tileSetWidth = mdata.mapWidth
-				mdata.tileSetHeight = mdata.mapHeight
+				// mdata.tileSetX = 0
+				// mdata.tileSetY = 0
+				// mdata.tileSetWidth = mdata.mapWidth
+				// mdata.tileSetHeight = mdata.mapHeight
 				// mdata.tileSetX = mdata.mapWidth/2 - 5
 				// mdata.tileSetY = 15
 				// mdata.tileSetWidth = mdata.mapWidth / 2
 				// mdata.tileSetHeight = mdata.mapHeight - 15
+
+				// var tileRowLength = mdat.tileSetWidth / 2
+				var mapRowLength = mdata.mapWidth / 2
+				var mapTileCount = mapRowLength * mdata.mapHeight
+				mdata.mapTileOffsets = make([]int, mapTileCount)
+				var minX, minY, maxX, maxY int
+				minX = mdata.mapWidth - 1
+				minY = mdata.mapHeight - 1
+				for i := 0; i < mapTileCount; i++ {
+					tileOffset := mdata.tilesOffset - 4 + (mdata.tileSetY+i/mapRowLength)*mapRowLength*tileBytes + (mdata.tileSetX+i%mapRowLength)*tileBytes
+					if mdata.spoilerFree(tileOffset) {
+						x := i % mapRowLength
+						y := i / mapRowLength
+						if x < minX {
+							minX = x
+						}
+						if x > maxX {
+							maxX = x
+						}
+						if y < minY {
+							minY = y
+						}
+						if y > maxY {
+							maxY = y
+						}
+						mdata.mapTileOffsets[i] = tileOffset
+					} else {
+						// tile elements will return null if offset <= 0
+						mdata.mapTileOffsets[i] = -1
+					}
+				}
+				// Need to ensure the first Y row is even because of how each odd row shifts a half tile right
+				if minY%2 != 0 {
+					minY -= 1
+				}
+				mdata.tileSetWidth = (maxX - minX + 1) * 2
+				mdata.tileSetX = minX * 2
+				mdata.tileSetHeight = maxY - minY + 1
+				mdata.tileSetY = minY
+
+				// mdata.tileSetX = 0
+				// mdata.tileSetY = 0
+				// mdata.tileSetWidth = mdata.mapWidth
+				// mdata.tileSetHeight = mdata.mapHeight
+
+				var tileSetRowLength = mdata.tileSetWidth / 2
+				var tileSetCount = tileSetRowLength * mdata.tileSetHeight
+				// if tileSetCount < mapTileCount {
+				mdata.tileSetOffsets = make([]int, tileSetCount)
+				for i := 0; i < tileSetCount; i++ {
+					mdata.tileSetOffsets[i] = mdata.mapTileOffsets[(i/tileSetRowLength+minY)*mdata.mapWidth/2+(i%tileSetRowLength+minX)]
+					// mdata.tileSetOffsets[i] = mdata.mapTileOffsets[minX+i%tileSetRowLength]
+					// mdata.tileSetOffsets[i] = mdata.tilesOffset - 4
+				}
+				// }
 				return mdata, nil
 			},
 		},

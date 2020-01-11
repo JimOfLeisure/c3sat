@@ -6,6 +6,8 @@ import (
 	"github.com/graphql-go/graphql"
 )
 
+const tileBytes = 212
+
 type worldData struct {
 	worldOffset int
 }
@@ -19,6 +21,8 @@ type mapData struct {
 	tileSetY          int
 	playerSpoilerMask int32
 	tilesOffset       int
+	tileSetOffsets    []int
+	mapTileOffsets    []int
 }
 
 // no longer needed
@@ -137,21 +141,8 @@ var mapType = graphql.NewObject(graphql.ObjectConfig{
 			Description: "Height of the currently visible map in tiles",
 			Resolve: func(p graphql.ResolveParams) (interface{}, error) {
 				if mdat, ok := p.Source.(mapData); ok {
-					const tileBytes = 212
-					var tileRowLength = mdat.tileSetWidth / 2
-					var mapRowLength = mdat.mapWidth / 2
-					var tileCount = tileRowLength * mdat.tileSetHeight
-					offsets := make([]int, tileCount)
-					for i := 0; i < tileCount; i++ {
-						tileOffset := mdat.tilesOffset - 4 + (mdat.tileSetY+i/tileRowLength)*mapRowLength*tileBytes + (mdat.tileSetX+i%tileRowLength)*tileBytes
-						if mdat.spoilerFree(tileOffset) {
-							offsets[i] = tileOffset
-						} else {
-							// tile elements will return null if offset <= 0
-							offsets[i] = -1
-						}
-					}
-					return offsets, nil
+					return mdat.tileSetOffsets, nil
+					// return mdat.mapTileOffsets, nil
 				}
 				return nil, nil
 			},
