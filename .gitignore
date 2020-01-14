@@ -3,6 +3,7 @@
 *.sav
 *.csv
 *.json
+cmd/temp/
 
 # built executables
 civ3sat/civ3sat
