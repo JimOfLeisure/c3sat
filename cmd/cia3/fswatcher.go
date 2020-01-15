@@ -10,28 +10,27 @@ import (
 	"github.com/fsnotify/fsnotify"
 )
 
-func f(s string) {
-	fmt.Println(time.Now().String() + " " + s + " modified")
-}
+const debounceInterval = 300 * time.Millisecond
 
-func debounce(interval time.Duration, input chan string, f func(arg string)) {
-	var (
-		filename string
-	)
-	for {
-		select {
-		case filename = <-input:
-			// fmt.Println("received a send on a spammy channel - might be doing a costly operation if not for debounce")
-			fmt.Println("doot")
-			// do nothing
-		case <-time.After(interval):
-			f(filename)
+func f(s string) {
+	// fmt.Println(s + " <==")
+	if len(s) > 4 && strings.ToLower(s[len(s)-4:]) == ".sav" {
+		fi, err := os.Stat(s)
+		if err != nil {
+			// log.Fatal(err)
+			fmt.Println("stat error - " + s)
+			return
+		}
+		if fi.Mode().IsRegular() {
+			fmt.Println(time.Now().String() + " " + s + " modified")
 		}
 	}
 }
 
 func ExampleNewWatcher() {
+	var fn string
 	watcher, err := fsnotify.NewWatcher()
+	timer := time.NewTimer(debounceInterval)
 	if err != nil {
 		log.Fatal(err)
 	}
@@ -45,19 +44,13 @@ func ExampleNewWatcher() {
 				if !ok {
 					return
 				}
-				fn := event.Name
-				fi, err := os.Stat(fn)
-				if err != nil {
-					// log.Fatal(err)
-					fmt.Println("stat error - " + fn)
-					// return
-				} else {
-					// fmt.Println(strings.ToLower(fn[len(fn)-4:]))
-					if event.Op&fsnotify.Write == fsnotify.Write && strings.ToLower(fn[len(fn)-4:]) == ".sav" && fi.Mode().IsRegular() {
-						// log.Println("modified file:", event.Name)
-						f(event.Name)
-					}
+				fn = event.Name
+				if event.Op&fsnotify.Write == fsnotify.Write {
+					timer.Reset(debounceInterval)
 				}
+			case <-timer.C:
+				// This will get called once debounceInterval after program start, and I'm going to live with that
+				f(fn)
 			case err, ok := <-watcher.Errors:
 				if !ok {
 					return
