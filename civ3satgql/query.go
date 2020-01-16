@@ -179,7 +179,7 @@ var queryType = graphql.NewObject(graphql.ObjectConfig{
 		},
 		"hexString": &graphql.Field{
 			Type:        graphql.String,
-			Description: "Base64-encoded byte array",
+			Description: "Byte array in hex string format",
 			Args: graphql.FieldConfigArgument{
 				"section": &graphql.ArgumentConfig{
 					Type:        graphql.NewNonNull(graphql.String),
@@ -208,6 +208,39 @@ var queryType = graphql.NewObject(graphql.ObjectConfig{
 					return nil, err
 				}
 				return hex.EncodeToString(saveGame.data[savSection+offset : savSection+offset+count]), nil
+			},
+		},
+		"hexDump": &graphql.Field{
+			Type:        graphql.String,
+			Description: "Hex dump of data",
+			Args: graphql.FieldConfigArgument{
+				"section": &graphql.ArgumentConfig{
+					Type:        graphql.NewNonNull(graphql.String),
+					Description: "Four-character section name. e.g. TILE",
+				},
+				"nth": &graphql.ArgumentConfig{
+					Type:        graphql.NewNonNull(graphql.Int),
+					Description: "e.g. 2 for the second named section instance",
+				},
+				"offset": &graphql.ArgumentConfig{
+					Type:        graphql.NewNonNull(graphql.Int),
+					Description: "Offset from start of section",
+				},
+				"count": &graphql.ArgumentConfig{
+					Type:        graphql.NewNonNull(graphql.Int),
+					Description: "Number of bytes to return",
+				},
+			},
+			Resolve: func(p graphql.ResolveParams) (interface{}, error) {
+				section, _ := p.Args["section"].(string)
+				nth, _ := p.Args["nth"].(int)
+				offset, _ := p.Args["offset"].(int)
+				count, _ := p.Args["count"].(int)
+				savSection, err := SectionOffset(section, nth)
+				if err != nil {
+					return nil, err
+				}
+				return hex.Dump(saveGame.data[savSection+offset : savSection+offset+count]), nil
 			},
 		},
 		"int16s": &graphql.Field{
