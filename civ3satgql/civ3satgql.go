@@ -2,6 +2,7 @@ package civ3satgql
 
 import (
 	"encoding/json"
+	"fmt"
 	"log"
 	"net/http"
 	"strconv"
@@ -24,6 +25,7 @@ type saveGameType struct {
 }
 
 var saveGame saveGameType
+var refreshTrigger = make(chan bool)
 
 // populates the structure given a path to a sav file
 func (sav *saveGameType) loadSave(path string) error {
@@ -53,6 +55,7 @@ func (sav *saveGameType) loadSave(path string) error {
 			sav.sections = append(sav.sections, *s)
 		}
 	}
+	refreshTrigger <- true
 	return nil
 }
 
@@ -110,6 +113,14 @@ func NoPathServer(bindAddress, bindPort string) error {
 		Playground: true,
 	})
 
+	go func() {
+		for {
+			select {
+			case trigger := <-refreshTrigger:
+				fmt.Print("refresh!", trigger)
+			}
+		}
+	}()
 	http.Handle("/graphql", setHeaders(graphQlHandler))
 	log.Fatal(http.ListenAndServe(bindAddress+":"+bindPort, nil))
 	return nil
