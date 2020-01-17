@@ -7,6 +7,8 @@ import (
 	"net/http"
 	"strconv"
 
+	"golang.org/x/net/websocket"
+
 	"github.com/graphql-go/graphql"
 	"github.com/graphql-go/handler"
 	"github.com/myjimnelson/c3sat/parseciv3"
@@ -112,15 +114,21 @@ func NoPathServer(bindAddress, bindPort string) error {
 		// Playground provides fancier web browser query interface pulled from Internet
 		Playground: true,
 	})
-
-	go func() {
+	http.Handle("/ws", websocket.Handler(func(conn *websocket.Conn) {
+		// go func() {
 		for {
 			select {
-			case trigger := <-refreshTrigger:
-				fmt.Print("refresh!", trigger)
+			case <-refreshTrigger:
+				message := "refresh! "
+				fmt.Print(message)
+				websocket.Message.Send(conn, message)
+				// case <-time.After(5000 * time.Millisecond):
+				// 	fmt.Print("timer! ")
+				// 	websocket.Message.Send(conn, "timer!")
 			}
 		}
-	}()
+		// }()
+	}))
 	http.Handle("/graphql", setHeaders(graphQlHandler))
 	log.Fatal(http.ListenAndServe(bindAddress+":"+bindPort, nil))
 	return nil

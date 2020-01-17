@@ -4,6 +4,8 @@ xhr.onload = () => {
         map = document.getElementById('map');
         map.innerHTML = '';
         mapData = JSON.parse(xhr.responseText);
+        const fileName = document.getElementById("fileName");
+        fileName.innerText = mapData.data.fileName;
         let tilesWide = Math.floor(mapData.data.map.tileSetWidth / 2);
         map.style.setProperty('--map-width', tilesWide);
         for (let j = 0, l = mapData.data.map.tileSetHeight; j < l; j++) {
@@ -30,6 +32,7 @@ xhr.onload = () => {
 
 let spoilerMask = 0x2;
 let query = `{
+    fileName
     map(playerSpoilerMask: ${spoilerMask}) {
         tileSetWidth
         tileSetHeight
@@ -49,6 +52,15 @@ let body = {
 xhr.open('POST', 'http://127.0.0.1:8080/graphql');
 xhr.setRequestHeader('Content-Type', 'application/json');
 xhr.send(JSON.stringify(body));
+
+let refreshSocket = new WebSocket("ws://127.0.0.1:8080/ws");
+
+refreshSocket.onmessage = e => {
+    console.log(e.data);
+    xhr.open('POST', 'http://127.0.0.1:8080/graphql');
+    xhr.setRequestHeader('Content-Type', 'application/json');
+    xhr.send(JSON.stringify(body));
+}
 
 class MapTile extends HTMLElement {
 	connectedCallback () {
