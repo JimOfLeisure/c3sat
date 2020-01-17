@@ -8,6 +8,7 @@ import (
 	"time"
 
 	"github.com/fsnotify/fsnotify"
+	"github.com/myjimnelson/c3sat/civ3satgql"
 )
 
 const debounceInterval = 300 * time.Millisecond
@@ -23,6 +24,10 @@ func f(s string) {
 		}
 		if fi.Mode().IsRegular() {
 			fmt.Println(time.Now().String() + " " + s + " modified")
+			err := civ3satgql.ChangeSavePath(s)
+			if err != nil {
+				fmt.Println(err)
+			}
 		}
 	}
 }
@@ -36,7 +41,7 @@ func ExampleNewWatcher() {
 	}
 	defer watcher.Close()
 
-	done := make(chan bool)
+	// done := make(chan bool)
 	go func() {
 		for {
 			select {
@@ -68,5 +73,7 @@ func ExampleNewWatcher() {
 	if err != nil {
 		log.Fatal(err)
 	}
-	<-done
+	// <-done
+	civ3satgql.NoPathServer("127.0.0.1", "8080")
+
 }

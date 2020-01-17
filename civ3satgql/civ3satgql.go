@@ -67,6 +67,12 @@ func (sav *saveGameType) fileName() string {
 	return sav.path[o+1:]
 }
 
+// ChangeSavePath updates the package saveGame structure with save file data at <path>
+func ChangeSavePath(path string) error {
+	err := saveGame.loadSave(path)
+	return err
+}
+
 // Handler wrapper to allow adding headers to all responses
 // concept yoinked from http://echorand.me/dissecting-golangs-handlerfunc-handle-and-defaultservemux.html
 func setHeaders(handler http.Handler) http.Handler {
@@ -85,8 +91,35 @@ func setHeaders(handler http.Handler) http.Handler {
 	})
 }
 
+func NoPathServer(bindAddress, bindPort string) error {
+	Schema, err := graphql.NewSchema(graphql.SchemaConfig{
+		Query: queryType,
+		// Mutation: MutationType,
+	})
+	if err != nil {
+		return err
+	}
+
+	// create a graphl-go HTTP handler
+	graphQlHandler := handler.New(&handler.Config{
+		Schema: &Schema,
+		Pretty: false,
+		// GraphiQL provides simple web browser query interface pulled from Internet
+		GraphiQL: false,
+		// Playground provides fancier web browser query interface pulled from Internet
+		Playground: true,
+	})
+
+	http.Handle("/graphql", setHeaders(graphQlHandler))
+	log.Fatal(http.ListenAndServe(bindAddress+":"+bindPort, nil))
+	return nil
+}
+
 func Server(path string, bindAddress, bindPort string) error {
-	saveGame.loadSave(path)
+	err := saveGame.loadSave(path)
+	if err != nil {
+		return err
+	}
 
 	Schema, err := graphql.NewSchema(graphql.SchemaConfig{
 		Query: queryType,
@@ -112,7 +145,10 @@ func Server(path string, bindAddress, bindPort string) error {
 }
 
 func Query(query, path string) (string, error) {
-	saveGame.loadSave(path)
+	err := saveGame.loadSave(path)
+	if err != nil {
+		return "", err
+	}
 	Schema, err := graphql.NewSchema(graphql.SchemaConfig{
 		Query: queryType,
 		// Mutation: MutationType,
@@ -147,7 +183,10 @@ func WorldSettings(path string) ([][3]string, error) {
 	var temperature = [...]string{"Warm", "Temperate", "Cool", "Random"}
 	var age = [...]string{"3 Billion", "4 Billion", "5 Billion", "Random"}
 	var settings [][3]string
-	saveGame.loadSave(path)
+	err := saveGame.loadSave(path)
+	if err != nil {
+		return nil, err
+	}
 	wrldSection, err := SectionOffset("WRLD", 1)
 	if err != nil {
 		return [][3]string{}, err
