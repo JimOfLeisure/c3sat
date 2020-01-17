@@ -18,17 +18,25 @@ type sectionType struct {
 }
 
 type saveGameType struct {
+	path     string
 	data     []byte
 	sections []sectionType
 }
 
 var saveGame saveGameType
 
-func findSections() {
+// populates the structure given a path to a sav file
+func (sav *saveGameType) loadSave(path string) error {
 	var i, count, offset int
-	for i < len(saveGame.data) {
-		// for i < 83000 {
-		if saveGame.data[i] < 0x20 || saveGame.data[i] > 0x5a {
+	var err error
+	sav.data, _, err = parseciv3.ReadFile(path)
+	if err != nil {
+		return err
+	}
+	sav.path = path
+	// find sections demarc'ed by 4-character ASCII headers
+	for i < len(sav.data) {
+		if sav.data[i] < 0x20 || sav.data[i] > 0x5a {
 			count = 0
 		} else {
 			if count == 0 {
@@ -41,11 +49,11 @@ func findSections() {
 			count = 0
 			s := new(sectionType)
 			s.offset = offset
-			s.name = string(saveGame.data[offset:i])
-			saveGame.sections = append(saveGame.sections, *s)
-			// fmt.Println(string(saveGame.data[offset:i]) + " " + strconv.Itoa(offset))
+			s.name = string(sav.data[offset:i])
+			sav.sections = append(sav.sections, *s)
 		}
 	}
+	return nil
 }
 
 // Handler wrapper to allow adding headers to all responses
@@ -67,12 +75,7 @@ func setHeaders(handler http.Handler) http.Handler {
 }
 
 func Server(path string, bindAddress, bindPort string) error {
-	var err error
-	saveGame.data, _, err = parseciv3.ReadFile(path)
-	if err != nil {
-		return err
-	}
-	findSections()
+	saveGame.loadSave(path)
 
 	Schema, err := graphql.NewSchema(graphql.SchemaConfig{
 		Query: queryType,
@@ -98,14 +101,7 @@ func Server(path string, bindAddress, bindPort string) error {
 }
 
 func Query(query, path string) (string, error) {
-	var err error
-	saveGame.data, _, err = parseciv3.ReadFile(path)
-	if err != nil {
-		return "", err
-	}
-	findSections()
-	// fmt.Println(saveGame.sections[len(saveGame.sections)-1])
-	// saveGame.sections = []string{"hello", "there"}
+	saveGame.loadSave(path)
 	Schema, err := graphql.NewSchema(graphql.SchemaConfig{
 		Query: queryType,
 		// Mutation: MutationType,
@@ -140,12 +136,7 @@ func WorldSettings(path string) ([][3]string, error) {
 	var temperature = [...]string{"Warm", "Temperate", "Cool", "Random"}
 	var age = [...]string{"3 Billion", "4 Billion", "5 Billion", "Random"}
 	var settings [][3]string
-	var err error
-	saveGame.data, _, err = parseciv3.ReadFile(path)
-	if err != nil {
-		return [][3]string{}, err
-	}
-	findSections()
+	saveGame.loadSave(path)
 	wrldSection, err := SectionOffset("WRLD", 1)
 	if err != nil {
 		return [][3]string{}, err
