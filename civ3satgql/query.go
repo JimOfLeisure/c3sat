@@ -21,6 +21,20 @@ var queryType = graphql.NewObject(graphql.ObjectConfig{
 				return worldData{worldOffset: wrldSection}, nil
 			},
 		},
+		"fullPath": &graphql.Field{
+			Type:        graphql.String,
+			Description: "Save file path",
+			Resolve: func(p graphql.ResolveParams) (interface{}, error) {
+				return saveGame.path, nil
+			},
+		},
+		"fileName": &graphql.Field{
+			Type:        graphql.String,
+			Description: "Save file name",
+			Resolve: func(p graphql.ResolveParams) (interface{}, error) {
+				return saveGame.fileName(), nil
+			},
+		},
 		"map": &graphql.Field{
 			Type:        mapType,
 			Description: "Current Game Map",

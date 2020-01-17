@@ -56,6 +56,17 @@ func (sav *saveGameType) loadSave(path string) error {
 	return nil
 }
 
+// returns just the filename part of the path assuming / or \ separators
+func (sav *saveGameType) fileName() string {
+	var o int
+	for i := 0; i < len(sav.path); i++ {
+		if sav.path[i] == 0x2f || sav.path[i] == 0x5c {
+			o = i
+		}
+	}
+	return sav.path[o+1:]
+}
+
 // Handler wrapper to allow adding headers to all responses
 // concept yoinked from http://echorand.me/dissecting-golangs-handlerfunc-handle-and-defaultservemux.html
 func setHeaders(handler http.Handler) http.Handler {
