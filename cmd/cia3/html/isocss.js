@@ -53,7 +53,7 @@ let body = {
     'query' : query
 };
 
-xhr.open('POST', 'http://127.0.0.1:8080/graphql');
+xhr.open('POST', '/graphql');
 xhr.setRequestHeader('Content-Type', 'application/json');
 xhr.send(JSON.stringify(body));
 

@@ -4,6 +4,7 @@ import (
 	"log"
 	"net/http"
 
+	"github.com/markbates/pkger"
 	"github.com/myjimnelson/c3sat/civ3satgql"
 )
 
@@ -28,6 +29,9 @@ func server() {
 	if err != nil {
 		log.Fatal(err)
 	}
+	staticFiles := http.FileServer(pkger.Dir("/cmd/cia3/html"))
+	// Can't figure out how to make pkger work for non-root
+	http.Handle("/", staticFiles)
 	http.Handle("/graphql", setHeaders(gQlHandler))
 	log.Fatal(http.ListenAndServe("127.0.0.1:8080", nil))
 }
