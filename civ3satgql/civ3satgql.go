@@ -57,7 +57,11 @@ func (sav *saveGameType) loadSave(path string) error {
 			sav.sections = append(sav.sections, *s)
 		}
 	}
-	refreshTrigger <- true
+	// Only send refresh if there are listeners (if channel isn't blocked)
+	select {
+	case refreshTrigger <- true:
+	default:
+	}
 	return nil
 }
 
@@ -96,13 +100,14 @@ func setHeaders(handler http.Handler) http.Handler {
 	})
 }
 
-func NoPathServer(bindAddress, bindPort string) error {
+// GraphQlHandler returns a GraphQL http handler
+func GraphQlHandler() (http.Handler, error) {
 	Schema, err := graphql.NewSchema(graphql.SchemaConfig{
 		Query: queryType,
 		// Mutation: MutationType,
 	})
 	if err != nil {
-		return err
+		return nil, err
 	}
 
 	// create a graphl-go HTTP handler
@@ -114,6 +119,15 @@ func NoPathServer(bindAddress, bindPort string) error {
 		// Playground provides fancier web browser query interface pulled from Internet
 		Playground: true,
 	})
+	return graphQlHandler, nil
+}
+
+func NoPathServer(bindAddress, bindPort string) error {
+	gQlHandler, err := GraphQlHandler()
+	if err != nil {
+		return err
+	}
+
 	http.Handle("/ws", websocket.Handler(func(conn *websocket.Conn) {
 		// go func() {
 		for {
@@ -129,7 +143,7 @@ func NoPathServer(bindAddress, bindPort string) error {
 		}
 		// }()
 	}))
-	http.Handle("/graphql", setHeaders(graphQlHandler))
+	http.Handle("/graphql", setHeaders(gQlHandler))
 	log.Fatal(http.ListenAndServe(bindAddress+":"+bindPort, nil))
 	return nil
 }
@@ -140,25 +154,12 @@ func Server(path string, bindAddress, bindPort string) error {
 		return err
 	}
 
-	Schema, err := graphql.NewSchema(graphql.SchemaConfig{
-		Query: queryType,
-		// Mutation: MutationType,
-	})
+	gQlHandler, err := GraphQlHandler()
 	if err != nil {
 		return err
 	}
 
-	// create a graphl-go HTTP handler
-	graphQlHandler := handler.New(&handler.Config{
-		Schema: &Schema,
-		Pretty: false,
-		// GraphiQL provides simple web browser query interface pulled from Internet
-		GraphiQL: false,
-		// Playground provides fancier web browser query interface pulled from Internet
-		Playground: true,
-	})
-
-	http.Handle("/graphql", setHeaders(graphQlHandler))
+	http.Handle("/graphql", setHeaders(gQlHandler))
 	log.Fatal(http.ListenAndServe(bindAddress+":"+bindPort, nil))
 	return nil
 }
