@@ -57,15 +57,6 @@ xhr.open('POST', 'http://127.0.0.1:8080/graphql');
 xhr.setRequestHeader('Content-Type', 'application/json');
 xhr.send(JSON.stringify(body));
 
-let refreshSocket = new WebSocket("ws://127.0.0.1:8080/ws");
-
-refreshSocket.onmessage = e => {
-    console.log(e.data);
-    xhr.open('POST', 'http://127.0.0.1:8080/graphql');
-    xhr.setRequestHeader('Content-Type', 'application/json');
-    xhr.send(JSON.stringify(body));
-}
-
 function renderMapTile (e) {
     const baseTerrainCss = {
         '0': 'desert',
