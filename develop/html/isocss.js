@@ -24,10 +24,14 @@ xhr.onload = () => {
                 row.appendChild(tile);
             }
         }
+    // If non-WebComponent browser, manually render each tile
+    if (typeof customElements == 'undefined') {
+        nonWebComponentRender();
+    }
 	} else {
 		console.error(xhr.status, 'Data fetch failed. Response text follows.');
 		console.log(xhr.responseText);
-	}
+    }
 }
 
 let spoilerMask = 0x2;
@@ -62,57 +66,75 @@ refreshSocket.onmessage = e => {
     xhr.send(JSON.stringify(body));
 }
 
+function renderMapTile (e) {
+    const baseTerrainCss = {
+        '0': 'desert',
+        '1': 'plains',
+        '2': 'grassland',
+        '3': 'tundra',
+        'b': 'coast',
+        'c': 'sea',
+        'd': 'ocean'
+    }
+    const overlayTerrain = {
+        '4': 'fp',
+        '5': 'hill',
+        '6': '⛰️',
+        '7': '🌲',
+        '8': '🌴',
+        '9': 'marsh',
+        'a': '🌋'
+    }
+    const tileDiv = document.createElement('div');
+    e.appendChild(tileDiv);
+    tileDiv.classList.add('isotile');
+    if (e.dataset.chopped == 'true') {
+        const chopDiv = document.createElement('div');
+        chopDiv.classList.add('chopped');
+        e.appendChild(chopDiv);
+    }
+    let terr = e.dataset.terrain;
+    if (terr) {
+        if (baseTerrainCss[terr[1]]) {
+            e.style.setProperty('--tile-color', `var(--${baseTerrainCss[terr[1]]})`);
+        }
+        if (overlayTerrain[terr[0]]) {
+            const terrOverlayDiv = document.createElement('div');
+            e.appendChild(terrOverlayDiv);
+            terrOverlayDiv.className = 'terrain-overlay';
+            terrOverlayDiv.innerText = overlayTerrain[terr[0]];
+        }
+    }
+    let text = e.dataset.text;
+    if (text) {
+        const textDiv = document.createElement('div');
+        textDiv.classList.add('tiletext');
+        e.appendChild(textDiv);
+    }
+}
+
 class MapTile extends HTMLElement {
 	connectedCallback () {
-		this.render();
+        renderMapTile(this);
+		// this.render();
 	}
-	render () {
-        const baseTerrainCss = {
-            '0': 'desert',
-            '1': 'plains',
-            '2': 'grassland',
-            '3': 'tundra',
-            'b': 'coast',
-            'c': 'sea',
-            'd': 'ocean'
-        }
-        const overlayTerrain = {
-            '4': 'fp',
-            '5': 'hill',
-            '6': '⛰️',
-            '7': '🌲',
-            '8': '🌴',
-            '9': 'marsh',
-            'a': '🌋'
-        }
-		const tileDiv = document.createElement('div');
-        this.appendChild(tileDiv);
-        tileDiv.classList.add('isotile');
-        if (this.dataset.chopped == 'true') {
-            const chopDiv = document.createElement('div');
-            chopDiv.classList.add('chopped');
-            this.appendChild(chopDiv);
-        }
-        let terr = this.dataset.terrain;
-        if (terr) {
-            if (baseTerrainCss[terr[1]]) {
-                this.style.setProperty('--tile-color', `var(--${baseTerrainCss[terr[1]]})`);
-            }
-            if (overlayTerrain[terr[0]]) {
-                const terrOverlayDiv = document.createElement('div');
-                this.appendChild(terrOverlayDiv);
-                terrOverlayDiv.className = 'terrain-overlay';
-                terrOverlayDiv.innerText = overlayTerrain[terr[0]];
-            }
-        }
-        let text = this.dataset.text;
-        if (text) {
-            const textDiv = document.createElement('div');
-            textDiv.classList.add('tiletext');
-            this.appendChild(textDiv);
-
-        }
-	}
+	// render () {
+	// }
 }
-// TODO: put this in try/catch with friendly output for non-web-component browsers
-customElements.define('map-tile', MapTile);
+
+function nonWebComponentRender() {
+    foo = document.getElementsByTagName('map-tile');
+    for (i=0; i< foo.length; i++) {
+        renderMapTile(foo[i]);
+    }
+}
+
+// If non-WebComponent browser, manually render each tile
+if (typeof customElements == 'undefined') {
+    document.addEventListener('DOMContentLoaded',() => {
+        nonWebComponentRender();
+    });
+} else {
+    customElements.define('map-tile', MapTile);
+}
+
