@@ -26,6 +26,7 @@ func f(s string) {
 			if err != nil {
 				fmt.Println(err)
 			}
+			longPoll.Publish("refresh", s)
 		}
 	}
 }

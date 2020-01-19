@@ -5,10 +5,12 @@ import (
 	"time"
 
 	"github.com/fsnotify/fsnotify"
+	"github.com/jcuga/golongpoll"
 )
 
 var savWatcher *fsnotify.Watcher
 var debounceTimer *time.Timer
+var longPoll *golongpoll.LongpollManager
 
 const debounceInterval = 300 * time.Millisecond
 
@@ -32,6 +34,16 @@ func main() {
 	if err != nil {
 		log.Fatal(err)
 	}
+
+	// Initialize long poll manager
+	longPoll, err = golongpoll.StartLongpoll(golongpoll.Options{})
+	if err != nil {
+		log.Fatal(err)
+	}
+	defer longPoll.Shutdown()
+
+	// temp loading a hard-coded SAV on startup
+	f("F:\\SteamLibrary\\steamapps\\common\\Sid Meier's Civilization III Complete\\Conquests\\Saves\\WAR-Russia-Galley-Mao of the Chinese, 300 AD.SAV")
 
 	// Api server
 	server()

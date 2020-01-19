@@ -1,4 +1,32 @@
 let xhr = new XMLHttpRequest();
+let pollXhr = new XMLHttpRequest();
+let pollSince = Date.now() - 86400000
+const longPollTimeout = 30
+
+pollNow = () => {
+    pollXhr.open('GET', `/events?timeout=${longPollTimeout}&category=refresh&since_time=${pollSince}`);
+    pollXhr.send();
+}
+
+pollXhr.onload = () => {
+    if (pollXhr.status >= 200 & pollXhr.status < 300) {
+        let pollData = JSON.parse(pollXhr.responseText);
+        if (typeof pollData.events != 'undefined') {
+            pollSince = pollData.events[0].timestamp;
+            xhr.open('POST', '/graphql');
+            xhr.setRequestHeader('Content-Type', 'application/json');
+            xhr.send(JSON.stringify(body));
+            }
+        if (pollData.timeout != undefined) {
+            pollSince = pollData.timestamp;
+        }
+        pollNow();
+    } else {
+        console.error("Long poll returned error");
+        console.log(pollXhr.responseText);
+    }
+}
+
 xhr.onload = () => {
 	if (xhr.status >= 200 && xhr.status < 300) {
         map = document.getElementById('map');
@@ -53,9 +81,7 @@ let body = {
     'query' : query
 };
 
-xhr.open('POST', '/graphql');
-xhr.setRequestHeader('Content-Type', 'application/json');
-xhr.send(JSON.stringify(body));
+pollNow();
 
 function renderMapTile (e) {
     const baseTerrainCss = {

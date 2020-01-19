@@ -33,5 +33,6 @@ func server() {
 	// Can't figure out how to make pkger work for non-root
 	http.Handle("/", staticFiles)
 	http.Handle("/graphql", setHeaders(gQlHandler))
+	http.Handle("/events", setHeaders(http.Handler(http.HandlerFunc(longPoll.SubscriptionHandler))))
 	log.Fatal(http.ListenAndServe("127.0.0.1:8080", nil))
 }
