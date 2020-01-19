@@ -22,9 +22,21 @@ pollXhr.onload = () => {
         }
         pollNow();
     } else {
-        console.error("Long poll returned error");
-        console.log(pollXhr.responseText);
+        // TODO: Better error handling. For now just passing the xhr object to a function which usually gets a ProgressEvent
+        pollError(pollXhr);
     }
+}
+
+pollXhr.onerror = e => pollError(e);
+
+pollError = (e) => {
+    console.error("Long poll returned error");
+    console.log(e);
+    const errorDiv = document.getElementById('error');
+    const errMsg = document.createElement('p');
+    errMsg.innerText = `Polling error. Live updates have stopped. Correct and refresh page.`
+    errorDiv.appendChild(errMsg);
+
 }
 
 xhr.onload = () => {
