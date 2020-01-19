@@ -1,12 +1,16 @@
 package main
 
 import (
+	"fmt"
 	"log"
 	"net/http"
 
 	"github.com/markbates/pkger"
 	"github.com/myjimnelson/c3sat/civ3satgql"
 )
+
+const addr = "127.0.0.1"
+const port = "8080"
 
 func setHeaders(handler http.Handler) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
@@ -34,5 +38,10 @@ func server() {
 	http.Handle("/", staticFiles)
 	http.Handle("/graphql", setHeaders(gQlHandler))
 	http.Handle("/events", setHeaders(http.Handler(http.HandlerFunc(longPoll.SubscriptionHandler))))
-	log.Fatal(http.ListenAndServe("127.0.0.1:8080", nil))
+	fmt.Println("Opening local web server, please browse to http://" + addr + ":" + port + "/isocss.html")
+	fmt.Println("Press control-C in this window or close it to end program")
+	err = http.ListenAndServe(addr+":"+port, nil)
+	if err != nil {
+		log.Fatal(err)
+	}
 }

@@ -1,6 +1,7 @@
 package main
 
 import (
+	"fmt"
 	"log"
 	"time"
 
@@ -15,6 +16,8 @@ var longPoll *golongpoll.LongpollManager
 const debounceInterval = 300 * time.Millisecond
 
 func main() {
+	fmt.Println("\nCiv Intelligence Agency III alpha 1\n")
+	fmt.Println("Setting up\n")
 	// Set up file watcher
 	var err error
 	savWatcher, err = fsnotify.NewWatcher()
@@ -27,16 +30,6 @@ func main() {
 	debounceTimer = time.NewTimer(debounceInterval)
 	go watchSavs()
 
-	// TODO: UI for adding watches and/or registry query for SAV locations
-	err = savWatcher.Add("F:\\SteamLibrary\\steamapps\\common\\Sid Meier's Civilization III Complete\\Conquests\\Saves")
-	if err != nil {
-		log.Fatal(err)
-	}
-	err = savWatcher.Add("F:\\SteamLibrary\\steamapps\\common\\Sid Meier's Civilization III Complete\\Conquests\\Saves\\Auto")
-	if err != nil {
-		log.Fatal(err)
-	}
-
 	// Initialize long poll manager
 	longPoll, err = golongpoll.StartLongpoll(golongpoll.Options{})
 	if err != nil {
@@ -44,8 +37,32 @@ func main() {
 	}
 	defer longPoll.Shutdown()
 
-	// temp loading a hard-coded SAV on startup
-	loadNewSav("F:\\SteamLibrary\\steamapps\\common\\Sid Meier's Civilization III Complete\\Conquests\\Saves\\WAR-Russia-Galley-Mao of the Chinese, 300 AD.SAV")
+	// Read Win registry for Civ3 Conquests path
+	civPath, err := findWinCivInstall()
+	if err != nil {
+		log.Fatal(err)
+	}
+	fmt.Println("Detected Civ3 location: " + civPath + "\n")
+
+	lastSav, err := getLastSav(civPath)
+	if err != nil {
+		fmt.Println("Failed to discover latest save from conquests.ini. " + err.Error())
+	} else {
+		fmt.Println("Opening latest SAV file " + lastSav + "\n")
+		loadNewSav(lastSav)
+	}
+
+	fmt.Println(`Adding <civ3 location>\Saves and <civ3 location>\Saves\Auto to watch list` + "\n")
+
+	// Add Saves and Saves\Auto folder watches
+	err = savWatcher.Add(civPath + `\Saves`)
+	if err != nil {
+		log.Fatal(err)
+	}
+	err = savWatcher.Add(civPath + `\Saves\Auto`)
+	if err != nil {
+		log.Fatal(err)
+	}
 
 	// Api server
 	server()
