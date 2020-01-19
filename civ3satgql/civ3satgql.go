@@ -38,6 +38,7 @@ func (sav *saveGameType) loadSave(path string) error {
 		return err
 	}
 	sav.path = path
+	sav.sections = make([]sectionType, 0)
 	// find sections demarc'ed by 4-character ASCII headers
 	for i < len(sav.data) {
 		if sav.data[i] < 0x20 || sav.data[i] > 0x5a {
