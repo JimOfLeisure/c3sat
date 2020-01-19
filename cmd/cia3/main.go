@@ -16,7 +16,7 @@ var longPoll *golongpoll.LongpollManager
 const debounceInterval = 300 * time.Millisecond
 
 func main() {
-	fmt.Println("\nCiv Intelligence Agency III alpha 1\n")
+	fmt.Println("\nCiv Intelligence Agency III alpha 1b\n")
 	fmt.Println("Setting up\n")
 	// Set up file watcher
 	var err error

@@ -33,7 +33,7 @@ func server() {
 	if err != nil {
 		log.Fatal(err)
 	}
-	staticFiles := http.FileServer(pkger.Dir("/cmd/cia3/html"))
+	staticFiles := http.FileServer(pkger.Dir("/html"))
 	// Can't figure out how to make pkger work for non-root
 	http.Handle("/", staticFiles)
 	http.Handle("/graphql", setHeaders(gQlHandler))

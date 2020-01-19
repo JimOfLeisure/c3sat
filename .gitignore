@@ -5,6 +5,9 @@
 *.json
 cmd/temp/
 
+# embeded files built by pkger
+pkged.go
+
 # built executables
 civ3sat/civ3sat
 *.exe
