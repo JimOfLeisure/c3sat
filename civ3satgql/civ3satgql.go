@@ -2,12 +2,8 @@ package civ3satgql
 
 import (
 	"encoding/json"
-	"fmt"
-	"log"
 	"net/http"
 	"strconv"
-
-	"golang.org/x/net/websocket"
 
 	"github.com/graphql-go/graphql"
 	"github.com/graphql-go/handler"
@@ -27,7 +23,6 @@ type saveGameType struct {
 }
 
 var saveGame saveGameType
-var refreshTrigger = make(chan bool)
 
 // populates the structure given a path to a sav file
 func (sav *saveGameType) loadSave(path string) error {
@@ -57,11 +52,6 @@ func (sav *saveGameType) loadSave(path string) error {
 			s.name = string(sav.data[offset:i])
 			sav.sections = append(sav.sections, *s)
 		}
-	}
-	// Only send refresh if there are listeners (if channel isn't blocked)
-	select {
-	case refreshTrigger <- true:
-	default:
 	}
 	return nil
 }
@@ -123,32 +113,6 @@ func GraphQlHandler() (http.Handler, error) {
 	return graphQlHandler, nil
 }
 
-func NoPathServer(bindAddress, bindPort string) error {
-	gQlHandler, err := GraphQlHandler()
-	if err != nil {
-		return err
-	}
-
-	http.Handle("/ws", websocket.Handler(func(conn *websocket.Conn) {
-		// go func() {
-		for {
-			select {
-			case <-refreshTrigger:
-				message := "refresh! "
-				fmt.Print(message)
-				websocket.Message.Send(conn, message)
-				// case <-time.After(5000 * time.Millisecond):
-				// 	fmt.Print("timer! ")
-				// 	websocket.Message.Send(conn, "timer!")
-			}
-		}
-		// }()
-	}))
-	http.Handle("/graphql", setHeaders(gQlHandler))
-	log.Fatal(http.ListenAndServe(bindAddress+":"+bindPort, nil))
-	return nil
-}
-
 func Server(path string, bindAddress, bindPort string) error {
 	err := saveGame.loadSave(path)
 	if err != nil {
@@ -161,7 +125,10 @@ func Server(path string, bindAddress, bindPort string) error {
 	}
 
 	http.Handle("/graphql", setHeaders(gQlHandler))
-	log.Fatal(http.ListenAndServe(bindAddress+":"+bindPort, nil))
+	http.ListenAndServe(bindAddress+":"+bindPort, nil)
+	if err != nil {
+		return err
+	}
 	return nil
 }
 

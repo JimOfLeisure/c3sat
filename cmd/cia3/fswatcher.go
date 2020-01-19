@@ -1,30 +1,25 @@
 package main
 
 import (
-	"fmt"
 	"log"
 	"os"
 	"strings"
-	"time"
 
 	"github.com/fsnotify/fsnotify"
 	"github.com/myjimnelson/c3sat/civ3satgql"
 )
 
-func f(s string) {
-	// fmt.Println(s + " <==")
+func loadNewSav(s string) {
 	if len(s) > 4 && strings.ToLower(s[len(s)-4:]) == ".sav" {
 		fi, err := os.Stat(s)
 		if err != nil {
-			// log.Fatal(err)
-			fmt.Println("stat error - " + s)
+			log.Fatal(err)
 			return
 		}
 		if fi.Mode().IsRegular() {
-			fmt.Println(time.Now().String() + " " + s + " modified")
 			err := civ3satgql.ChangeSavePath(s)
 			if err != nil {
-				fmt.Println(err)
+				log.Fatal(err)
 			}
 			longPoll.Publish("refresh", s)
 		}
@@ -45,7 +40,7 @@ func watchSavs() {
 			}
 		case <-debounceTimer.C:
 			// This will get called once debounceInterval after program start, and I'm going to live with that
-			f(fn)
+			loadNewSav(fn)
 		case err, ok := <-savWatcher.Errors:
 			if !ok {
 				return

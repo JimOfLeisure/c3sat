@@ -15,13 +15,15 @@ var longPoll *golongpoll.LongpollManager
 const debounceInterval = 300 * time.Millisecond
 
 func main() {
-	// Set up file watcher and go func to handle events
+	// Set up file watcher
 	var err error
 	savWatcher, err = fsnotify.NewWatcher()
 	if err != nil {
 		log.Fatal(err)
 	}
 	defer savWatcher.Close()
+
+	// Set up file event handler
 	debounceTimer = time.NewTimer(debounceInterval)
 	go watchSavs()
 
@@ -43,7 +45,7 @@ func main() {
 	defer longPoll.Shutdown()
 
 	// temp loading a hard-coded SAV on startup
-	f("F:\\SteamLibrary\\steamapps\\common\\Sid Meier's Civilization III Complete\\Conquests\\Saves\\WAR-Russia-Galley-Mao of the Chinese, 300 AD.SAV")
+	loadNewSav("F:\\SteamLibrary\\steamapps\\common\\Sid Meier's Civilization III Complete\\Conquests\\Saves\\WAR-Russia-Galley-Mao of the Chinese, 300 AD.SAV")
 
 	// Api server
 	server()
