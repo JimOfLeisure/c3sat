@@ -1,12 +1,13 @@
 package main
 
 import (
-	"fmt"
+	// "fmt"
 	"log"
 	"time"
 
 	"github.com/fsnotify/fsnotify"
 	"github.com/jcuga/golongpoll"
+	"github.com/zserge/lorca"
 )
 
 var savWatcher *fsnotify.Watcher
@@ -16,8 +17,8 @@ var longPoll *golongpoll.LongpollManager
 const debounceInterval = 300 * time.Millisecond
 
 func main() {
-	fmt.Println("\nCiv Intelligence Agency III alpha 1b\n")
-	fmt.Println("Setting up\n")
+	// fmt.Println("\nCiv Intelligence Agency III alpha 1b\n")
+	// fmt.Println("Setting up\n")
 	// Set up file watcher
 	var err error
 	savWatcher, err = fsnotify.NewWatcher()
@@ -42,17 +43,17 @@ func main() {
 	if err != nil {
 		log.Fatal(err)
 	}
-	fmt.Println("Detected Civ3 location: " + civPath + "\n")
+	// fmt.Println("Detected Civ3 location: " + civPath + "\n")
 
 	lastSav, err := getLastSav(civPath)
 	if err != nil {
-		fmt.Println("Failed to discover latest save from conquests.ini. " + err.Error())
+		// fmt.Println("Failed to discover latest save from conquests.ini. " + err.Error())
 	} else {
-		fmt.Println("Opening latest SAV file " + lastSav + "\n")
+		// fmt.Println("Opening latest SAV file " + lastSav + "\n")
 		loadNewSav(lastSav)
 	}
 
-	fmt.Println(`Adding <civ3 location>\Saves and <civ3 location>\Saves\Auto to watch list` + "\n")
+	// fmt.Println(`Adding <civ3 location>\Saves and <civ3 location>\Saves\Auto to watch list` + "\n")
 
 	// Add Saves and Saves\Auto folder watches
 	err = savWatcher.Add(civPath + `\Saves`)
@@ -65,5 +66,14 @@ func main() {
 	}
 
 	// Api server
-	server()
+	go server()
+
+	// _, err = lorca.New("Civ Intelligence Agency III", "http://"+addr+":"+port+"/isocss.html", 800, 600)
+	ui, err := lorca.New("", "", 1280, 720)
+	if err != nil {
+		log.Fatal(err)
+	}
+	defer ui.Close()
+	ui.Load("http://" + addr + ":" + port + "/isocss.html")
+	<-ui.Done()
 }
