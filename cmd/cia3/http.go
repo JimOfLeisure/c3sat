@@ -1,7 +1,6 @@
 package main
 
 import (
-	"fmt"
 	"log"
 	"net/http"
 
@@ -33,13 +32,13 @@ func server() {
 	if err != nil {
 		log.Fatal(err)
 	}
-	staticFiles := http.FileServer(pkger.Dir("/html"))
+	staticFiles := http.FileServer(pkger.Dir("github.com/myjimnelson/c3sat:/cmd/cia3/html"))
 	// Can't figure out how to make pkger work for non-root
 	http.Handle("/", staticFiles)
 	http.Handle("/graphql", setHeaders(gQlHandler))
 	http.Handle("/events", setHeaders(http.Handler(http.HandlerFunc(longPoll.SubscriptionHandler))))
-	fmt.Println("Opening local web server, please browse to http://" + addr + ":" + port + "/isocss.html")
-	fmt.Println("Press control-C in this window or close it to end program")
+	// fmt.Println("Opening local web server, please browse to http://" + addr + ":" + port + "/isocss.html")
+	// fmt.Println("Press control-C in this window or close it to end program")
 	err = http.ListenAndServe(addr+":"+port, nil)
 	if err != nil {
 		log.Fatal(err)

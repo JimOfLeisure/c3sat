@@ -1,1 +1,1 @@
-Note: Must run pkger in this folder before building cia3
+Note: Must run `pkger -o /cmd/cia3` before building cmd/cia3 to create pkged.go in this directory.
