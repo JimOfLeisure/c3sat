@@ -1,37 +1,45 @@
-let xhr = new XMLHttpRequest();
 
-xhr.onload = () => {
-	if (xhr.status >= 200 && xhr.status < 300) {
-        map = document.getElementById('map');
-        map.innerHTML = '';
-        mapData = JSON.parse(xhr.responseText);
-        const fileName = document.getElementById("fileName");
-        fileName.innerText = mapData.data.fileName;
-        let tilesWide = Math.floor(mapData.data.map.tileSetWidth / 2);
-        map.style.setProperty('--map-width', tilesWide);
-        for (let j = 0, l = mapData.data.map.tileSetHeight; j < l; j++) {
-            const row = document.createElement('div');
-            row.classList += 'row';
-            map.appendChild(row);
-            for (let i=0; i < tilesWide; i++) {
-                const tile = document.createElement('map-tile');
-                const index = i + j * tilesWide;
-                if (mapData.data.map.tiles[index].hexTerrain) {
-                    tile.setAttribute('data-terrain', mapData.data.map.tiles[index].hexTerrain);
-                }
-                if (mapData.data.map.tiles[index].chopped) {
-                    tile.setAttribute('data-chopped', 'true');
-                }
-                row.appendChild(tile);
+xhrSuccess = (xhr) => {
+    map = document.getElementById('map');
+    map.innerHTML = '';
+    mapData = JSON.parse(xhr.responseText);
+    const fileName = document.getElementById("fileName");
+    fileName.innerText = mapData.data.fileName;
+    let tilesWide = Math.floor(mapData.data.map.tileSetWidth / 2);
+    map.style.setProperty('--map-width', tilesWide);
+    for (let j = 0, l = mapData.data.map.tileSetHeight; j < l; j++) {
+        const row = document.createElement('div');
+        row.classList += 'row';
+        map.appendChild(row);
+        for (let i=0; i < tilesWide; i++) {
+            const tile = document.createElement('map-tile');
+            const index = i + j * tilesWide;
+            if (mapData.data.map.tiles[index].hexTerrain) {
+                tile.setAttribute('data-terrain', mapData.data.map.tiles[index].hexTerrain);
             }
+            if (mapData.data.map.tiles[index].chopped) {
+                tile.setAttribute('data-chopped', 'true');
+            }
+            row.appendChild(tile);
         }
+    }
     // If non-WebComponent browser, manually render each tile
     if (typeof customElements == 'undefined') {
         nonWebComponentRender();
     }
+}
+
+xhrFail = (xhr) => {
+    console.error(xhr.status, 'Data fetch failed. Response text follows.');
+    console.log(xhr.responseText);
+}
+let xhr = new XMLHttpRequest();
+
+xhr.onload = () => {
+	if (xhr.status >= 200 && xhr.status < 300) {
+        xhrSuccess(xhr)
 	} else {
-		console.error(xhr.status, 'Data fetch failed. Response text follows.');
-		console.log(xhr.responseText);
+        xhrFail(xhr)
     }
 }
 
