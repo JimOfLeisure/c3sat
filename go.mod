@@ -11,5 +11,6 @@ require (
 	github.com/nu7hatch/gouuid v0.0.0-20131221200532-179d4d0c4d8d // indirect
 	github.com/urfave/cli v1.22.2
 	github.com/zserge/lorca v0.1.8
+	github.com/zserge/webview v0.0.0-20200107095028-df06660f74b1
 	golang.org/x/sys v0.0.0-20200117145432-59e60aa80a0c
 )

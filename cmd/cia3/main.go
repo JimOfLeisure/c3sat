@@ -7,7 +7,7 @@ import (
 
 	"github.com/fsnotify/fsnotify"
 	"github.com/jcuga/golongpoll"
-	"github.com/zserge/lorca"
+	"github.com/zserge/webview"
 )
 
 var savWatcher *fsnotify.Watcher
@@ -68,12 +68,8 @@ func main() {
 	// Api server
 	go server()
 
-	// _, err = lorca.New("Civ Intelligence Agency III", "http://"+addr+":"+port+"/isocss.html", 800, 600)
-	ui, err := lorca.New("", "", 1280, 720)
-	if err != nil {
-		log.Fatal(err)
-	}
-	defer ui.Close()
-	ui.Load("http://" + addr + ":" + port + "/isocss.html")
-	<-ui.Done()
+	// panic(webview.Open("CIA3", "http://"+addr+":"+port+"/isocss.html", 1280, 720, true))
+	ui := webview.New(false)
+	ui.Navigate("http://" + addr + ":" + port + "/")
+	ui.Run()
 }
