@@ -4,12 +4,22 @@
         <title>Civ Intelligence Agency III</title>
 <script>
 
-var gqlQuery = `
+gqlQuery = `
 {
-  difficulty: int32s(section: "GAME", nth: 2, offset: 20, count: 1)
+    fileName
+    difficulty: int32s(section: "GAME", nth: 2, offset: 20, count: 1)
 }
 `
-
+xhrSuccess = (data) => {
+    const fileName = document.getElementById("fileName");
+    fileName.innerText = data.data.fileName;
+    const difficulty = document.getElementById("difficulty");
+    difficulty.innerText = data.data.difficulty[0];
+}
+xhrFail = (xhr) => {
+    console.error(xhr.status, 'Data fetch failed. Response text follows.');
+    console.log(xhr.responseText);
+}
 </script>
 
         <script src="pollchanges.js" charset="utf-8"></script>
@@ -18,5 +28,9 @@ var gqlQuery = `
     <body>
         <h1>Civ Intelligence Agency III</h1>
         <a href="map.html">Map with forest chopped</a>
+        <h2 id="fileName"></h2>
+        <ul>
+            <li>Difficulty: <span id="difficulty"></span></li>
+        </ul>
     </body>
 </html>
