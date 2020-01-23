@@ -5,7 +5,7 @@ const longPollTimeout = 30
 
 xhr.onload = () => {
 	if (xhr.status >= 200 && xhr.status < 300) {
-        xhrSuccess(xhr)
+        xhrSuccess(JSON.parse(xhr.responseText));
 	} else {
         xhrFail(xhr)
     }

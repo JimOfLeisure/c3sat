@@ -1,8 +1,7 @@
 
-xhrSuccess = (xhr) => {
+xhrSuccess = (mapData) => {
     map = document.getElementById('map');
     map.innerHTML = '';
-    mapData = JSON.parse(xhr.responseText);
     const fileName = document.getElementById("fileName");
     fileName.innerText = mapData.data.fileName;
     let tilesWide = Math.floor(mapData.data.map.tileSetWidth / 2);
