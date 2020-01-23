@@ -1,6 +1,21 @@
+let xhr = new XMLHttpRequest();
 let pollXhr = new XMLHttpRequest();
 let pollSince = Date.now() - 86400000
 const longPollTimeout = 30
+
+xhr.onload = () => {
+	if (xhr.status >= 200 && xhr.status < 300) {
+        xhrSuccess(xhr)
+	} else {
+        xhrFail(xhr)
+    }
+}
+
+let body = {
+    // "operationName":null,
+    // "variables":{},
+    'query' : gqlQuery
+};
 
 pollNow = () => {
     pollXhr.open('GET', `/events?timeout=${longPollTimeout}&category=refresh&since_time=${pollSince}`);
@@ -39,3 +54,4 @@ pollError = (e) => {
 }
 
 pollNow();
+

@@ -1,7 +1,18 @@
 <!doctype html>
 <html>
     <head>
-        <title>CIA3</title>
+        <title>Civ Intelligence Agency III</title>
+        <script src="pollchanges.js" charset="utf-8"></script>
+<script>
+
+var gqlQuery = `
+{
+  difficulty: int32s(section: "GAME", nth: 2, offset: 20, count: 1)
+}
+`
+
+</script>
+
     </head>
     <body>
         <h1>Civ Intelligence Agency III</h1>

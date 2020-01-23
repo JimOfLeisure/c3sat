@@ -33,18 +33,9 @@ xhrFail = (xhr) => {
     console.error(xhr.status, 'Data fetch failed. Response text follows.');
     console.log(xhr.responseText);
 }
-let xhr = new XMLHttpRequest();
-
-xhr.onload = () => {
-	if (xhr.status >= 200 && xhr.status < 300) {
-        xhrSuccess(xhr)
-	} else {
-        xhrFail(xhr)
-    }
-}
 
 let spoilerMask = 0x2;
-let query = `{
+var gqlQuery = `{
     fileName
     map(playerSpoilerMask: ${spoilerMask}) {
         tileSetWidth
@@ -55,12 +46,6 @@ let query = `{
         }
     }
 }`;
-
-let body = {
-    // "operationName":null,
-    // "variables":{},
-    'query' : query
-};
 
 function renderMapTile (e) {
     const baseTerrainCss = {
