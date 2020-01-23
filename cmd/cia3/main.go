@@ -74,6 +74,6 @@ func main() {
 		log.Fatal(err)
 	}
 	defer ui.Close()
-	ui.Load("http://" + addr + ":" + port + "/isocss.html")
+	ui.Load("http://" + addr + ":" + port + "/")
 	<-ui.Done()
 }

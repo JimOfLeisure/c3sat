@@ -4,6 +4,7 @@
 *.csv
 *.json
 cmd/temp/
+*.dll
 
 # embeded files built by pkger
 pkged.go
