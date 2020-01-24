@@ -1,6 +1,22 @@
+let xhr = new XMLHttpRequest();
 let pollXhr = new XMLHttpRequest();
-let pollSince = Date.now() - 86400000
-const longPollTimeout = 30
+let pollSince = Date.now() - 86400000;
+const longPollTimeout = 30;
+let data = {};
+
+xhr.onload = () => {
+	if (xhr.status >= 200 && xhr.status < 300) {
+        data = JSON.parse(xhr.responseText).data;
+        const refreshData = new CustomEvent("refresh");
+        dispatchEvent(refreshData);
+	} else {
+        // TODO: Handle non-2xx results
+        console.log(xhr);
+    }
+}
+
+// TODO: Handle xhr errors
+xhr.onerror = e => console.log(e);
 
 let pollNow = () => {
     pollXhr.open('GET', `/events?timeout=${longPollTimeout}&category=refresh&since_time=${pollSince}`);
@@ -12,7 +28,9 @@ pollXhr.onload = () => {
         let pollData = JSON.parse(pollXhr.responseText);
         if (typeof pollData.events != 'undefined') {
             pollSince = pollData.events[0].timestamp;
-            console.log('poll event received at ' + pollSince);
+            xhr.open('POST', '/graphql');
+            xhr.setRequestHeader('Content-Type', 'application/json');
+            xhr.send(JSON.stringify(gqlQuery.body()));
         }
         if (pollData.timeout != undefined) {
             pollSince = pollData.timestamp;
@@ -25,42 +43,60 @@ pollXhr.onload = () => {
     }
 }
 
-pollXhr.onerror = e => pollError(e);
-
-let pollError = (e) => {
+pollXhr.onerror = e => {
     console.error("Long poll returned error");
     console.log(e);
-    const errorDiv = document.getElementsByTagName('cia3-error');
-    const errMsg = document.createElement('p');
-    errMsg.innerText = `Polling error. Live updates have stopped. Correct and refresh page.`
-    errorDiv[0].appendChild(errMsg);
-
+    let cia3Error = new CustomEvent("cia3Error", { 'detail' : `Polling error. Live updates have stopped. Correct and refresh page.`});
+    dispatchEvent(cia3Error);
 }
+
+class GqlQuery {
+    queries = [
+`
+fileName
+difficulty: int32s(section: "GAME", nth: 2, offset: 20, count: 1)
+`        
+    ]
+    query() {
+        let query = "";
+        this.queries.forEach(e => query+= e + "\n");
+        return '{' + query + '}';
+    }
+    body() {
+        return {
+            'query' : this.query()
+        }
+    }
+}
+let gqlQuery = new GqlQuery();
 
 class Error extends HTMLElement {
     connectedCallback() {
-        this.render();
+        window.addEventListener('cia3Error', (e) => this.render(e.detail));
     }
-    render() {
-        this.innerText = "Errors go here";
+    render(errMsg) {
+        const p = document.createElement('p');
+        p.innerText = errMsg;
+        this.appendChild(p);
+        // this.innerText = errMsg;
     }
 }
 
 class Filename extends HTMLElement {
     connectedCallback() {
-        this.render()
+        window.addEventListener('refresh', () => this.render());
     }
     render() {
-        this.innerText = "Filename goes here";
+        this.innerText = data.fileName;
     }
 }
 
 class Difficulty extends HTMLElement {
     connectedCallback() {
-        this.render()
+        window.addEventListener('refresh', () => this.render());
     }
     render() {
-        this.innerText = "Difficulty goes here; warlord/emperor/etc";
+        this.innerText = difficultyNames[data.difficulty[0]];
     }
 }
 
