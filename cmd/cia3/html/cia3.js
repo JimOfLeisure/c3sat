@@ -67,10 +67,10 @@ pollXhr.onerror = e => {
 }
 
 class GqlQuery {
-    queryParts = new Array();
+    // Using Set to deduplicate queries
+    queryParts = new Set();
     query() {
-        // Using Set to deduplicate array
-        return '{' + [...new Set(this.queryParts)].join('\n') + '}';
+        return '{' + Array.from(this.queryParts).join('\n') + '}';
     }
     body() {
         return {
@@ -94,7 +94,7 @@ class Error extends HTMLElement {
 
 class Filename extends HTMLElement {
     connectedCallback() {
-        gqlQuery.queryParts.push('fileName');
+        gqlQuery.queryParts.add('fileName');
         window.addEventListener('refresh', () => this.render());
     }
     render() {
@@ -104,7 +104,7 @@ class Filename extends HTMLElement {
 
 class Difficulty extends HTMLElement {
     connectedCallback() {
-        gqlQuery.queryParts.push('difficulty: int32s(section: "GAME", nth: 2, offset: 20, count: 1)');
+        gqlQuery.queryParts.add('difficulty: int32s(section: "GAME", nth: 2, offset: 20, count: 1)');
         window.addEventListener('refresh', () => this.render());
     }
     render() {
@@ -126,7 +126,7 @@ class Difficulty extends HTMLElement {
 class Map extends HTMLElement {
     connectedCallback() {
         let spoilerMask = 0x2;
-        gqlQuery.queryParts.push(`
+        gqlQuery.queryParts.add(`
             map(playerSpoilerMask: ${spoilerMask}) {
                 tileSetWidth
                 tileSetHeight
@@ -210,9 +210,33 @@ class Tile extends HTMLElement {
     }
 }
 
+class Url extends HTMLElement {
+    connectedCallback() {
+        this.render();
+    }
+    render() {
+        this.innerHTML = `<a href="${location.href}" target="_blank">${location.href}</a>`;
+    }
+}
+
+// TODO: Add controls to customize query and re-query. And remove old query from gqlQuery.
+class HexDump extends HTMLElement {
+    connectedCallback() {
+        gqlQuery.queryParts.add(this.queryPart);
+        window.addEventListener('refresh', () => this.render());
+    }
+    render() {
+        this.innerText = data.cia3Hexdump;
+    }
+    queryPart = 'cia3Hexdump: hexDump(section: "GAME", nth: 2, offset: -4, count: 256)'
+}
+
+
 window.customElements.define('cia3-error', Error);
 window.customElements.define('cia3-filename', Filename);
 window.customElements.define('cia3-difficulty', Difficulty);
 window.customElements.define('cia3-map', Map);
 window.customElements.define('cia3-tile', Tile);
+window.customElements.define('cia3-url', Url);
+window.customElements.define('cia3-hexdump', HexDump);
 pollNow();
