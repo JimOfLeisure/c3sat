@@ -1,3 +1,15 @@
+/*
+    loading this module starts long polling and xhr queries (if appropriate)
+    pollXhr implements long polling
+        if event received, launch xhr query
+    Each custom element adds its query part to gqlQuery (type GqlQuery)
+        use GraphQL aliases for each custom element for clarity, especially if arguments differ
+    GqlQuery dedups query parts and builds the xhr request body
+    Upon successful xhr query, "refresh" event dispatched
+        each custom element listens to refresh and renders itself when received
+    event "cia3Error" dispatched on errors, with detail being a string which the Error custom element will add to itself
+*/
+
 let xhr = new XMLHttpRequest();
 let pollXhr = new XMLHttpRequest();
 let pollSince = Date.now() - 86400000;
@@ -51,16 +63,10 @@ pollXhr.onerror = e => {
 }
 
 class GqlQuery {
-    queries = [
-`
-fileName
-difficulty: int32s(section: "GAME", nth: 2, offset: 20, count: 1)
-`        
-    ]
+    queryParts = new Array();
     query() {
-        let query = "";
-        this.queries.forEach(e => query+= e + "\n");
-        return '{' + query + '}';
+        // Using Set to deduplicate array
+        return '{' + [...new Set(this.queryParts)].join('\n') + '}';
     }
     body() {
         return {
@@ -84,6 +90,7 @@ class Error extends HTMLElement {
 
 class Filename extends HTMLElement {
     connectedCallback() {
+        gqlQuery.queryParts.push('fileName');
         window.addEventListener('refresh', () => this.render());
     }
     render() {
@@ -93,6 +100,17 @@ class Filename extends HTMLElement {
 
 class Difficulty extends HTMLElement {
     connectedCallback() {
+        gqlQuery.queryParts.push('difficulty: int32s(section: "GAME", nth: 2, offset: 20, count: 1)');
+        window.addEventListener('refresh', () => this.render());
+    }
+    render() {
+        this.innerText = difficultyNames[data.difficulty[0]];
+    }
+}
+
+class Map extends HTMLElement {
+    connectedCallback() {
+        gqlQuery.queryParts.push('testQueryNotReal: int32s(section: "GAME", nth: 2, offset: 20, count: 1)');
         window.addEventListener('refresh', () => this.render());
     }
     render() {
@@ -114,4 +132,5 @@ const difficultyNames = [
 window.customElements.define('cia3-error', Error);
 window.customElements.define('cia3-filename', Filename);
 window.customElements.define('cia3-difficulty', Difficulty);
+window.customElements.define('cia3-map', Map);
 pollNow();
