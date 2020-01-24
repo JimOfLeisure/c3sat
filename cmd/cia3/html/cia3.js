@@ -114,7 +114,59 @@ class Map extends HTMLElement {
         window.addEventListener('refresh', () => this.render());
     }
     render() {
-        this.innerText = difficultyNames[data.difficulty[0]];
+        // this.innerText = difficultyNames[data.difficulty[0]];
+    }
+}
+
+class Tile extends HTMLElement {
+	connectedCallback () {
+		this.render();
+	}
+	render () {
+        const baseTerrainCss = {
+            '0': 'desert',
+            '1': 'plains',
+            '2': 'grassland',
+            '3': 'tundra',
+            'b': 'coast',
+            'c': 'sea',
+            'd': 'ocean'
+        }
+        const overlayTerrain = {
+            '4': 'fp',
+            '5': 'hill',
+            '6': '⛰️',
+            '7': '🌲',
+            '8': '🌴',
+            '9': 'marsh',
+            'a': '🌋'
+        }
+        const tileDiv = document.createElement('div');
+        this.appendChild(tileDiv);
+        tileDiv.classList.add('isotile');
+        if (this.dataset.chopped == 'true') {
+            const chopDiv = document.createElement('div');
+            chopDiv.classList.add('chopped');
+            this.appendChild(chopDiv);
+        }
+        let terr = this.dataset.terrain;
+        if (terr) {
+            if (baseTerrainCss[terr[1]]) {
+                this.style.setProperty('--tile-color', `var(--${baseTerrainCss[terr[1]]})`);
+            }
+            if (overlayTerrain[terr[0]]) {
+                const terrOverlayDiv = document.createElement('div');
+                this.appendChild(terrOverlayDiv);
+                terrOverlayDiv.className = 'terrain-overlay';
+                terrOverlayDiv.innerText = overlayTerrain[terr[0]];
+            }
+        }
+        let text = this.dataset.text;
+        if (text) {
+            const textDiv = document.createElement('div');
+            textDiv.classList.add('tiletext');
+            this.appendChild(textDiv);
+        }
     }
 }
 
@@ -133,4 +185,5 @@ window.customElements.define('cia3-error', Error);
 window.customElements.define('cia3-filename', Filename);
 window.customElements.define('cia3-difficulty', Difficulty);
 window.customElements.define('cia3-map', Map);
+window.customElements.define('cia3-tile', Tile);
 pollNow();
