@@ -2,48 +2,15 @@
 <html>
     <head>
         <title>Civ Intelligence Agency III</title>
-<script>
-'use strict';
-
-const difficultyNames = [
-    "Chieftan",
-    "Warlord",
-    "Regent",
-    "Monarch",
-    "Emperor",
-    "Demigod",
-    "Deity",
-    "Sid"
-]
-// currently needs to be global for the polling module to read it
-var gqlQuery = `
-{
-    fileName
-    difficulty: int32s(section: "GAME", nth: 2, offset: 20, count: 1)
-}
-`
-// currently needs to be global for the polling module to read it
-var xhrSuccess = (data) => {
-    document.getElementById("fileName").innerText = data.data.fileName;
-    document.getElementById("difficulty").innerText = difficultyNames[data.data.difficulty[0]];
-}
-// currently needs to be global for the polling module to read it
-var xhrFail = (xhr) => {
-    console.error(xhr.status, 'Data fetch failed. Response text follows.');
-    console.log(xhr.responseText);
-}
-</script>
-
-        <script src="pollchanges.js" charset="utf-8"></script>
-
+        <script type="module" src="cia3.js"></script>
     </head>
     <body>
         <h1>Civ Intelligence Agency III</h1>
         <div id="error"><noscript>This page requires JavaScript to run.</noscript></div>
         <a href="map.html">Map with forest chopped</a>
-        <h2 id="fileName"></h2>
+        <h2><cia3-filename></cia3-filename></h2>
         <ul>
-            <li>Difficulty: <span id="difficulty"></span></li>
-        </ul>
+                <li>Difficulty: <cia3-difficulty></cia3-difficulty></li>
+            </ul>
     </body>
 </html>
