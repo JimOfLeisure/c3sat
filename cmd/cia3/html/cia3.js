@@ -108,8 +108,19 @@ class Difficulty extends HTMLElement {
         window.addEventListener('refresh', () => this.render());
     }
     render() {
-        this.innerText = difficultyNames[data.difficulty[0]];
+        this.innerText = this.difficultyNames[data.difficulty[0]];
     }
+    difficultyNames = [
+        "Chieftan",
+        "Warlord",
+        "Regent",
+        "Monarch",
+        "Emperor",
+        "Demigod",
+        "Deity",
+        "Sid"
+    ]
+    
 }
 
 class Map extends HTMLElement {
@@ -151,25 +162,25 @@ class Tile extends HTMLElement {
 	connectedCallback () {
 		this.render();
 	}
-	render () {
-        const baseTerrainCss = {
-            '0': 'desert',
-            '1': 'plains',
-            '2': 'grassland',
-            '3': 'tundra',
-            'b': 'coast',
-            'c': 'sea',
-            'd': 'ocean'
-        }
-        const overlayTerrain = {
-            '4': 'fp',
-            '5': 'hill',
-            '6': '⛰️',
-            '7': '🌲',
-            '8': '🌴',
-            '9': 'marsh',
-            'a': '🌋'
-        }
+    baseTerrainCss = {
+        '0': 'desert',
+        '1': 'plains',
+        '2': 'grassland',
+        '3': 'tundra',
+        'b': 'coast',
+        'c': 'sea',
+        'd': 'ocean'
+    }
+    overlayTerrain = {
+        '4': 'fp',
+        '5': 'hill',
+        '6': '⛰️',
+        '7': '🌲',
+        '8': '🌴',
+        '9': 'marsh',
+        'a': '🌋'
+    }
+    render () {
         const tileDiv = document.createElement('div');
         this.appendChild(tileDiv);
         tileDiv.classList.add('isotile');
@@ -180,14 +191,14 @@ class Tile extends HTMLElement {
         }
         let terr = this.dataset.terrain;
         if (terr) {
-            if (baseTerrainCss[terr[1]]) {
-                this.style.setProperty('--tile-color', `var(--${baseTerrainCss[terr[1]]})`);
+            if (this.baseTerrainCss[terr[1]]) {
+                this.style.setProperty('--tile-color', `var(--${this.baseTerrainCss[terr[1]]})`);
             }
-            if (overlayTerrain[terr[0]]) {
+            if (this.overlayTerrain[terr[0]]) {
                 const terrOverlayDiv = document.createElement('div');
                 this.appendChild(terrOverlayDiv);
                 terrOverlayDiv.className = 'terrain-overlay';
-                terrOverlayDiv.innerText = overlayTerrain[terr[0]];
+                terrOverlayDiv.innerText = this.overlayTerrain[terr[0]];
             }
         }
         let text = this.dataset.text;
@@ -198,17 +209,6 @@ class Tile extends HTMLElement {
         }
     }
 }
-
-const difficultyNames = [
-    "Chieftan",
-    "Warlord",
-    "Regent",
-    "Monarch",
-    "Emperor",
-    "Demigod",
-    "Deity",
-    "Sid"
-]
 
 window.customElements.define('cia3-error', Error);
 window.customElements.define('cia3-filename', Filename);
