@@ -22,13 +22,17 @@ xhr.onload = () => {
         const refreshData = new CustomEvent("refresh");
         dispatchEvent(refreshData);
 	} else {
-        // TODO: Handle non-2xx results
         console.log(xhr);
+        let cia3Error = new CustomEvent("cia3Error", { 'detail' : `Received non-2xx response on data query. Live updates will continue, but the latest save file is not shown here.`});
+        dispatchEvent(cia3Error);
     }
 }
 
-// TODO: Handle xhr errors
-xhr.onerror = e => console.log(e);
+xhr.onerror = e => {
+    console.log(e);
+    let cia3Error = new CustomEvent("cia3Error", { 'detail' : `Data query request failed. Live updates will continue, but the latest save file is not shown here.`});
+    dispatchEvent(cia3Error);
+}
 
 let pollNow = () => {
     pollXhr.open('GET', `/events?timeout=${longPollTimeout}&category=refresh&since_time=${pollSince}`);
@@ -49,9 +53,9 @@ pollXhr.onload = () => {
         }
         pollNow();
     } else {
-        // TODO: Better error handling. For now just passing the xhr object to a function which usually gets a ProgressEvent
-        // pollError(pollXhr);
-        console.log(pollXhr);
+        console.log("failed xhr request:", pollXhr);
+        let cia3Error = new CustomEvent("cia3Error", { 'detail' : `Received non-2xx response on polling query. Live updates have stopped.`});
+        dispatchEvent(cia3Error);
     }
 }
 
@@ -121,7 +125,6 @@ class Map extends HTMLElement {
                 }
             }
         `);
-        gqlQuery.queryParts.push('testQueryNotReal: int32s(section: "GAME", nth: 2, offset: 20, count: 1)');
         window.addEventListener('refresh', () => this.render());
     }
     render() {
@@ -139,7 +142,7 @@ class Map extends HTMLElement {
             if ((i + tilesWide) % data.map.tileSetWidth == 0) {
                 tile.classList.add('odd-row');
             }
-        this.appendChild(tile);
+            this.appendChild(tile);
         })
     }
 }
