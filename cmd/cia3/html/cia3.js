@@ -1,4 +1,14 @@
-export class Filename extends HTMLElement {
+class Error extends HTMLElement {
+    connectedCallback() {
+        this.render();
+    }
+    render() {
+        this.innerText = "Errors go here";
+    }
+}
+window.customElements.define('cia3-error', Error);
+
+class Filename extends HTMLElement {
     connectedCallback() {
         this.render()
     }
@@ -8,7 +18,7 @@ export class Filename extends HTMLElement {
 }
 window.customElements.define('cia3-filename', Filename);
 
-export class Difficulty extends HTMLElement {
+class Difficulty extends HTMLElement {
     connectedCallback() {
         this.render()
     }
