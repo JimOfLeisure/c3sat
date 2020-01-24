@@ -1,6 +1,8 @@
+'use strict';
 
-xhrSuccess = (mapData) => {
-    map = document.getElementById('map');
+// currently needs to be global for the polling module to read it
+var xhrSuccess = (mapData) => {
+    const map = document.getElementById('map');
     map.innerHTML = '';
     const fileName = document.getElementById("fileName");
     fileName.innerText = mapData.data.fileName;
@@ -28,7 +30,8 @@ xhrSuccess = (mapData) => {
     }
 }
 
-xhrFail = (xhr) => {
+// currently needs to be global for the polling module to read it
+var xhrFail = (xhr) => {
     console.error(xhr.status, 'Data fetch failed. Response text follows.');
     console.log(xhr.responseText);
 }

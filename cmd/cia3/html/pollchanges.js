@@ -1,3 +1,5 @@
+'use strict';
+
 let xhr = new XMLHttpRequest();
 let pollXhr = new XMLHttpRequest();
 let pollSince = Date.now() - 86400000
@@ -17,7 +19,7 @@ let body = {
     'query' : gqlQuery
 };
 
-pollNow = () => {
+let pollNow = () => {
     pollXhr.open('GET', `/events?timeout=${longPollTimeout}&category=refresh&since_time=${pollSince}`);
     pollXhr.send();
 }
@@ -43,7 +45,7 @@ pollXhr.onload = () => {
 
 pollXhr.onerror = e => pollError(e);
 
-pollError = (e) => {
+let pollError = (e) => {
     console.error("Long poll returned error");
     console.log(e);
     const errorDiv = document.getElementById('error');
