@@ -110,11 +110,37 @@ class Difficulty extends HTMLElement {
 
 class Map extends HTMLElement {
     connectedCallback() {
+        let spoilerMask = 0x2;
+        gqlQuery.queryParts.push(`
+            map(playerSpoilerMask: ${spoilerMask}) {
+                tileSetWidth
+                tileSetHeight
+                tiles {
+                    hexTerrain
+                    chopped
+                }
+            }
+        `);
         gqlQuery.queryParts.push('testQueryNotReal: int32s(section: "GAME", nth: 2, offset: 20, count: 1)');
         window.addEventListener('refresh', () => this.render());
     }
     render() {
-        // this.innerText = difficultyNames[data.difficulty[0]];
+        this.innerHTML = '';
+        let tilesWide = Math.floor(data.map.tileSetWidth / 2);
+        this.style.setProperty('--map-width', tilesWide);
+        data.map.tiles.forEach( (e, i) => {
+            const tile = document.createElement('cia3-tile');
+            if (e.hexTerrain) {
+                tile.setAttribute('data-terrain', e.hexTerrain);
+            }
+            if (e.chopped) {
+                tile.setAttribute('data-chopped', 'true');
+            }
+            if ((i + tilesWide) % data.map.tileSetWidth == 0) {
+                tile.classList.add('odd-row');
+            }
+        this.appendChild(tile);
+        })
     }
 }
 

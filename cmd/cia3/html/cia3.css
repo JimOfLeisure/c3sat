@@ -36,7 +36,7 @@ cia3-tile {
     width: var(--tile-width);
     height: var(--tile-height);
 }
-cia3-tile.indent {
+cia3-tile.odd-row {
     /* shift half-tile to the right */
     margin-left: calc(var(--tile-width) / 2);
 }
