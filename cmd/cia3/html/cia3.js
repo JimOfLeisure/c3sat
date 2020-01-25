@@ -102,6 +102,16 @@ class Filename extends HTMLElement {
     }
 }
 
+class Fullpath extends HTMLElement {
+    connectedCallback() {
+        gqlQuery.queryParts.add('fullPath');
+        window.addEventListener('refresh', () => this.render());
+    }
+    render() {
+        this.innerText = data.fullPath;
+    }
+}
+
 class Difficulty extends HTMLElement {
     connectedCallback() {
         gqlQuery.queryParts.add('difficulty: int32s(section: "GAME", nth: 2, offset: 20, count: 1)');
@@ -215,7 +225,8 @@ class Url extends HTMLElement {
         this.render();
     }
     render() {
-        this.innerHTML = `<a href="${location.href}" target="_blank">${location.href}</a>`;
+        let url = location.protocol + "//" + location.host;
+        this.innerHTML = `<a href="${url}" target="_blank">${url}</a>`;
     }
 }
 
@@ -234,6 +245,7 @@ class HexDump extends HTMLElement {
 
 window.customElements.define('cia3-error', Error);
 window.customElements.define('cia3-filename', Filename);
+window.customElements.define('cia3-fullpath', Fullpath);
 window.customElements.define('cia3-difficulty', Difficulty);
 window.customElements.define('cia3-map', Map);
 window.customElements.define('cia3-tile', Tile);

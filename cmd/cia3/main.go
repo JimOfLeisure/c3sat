@@ -3,6 +3,8 @@ package main
 import (
 	// "fmt"
 	"log"
+	"net"
+	"strconv"
 	"time"
 
 	"github.com/fsnotify/fsnotify"
@@ -65,6 +67,13 @@ func main() {
 		log.Fatal(err)
 	}
 
+	listener, err := net.Listen("tcp", ":0")
+	if err != nil {
+		panic(err)
+	}
+
+	httpPort = strconv.Itoa(listener.Addr().(*net.TCPAddr).Port)
+
 	// Api server
 	go server()
 
@@ -74,6 +83,6 @@ func main() {
 		log.Fatal(err)
 	}
 	defer ui.Close()
-	ui.Load("http://" + addr + ":" + port + "/")
+	ui.Load("http://" + addr + ":" + httpPort + "/")
 	<-ui.Done()
 }

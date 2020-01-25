@@ -9,7 +9,8 @@ import (
 )
 
 const addr = "127.0.0.1"
-const port = "8080"
+
+var httpPort = "8080"
 
 func setHeaders(handler http.Handler) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
@@ -32,14 +33,11 @@ func server() {
 	if err != nil {
 		log.Fatal(err)
 	}
-	staticFiles := http.FileServer(pkger.Dir("github.com/myjimnelson/c3sat:/cmd/cia3/html"))
-	// Can't figure out how to make pkger work for non-root
+	staticFiles := http.FileServer(pkger.Dir("/cmd/cia3/html"))
 	http.Handle("/", staticFiles)
 	http.Handle("/graphql", setHeaders(gQlHandler))
 	http.Handle("/events", setHeaders(http.Handler(http.HandlerFunc(longPoll.SubscriptionHandler))))
-	// fmt.Println("Opening local web server, please browse to http://" + addr + ":" + port + "/isocss.html")
-	// fmt.Println("Press control-C in this window or close it to end program")
-	err = http.ListenAndServe(addr+":"+port, nil)
+	err = http.ListenAndServe(addr+":"+httpPort, nil)
 	if err != nil {
 		log.Fatal(err)
 	}
