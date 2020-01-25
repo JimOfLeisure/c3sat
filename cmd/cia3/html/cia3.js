@@ -245,6 +245,55 @@ class HexDump extends Cia3Element {
     queryPart = 'cia3Hexdump: hexDump(section: "GAME", nth: 2, offset: -4, count: 256)'
 }
 
+class MapX extends Cia3Element {
+    render() {
+        this.innerText = data.mapx[0];
+    }
+    queryPart = 'mapx: int32s(section: "WRLD", nth: 2, offset: 8, count: 1)'
+}
+
+class MapY extends Cia3Element {
+    render() {
+        this.innerText = data.mapy[0];
+    }
+    queryPart = 'mapy: int32s(section: "WRLD", nth: 2, offset: 28, count: 1)'
+}
+
+class WorldSize extends Cia3Element {
+    render() {
+        this.innerText = this.worldSizeNames[data.worldsize.size];
+    }
+    queryPart = 'worldsize: civ3 { size }'
+    worldSizeNames = [
+        "Tiny",
+        "Small",
+        "Standard",
+        "Large",
+        "Huge"
+    ];
+}
+
+class Barbarians extends Cia3Element {
+    render() {
+        this.innerText = this.barbariansSettings[data.barbarians.barbariansFinal.toString()];
+    }
+    queryPart = 'barbarians: civ3 { barbariansFinal }'
+    barbariansSettings = {
+        '-1': 'No Barbarians',
+        '0': 'Sedentary',
+        '1': 'Roaming',
+        '2': 'Restless',
+        '3': 'Raging',
+        '4': 'Random'
+    }
+}
+
+class WorldSeed extends Cia3Element {
+    render() {
+        this.innerText = data.worldseed.worldSeed;
+    }
+    queryPart = 'worldseed: civ3 { worldSeed }'
+}
 
 window.customElements.define('cia3-error', Error);
 window.customElements.define('cia3-filename', Filename);
@@ -254,4 +303,9 @@ window.customElements.define('cia3-map', Map);
 window.customElements.define('cia3-tile', Tile);
 window.customElements.define('cia3-url', Url);
 window.customElements.define('cia3-hexdump', HexDump);
+window.customElements.define('cia3-mapx', MapX);
+window.customElements.define('cia3-mapy', MapY);
+window.customElements.define('cia3-worldsize', WorldSize);
+window.customElements.define('cia3-barbarians', Barbarians);
+window.customElements.define('cia3-worldseed', WorldSeed);
 pollNow();
