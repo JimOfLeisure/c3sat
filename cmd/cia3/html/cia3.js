@@ -80,6 +80,22 @@ class GqlQuery {
 }
 let gqlQuery = new GqlQuery();
 
+// Most of the cia3-* elements follow this form, so extend this class
+class Cia3Element extends HTMLElement {
+    connectedCallback() {
+        this.registerAndListen();
+    }
+    render() {
+        this.innerText = 'REPLACE ME';
+    }
+    registerAndListen() {
+        gqlQuery.queryParts.add(this.queryPart);
+        window.addEventListener('refresh', () => this.render());
+    }
+    queryPart = 'REPLACE ME';
+}
+
+// TODO: Allow removal of error messages
 class Error extends HTMLElement {
     connectedCallback() {
         window.addEventListener('cia3Error', (e) => this.render(e.detail));
@@ -88,38 +104,28 @@ class Error extends HTMLElement {
         const p = document.createElement('p');
         p.innerText = errMsg;
         this.appendChild(p);
-        // this.innerText = errMsg;
     }
 }
 
-class Filename extends HTMLElement {
-    connectedCallback() {
-        gqlQuery.queryParts.add('fileName');
-        window.addEventListener('refresh', () => this.render());
-    }
+class Filename extends Cia3Element {
     render() {
         this.innerText = data.fileName;
     }
+    queryPart = 'fileName';
 }
 
-class Fullpath extends HTMLElement {
-    connectedCallback() {
-        gqlQuery.queryParts.add('fullPath');
-        window.addEventListener('refresh', () => this.render());
-    }
+class Fullpath extends Cia3Element {
     render() {
         this.innerText = data.fullPath;
     }
+    queryPart = 'fullPath';
 }
 
-class Difficulty extends HTMLElement {
-    connectedCallback() {
-        gqlQuery.queryParts.add('difficulty: int32s(section: "GAME", nth: 2, offset: 20, count: 1)');
-        window.addEventListener('refresh', () => this.render());
-    }
+class Difficulty extends Cia3Element {
     render() {
         this.innerText = this.difficultyNames[data.difficulty[0]];
     }
+    queryPart = 'difficulty: int32s(section: "GAME", nth: 2, offset: 20, count: 1)';
     difficultyNames = [
         "Chieftan",
         "Warlord",
@@ -129,14 +135,14 @@ class Difficulty extends HTMLElement {
         "Demigod",
         "Deity",
         "Sid"
-    ]
+    ];
     
 }
 
-class Map extends HTMLElement {
+class Map extends Cia3Element {
     connectedCallback() {
         let spoilerMask = 0x2;
-        gqlQuery.queryParts.add(`
+        this.queryPart = `
             map(playerSpoilerMask: ${spoilerMask}) {
                 tileSetWidth
                 tileSetHeight
@@ -145,8 +151,8 @@ class Map extends HTMLElement {
                     chopped
                 }
             }
-        `);
-        window.addEventListener('refresh', () => this.render());
+        `;
+        this.registerAndListen();
     }
     render() {
         this.innerHTML = '';
@@ -164,8 +170,9 @@ class Map extends HTMLElement {
                 tile.classList.add('odd-row');
             }
             this.appendChild(tile);
-        })
+        });
     }
+    queryPart = '';
 }
 
 class Tile extends HTMLElement {
@@ -231,11 +238,7 @@ class Url extends HTMLElement {
 }
 
 // TODO: Add controls to customize query and re-query. And remove old query from gqlQuery.
-class HexDump extends HTMLElement {
-    connectedCallback() {
-        gqlQuery.queryParts.add(this.queryPart);
-        window.addEventListener('refresh', () => this.render());
-    }
+class HexDump extends Cia3Element {
     render() {
         this.innerText = data.cia3Hexdump;
     }
