@@ -25,11 +25,6 @@ type mapData struct {
 	mapTileOffsets    []int
 }
 
-// no longer needed
-// func (m *mapData) tileCount() int {
-// 	return m.mapWidth * m.mapHeight
-// }
-
 func (m *mapData) spoilerFree(offset int) bool {
 	if m.playerSpoilerMask == 0 || int(m.playerSpoilerMask)&ReadInt32(offset+84, Unsigned) != 0 {
 		return true
@@ -142,7 +137,6 @@ var mapType = graphql.NewObject(graphql.ObjectConfig{
 			Resolve: func(p graphql.ResolveParams) (interface{}, error) {
 				if mdat, ok := p.Source.(mapData); ok {
 					return mdat.tileSetOffsets, nil
-					// return mdat.mapTileOffsets, nil
 				}
 				return nil, nil
 			},
@@ -164,8 +158,8 @@ var civ3Type = graphql.NewObject(graphql.ObjectConfig{
 			},
 		},
 		"climate": &graphql.Field{
-			Type: graphql.Int,
-			// Description: "Random seed of random worlds",
+			Type:        graphql.Int,
+			Description: "Climate option chosen for random map generation",
 			Resolve: func(p graphql.ResolveParams) (interface{}, error) {
 				if wdat, ok := p.Source.(worldData); ok {
 					return ReadInt32(wdat.worldOffset+186, Signed), nil
@@ -174,8 +168,8 @@ var civ3Type = graphql.NewObject(graphql.ObjectConfig{
 			},
 		},
 		"climateFinal": &graphql.Field{
-			Type: graphql.Int,
-			// Description: "Random seed of random worlds",
+			Type:        graphql.Int,
+			Description: "Climate setting of map",
 			Resolve: func(p graphql.ResolveParams) (interface{}, error) {
 				if wdat, ok := p.Source.(worldData); ok {
 					return ReadInt32(wdat.worldOffset+190, Signed), nil
@@ -184,8 +178,8 @@ var civ3Type = graphql.NewObject(graphql.ObjectConfig{
 			},
 		},
 		"barbarians": &graphql.Field{
-			Type: graphql.Int,
-			// Description: "Random seed of random worlds",
+			Type:        graphql.Int,
+			Description: "Barbarians option chosen for random map generation",
 			Resolve: func(p graphql.ResolveParams) (interface{}, error) {
 				if wdat, ok := p.Source.(worldData); ok {
 					return ReadInt32(wdat.worldOffset+194, Signed), nil
@@ -194,8 +188,8 @@ var civ3Type = graphql.NewObject(graphql.ObjectConfig{
 			},
 		},
 		"barbariansFinal": &graphql.Field{
-			Type: graphql.Int,
-			// Description: "Random seed of random worlds",
+			Type:        graphql.Int,
+			Description: "Barbarians setting of map",
 			Resolve: func(p graphql.ResolveParams) (interface{}, error) {
 				if wdat, ok := p.Source.(worldData); ok {
 					return ReadInt32(wdat.worldOffset+198, Signed), nil
@@ -204,8 +198,8 @@ var civ3Type = graphql.NewObject(graphql.ObjectConfig{
 			},
 		},
 		"landMass": &graphql.Field{
-			Type: graphql.Int,
-			// Description: "Random seed of random worlds",
+			Type:        graphql.Int,
+			Description: "Land mass option chosen for random map generation",
 			Resolve: func(p graphql.ResolveParams) (interface{}, error) {
 				if wdat, ok := p.Source.(worldData); ok {
 					return ReadInt32(wdat.worldOffset+202, Signed), nil
@@ -214,8 +208,8 @@ var civ3Type = graphql.NewObject(graphql.ObjectConfig{
 			},
 		},
 		"landMassFinal": &graphql.Field{
-			Type: graphql.Int,
-			// Description: "Random seed of random worlds",
+			Type:        graphql.Int,
+			Description: "Land mass setting of map",
 			Resolve: func(p graphql.ResolveParams) (interface{}, error) {
 				if wdat, ok := p.Source.(worldData); ok {
 					return ReadInt32(wdat.worldOffset+206, Signed), nil
@@ -224,8 +218,8 @@ var civ3Type = graphql.NewObject(graphql.ObjectConfig{
 			},
 		},
 		"oceanCoverage": &graphql.Field{
-			Type: graphql.Int,
-			// Description: "Random seed of random worlds",
+			Type:        graphql.Int,
+			Description: "Ocean coverage option chosen for random map generation",
 			Resolve: func(p graphql.ResolveParams) (interface{}, error) {
 				if wdat, ok := p.Source.(worldData); ok {
 					return ReadInt32(wdat.worldOffset+210, Signed), nil
@@ -234,8 +228,8 @@ var civ3Type = graphql.NewObject(graphql.ObjectConfig{
 			},
 		},
 		"oceanCoverageFinal": &graphql.Field{
-			Type: graphql.Int,
-			// Description: "Random seed of random worlds",
+			Type:        graphql.Int,
+			Description: "Ocean coverage setting of map",
 			Resolve: func(p graphql.ResolveParams) (interface{}, error) {
 				if wdat, ok := p.Source.(worldData); ok {
 					return ReadInt32(wdat.worldOffset+214, Signed), nil
@@ -244,8 +238,8 @@ var civ3Type = graphql.NewObject(graphql.ObjectConfig{
 			},
 		},
 		"temperature": &graphql.Field{
-			Type: graphql.Int,
-			// Description: "Random seed of random worlds",
+			Type:        graphql.Int,
+			Description: "Temperature option chosen for random map generation",
 			Resolve: func(p graphql.ResolveParams) (interface{}, error) {
 				if wdat, ok := p.Source.(worldData); ok {
 					return ReadInt32(wdat.worldOffset+218, Signed), nil
@@ -254,8 +248,8 @@ var civ3Type = graphql.NewObject(graphql.ObjectConfig{
 			},
 		},
 		"temperatureFinal": &graphql.Field{
-			Type: graphql.Int,
-			// Description: "Random seed of random worlds",
+			Type:        graphql.Int,
+			Description: "Temperature setting of map",
 			Resolve: func(p graphql.ResolveParams) (interface{}, error) {
 				if wdat, ok := p.Source.(worldData); ok {
 					return ReadInt32(wdat.worldOffset+222, Signed), nil
@@ -264,8 +258,8 @@ var civ3Type = graphql.NewObject(graphql.ObjectConfig{
 			},
 		},
 		"age": &graphql.Field{
-			Type: graphql.Int,
-			// Description: "Random seed of random worlds",
+			Type:        graphql.Int,
+			Description: "Age option chosen for random map generation",
 			Resolve: func(p graphql.ResolveParams) (interface{}, error) {
 				if wdat, ok := p.Source.(worldData); ok {
 					return ReadInt32(wdat.worldOffset+226, Signed), nil
@@ -274,8 +268,8 @@ var civ3Type = graphql.NewObject(graphql.ObjectConfig{
 			},
 		},
 		"ageFinal": &graphql.Field{
-			Type: graphql.Int,
-			// Description: "Random seed of random worlds",
+			Type:        graphql.Int,
+			Description: "Age setting of map",
 			Resolve: func(p graphql.ResolveParams) (interface{}, error) {
 				if wdat, ok := p.Source.(worldData); ok {
 					return ReadInt32(wdat.worldOffset+230, Signed), nil
@@ -284,8 +278,8 @@ var civ3Type = graphql.NewObject(graphql.ObjectConfig{
 			},
 		},
 		"size": &graphql.Field{
-			Type: graphql.Int,
-			// Description: "Random seed of random worlds",
+			Type:        graphql.Int,
+			Description: "Size setting of map",
 			Resolve: func(p graphql.ResolveParams) (interface{}, error) {
 				if wdat, ok := p.Source.(worldData); ok {
 					return ReadInt32(wdat.worldOffset+234, Signed), nil

@@ -13,7 +13,6 @@ import (
 type sectionType struct {
 	name   string
 	offset int
-	length int
 }
 
 type saveGameType struct {
@@ -152,8 +151,6 @@ func Query(query, path string) (string, error) {
 	if err != nil {
 		return "", err
 	}
-
-	// return hex.EncodeToString(saveGame[:4]), nil
 	return string(out[:]), nil
 }
 
