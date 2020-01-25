@@ -1,3 +1,25 @@
+*,::before,::after {
+    box-sizing: border-box
+}
+body>*+*,main>*+* {
+    margin-top: 1em
+}
+body {
+    font-family: Verdana, Geneva, Tahoma, sans-serif;
+    min-height: 100vh;
+    text-rendering: optimizeSpeed;
+    color: #363940;
+    font-size: 1em;
+    line-height: 1.5em
+
+}
+li {
+    /* for click target size */
+    line-height: 1.5em;
+}
+li+li {
+    margin-top: 0.5em;
+}
 cia3-map {
     --tile-width: 5em;
     --tile-height: calc(var(--tile-width) / 2);
