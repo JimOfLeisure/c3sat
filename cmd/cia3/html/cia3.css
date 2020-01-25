@@ -83,5 +83,6 @@ div.isotile:after {
     opacity: 0.3;
 }
 cia3-hexdump {
+    display: block;
     font-family: 'Consolas', 'Lucidia Console', 'Courier New', Courier, monospace
 }
