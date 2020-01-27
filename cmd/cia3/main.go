@@ -84,7 +84,6 @@ func main() {
 	// Api server
 	go server()
 
-	// _, err = lorca.New("Civ Intelligence Agency III", "http://"+addr+":"+port+"/isocss.html", 800, 600)
 	ui, err := lorca.New("", "", 1280, 720)
 	if err == nil {
 		defer ui.Close()

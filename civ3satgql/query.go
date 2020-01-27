@@ -355,5 +355,36 @@ var queryType = graphql.NewObject(graphql.ObjectConfig{
 				return output, nil
 			},
 		},
+		"listSection": &graphql.Field{
+			Type:        graphql.NewList(graphql.String),
+			Description: "A list section has a 4-byte count of list items, and each item has a 4-byte length",
+			Args: graphql.FieldConfigArgument{
+				"section": &graphql.ArgumentConfig{
+					Type:        graphql.NewNonNull(graphql.String),
+					Description: "Four-character section name. e.g. TILE",
+				},
+				"nth": &graphql.ArgumentConfig{
+					Type:        graphql.NewNonNull(graphql.Int),
+					Description: "e.g. 2 for the second named section instance",
+				},
+			},
+			Resolve: func(p graphql.ResolveParams) (interface{}, error) {
+				section, _ := p.Args["section"].(string)
+				nth, _ := p.Args["nth"].(int)
+				savSection, err := SectionOffset(section, nth)
+				if err != nil {
+					return nil, err
+				}
+				count := ReadInt32(savSection, Signed)
+				output := make([]string, count)
+				offset := 4
+				for i := 0; i < count; i++ {
+					length := ReadInt32(savSection+offset, Signed)
+					output[i] = hex.Dump(saveGame.data[savSection+offset+4 : savSection+offset+4+length])
+					offset += 4 + length
+				}
+				return output, nil
+			},
+		},
 	},
 })
