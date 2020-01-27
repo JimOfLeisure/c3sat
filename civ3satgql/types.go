@@ -32,26 +32,7 @@ func (m *mapData) spoilerFree(offset int) bool {
 	return false
 }
 
-var tempIntermediateObject = graphql.NewObject(graphql.ObjectConfig{
-	Description: "A list section has a 4-byte count of list items, and each item has a 4-byte length",
-	Name:        "List section Item",
-	Fields: graphql.Fields{
-		"int32": &graphql.Field{
-			Type:        graphql.Int,
-			Description: "4-byte integer",
-			Resolve: func(p graphql.ResolveParams) (interface{}, error) {
-				if itemOffset, ok := p.Source.(int); ok {
-					if itemOffset > 0 {
-						return itemOffset, nil
-					}
-				}
-				return 54321, nil
-			},
-		},
-	},
-})
-
-var tempObject = graphql.NewObject(graphql.ObjectConfig{
+var listSectionItem = graphql.NewObject(graphql.ObjectConfig{
 	Description: ":P",
 	Name:        "debugging",
 	Fields: graphql.Fields{
@@ -83,18 +64,6 @@ var tempObject = graphql.NewObject(graphql.ObjectConfig{
 				return nil, nil
 			},
 		},
-		"int32": &graphql.Field{
-			Type:        graphql.Int,
-			Description: "4-byte integer",
-			Resolve: func(p graphql.ResolveParams) (interface{}, error) {
-				if itemOffset, ok := p.Source.(int); ok {
-					if itemOffset > 0 {
-						return itemOffset, nil
-					}
-				}
-				return 54321, nil
-			},
-		},
 		"hexDump": &graphql.Field{
 			Type:        graphql.String,
 			Description: "Hex dump of the entire item",
@@ -102,10 +71,7 @@ var tempObject = graphql.NewObject(graphql.ObjectConfig{
 				if itemOffset, ok := p.Source.(int); ok {
 					if itemOffset > 0 {
 						length := ReadInt32(itemOffset, Signed)
-						// return strconv.Itoa(itemOffset) + " : " + strconv.Itoa(length), nil
-						// return strconv.Itoa(length), nil
 						return hex.Dump(saveGame.data[itemOffset+4 : itemOffset+4+length]), nil
-						// return hex.Dump(saveGame.data[itemOffset : itemOffset+128]), nil
 					}
 				}
 				return "", nil
@@ -141,39 +107,6 @@ var tempObject = graphql.NewObject(graphql.ObjectConfig{
 				return "", nil
 			},
 		},
-	},
-})
-
-var foofoofoo = graphql.NewObject(graphql.ObjectConfig{
-	Name: "List section Item",
-	Fields: graphql.Fields{
-		// "string": &graphql.Field{
-		// 	Type:        graphql.String,
-		// 	Description: "Null-terminated string",
-		// 	Resolve: func(p graphql.ResolveParams) (interface{}, error) {
-		// 		return "Still testing", nil
-		// 	},
-		// },
-		"int32": &graphql.Field{
-			Type:        graphql.Int,
-			Description: "4-byte integer",
-			Resolve: func(p graphql.ResolveParams) (interface{}, error) {
-				return 12345, nil
-			},
-		},
-		// "dump": &graphql.Field{
-		// 	Type:        graphql.String,
-		// 	Description: "Hex dump of the entire item",
-		// 	Resolve: func(p graphql.ResolveParams) (interface{}, error) {
-		// 		if itemOffset, ok := p.Source.(int); ok {
-		// 			if itemOffset > 0 {
-		// 				length := ReadInt32(itemOffset, Signed)
-		// 				return hex.Dump(saveGame.data[itemOffset+4 : itemOffset+4+length]), nil
-		// 			}
-		// 		}
-		// 		return nil, nil
-		// 	},
-		// },
 	},
 })
 
