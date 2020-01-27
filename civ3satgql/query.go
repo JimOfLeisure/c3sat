@@ -386,7 +386,7 @@ var queryType = graphql.NewObject(graphql.ObjectConfig{
 				output := make([]int, count)
 				offset := 4
 				for i := 0; i < count; i++ {
-					output[i] = savSection + 4 + offset
+					output[i] = savSection + offset
 					length := ReadInt32(savSection+offset, Signed)
 					offset += 4 + length
 				}
