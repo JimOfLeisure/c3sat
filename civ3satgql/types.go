@@ -32,7 +32,45 @@ func (m *mapData) spoilerFree(offset int) bool {
 	return false
 }
 
-var listSectionItem = graphql.NewObject(graphql.ObjectConfig{
+var tempIntermediateObject = graphql.NewObject(graphql.ObjectConfig{
+	Description: "A list section has a 4-byte count of list items, and each item has a 4-byte length",
+	Name:        "List section Item",
+	Fields: graphql.Fields{
+		"int32": &graphql.Field{
+			Type:        graphql.Int,
+			Description: "4-byte integer",
+			Resolve: func(p graphql.ResolveParams) (interface{}, error) {
+				if itemOffset, ok := p.Source.(int); ok {
+					if itemOffset > 0 {
+						return itemOffset, nil
+					}
+				}
+				return 54321, nil
+			},
+		},
+	},
+})
+
+var tempObject = graphql.NewObject(graphql.ObjectConfig{
+	Description: ":P",
+	Name:        "debugging",
+	Fields: graphql.Fields{
+		"int32": &graphql.Field{
+			Type:        graphql.Int,
+			Description: "4-byte integer",
+			Resolve: func(p graphql.ResolveParams) (interface{}, error) {
+				if itemOffset, ok := p.Source.(int); ok {
+					if itemOffset > 0 {
+						return itemOffset, nil
+					}
+				}
+				return 54321, nil
+			},
+		},
+	},
+})
+
+var foofoofoo = graphql.NewObject(graphql.ObjectConfig{
 	Name: "List section Item",
 	Fields: graphql.Fields{
 		// "string": &graphql.Field{

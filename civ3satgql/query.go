@@ -356,7 +356,7 @@ var queryType = graphql.NewObject(graphql.ObjectConfig{
 			},
 		},
 		"listSection": &graphql.Field{
-			Type:        graphql.NewList(listSectionItem),
+			Type:        graphql.NewList(tempObject),
 			Description: "A list section has a 4-byte count of list items, and each item has a 4-byte length",
 			Args: graphql.FieldConfigArgument{
 				"section": &graphql.ArgumentConfig{
@@ -386,7 +386,7 @@ var queryType = graphql.NewObject(graphql.ObjectConfig{
 				output := make([]int, count)
 				offset := 4
 				for i := 0; i < count; i++ {
-					output[i] = offset
+					output[i] = savSection + 4 + offset
 					length := ReadInt32(savSection+offset, Signed)
 					offset += 4 + length
 				}
