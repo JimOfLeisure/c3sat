@@ -331,5 +331,29 @@ var queryType = graphql.NewObject(graphql.ObjectConfig{
 				return intList, nil
 			},
 		},
+		"allStrings": &graphql.Field{
+			Type:        graphql.NewList(graphql.String),
+			Description: "All ASCII strings four bytes or longer",
+			Resolve: func(p graphql.ResolveParams) (interface{}, error) {
+				var i, count, offset int
+				var output = make([]string, 0)
+				for i < len(saveGame.data) {
+					if saveGame.data[i] < 0x20 || saveGame.data[i] > 0x7F {
+						if count > 3 {
+							s := string(saveGame.data[offset:i])
+							output = append(output, s)
+						}
+						count = 0
+					} else {
+						if count == 0 {
+							offset = i
+						}
+						count++
+					}
+					i++
+				}
+				return output, nil
+			},
+		},
 	},
 })

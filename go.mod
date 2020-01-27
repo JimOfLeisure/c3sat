@@ -3,6 +3,7 @@ module github.com/myjimnelson/c3sat
 go 1.13
 
 require (
+	fyne.io/fyne v1.2.1
 	github.com/fsnotify/fsnotify v1.4.7
 	github.com/graphql-go/graphql v0.7.8
 	github.com/graphql-go/handler v0.2.3

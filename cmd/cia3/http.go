@@ -10,7 +10,14 @@ import (
 
 const addr = "127.0.0.1"
 
+var httpUrlString string
 var httpPort = "8080"
+var httpPortTry = []string{
+	":8080",
+	":8000",
+	":8888",
+	":0",
+}
 
 func setHeaders(handler http.Handler) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {

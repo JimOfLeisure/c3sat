@@ -240,7 +240,7 @@ class Url extends HTMLElement {
 // TODO: Add controls to customize query and re-query. And remove old query from gqlQuery.
 class HexDump extends Cia3Element {
     render() {
-        this.innerText = data.cia3Hexdump;
+        this.innerText = 'Hex dump tool under construction, no controls yet.\n' + data.cia3Hexdump;
     }
     queryPart = 'cia3Hexdump: hexDump(section: "GAME", nth: 2, offset: -4, count: 256)'
 }
@@ -295,6 +295,71 @@ class WorldSeed extends Cia3Element {
     queryPart = 'worldseed: civ3 { worldSeed }'
 }
 
+class LandMass extends Cia3Element {
+    render() {
+        this.innerText = this.landMassNames[data.landmass.landMassFinal];
+    }
+    queryPart = 'landmass: civ3 { landMassFinal }'
+    landMassNames = [
+        "Archipelago",
+        "Continents",
+        "Pangea",
+        "Random"
+    ]
+}
+
+class OceanCoverage extends Cia3Element {
+    render() {
+        this.innerText = this.oceanCoverageNames[data.oceancoverage.oceanCoverageFinal];
+    }
+    queryPart = 'oceancoverage: civ3 { oceanCoverageFinal }'
+    oceanCoverageNames = [
+        "80% Water",
+        "70% Water",
+        "60% Water",
+        "Random"
+    ]
+}
+
+class Climate extends Cia3Element {
+    render() {
+        this.innerText = this.climateNames[data.climate.climateFinal];
+    }
+    queryPart = 'climate: civ3 { climateFinal }'
+    climateNames = [
+        "Arid",
+        "Normal",
+        "Wet",
+        "Random"
+    ]
+}
+
+class Temperature extends Cia3Element {
+    render() {
+        this.innerText = this.temperatureNames[data.temperature.temperatureFinal];
+    }
+    queryPart = 'temperature: civ3 { temperatureFinal }'
+    temperatureNames = [
+        "Warm",
+        "Temperate",
+        "Cool",
+        "Random"
+    ]
+}
+
+class Age extends Cia3Element {
+    render() {
+        this.innerText = this.ageNames[data.age.ageFinal];
+    }
+    queryPart = 'age: civ3 { ageFinal }'
+    ageNames = [
+        "3 Billion",
+        "4 Billion",
+        "5 Billion",
+        "Random"
+    ]
+}
+
 window.customElements.define('cia3-error', Error);
 window.customElements.define('cia3-filename', Filename);
 window.customElements.define('cia3-fullpath', Fullpath);
@@ -308,4 +373,9 @@ window.customElements.define('cia3-mapy', MapY);
 window.customElements.define('cia3-worldsize', WorldSize);
 window.customElements.define('cia3-barbarians', Barbarians);
 window.customElements.define('cia3-worldseed', WorldSeed);
+window.customElements.define('cia3-landmass', LandMass);
+window.customElements.define('cia3-oceancoverage', OceanCoverage);
+window.customElements.define('cia3-climate', Climate);
+window.customElements.define('cia3-temperature', Temperature);
+window.customElements.define('cia3-age', Age);
 pollNow();

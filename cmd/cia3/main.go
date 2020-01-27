@@ -15,6 +15,7 @@ import (
 var savWatcher *fsnotify.Watcher
 var debounceTimer *time.Timer
 var longPoll *golongpoll.LongpollManager
+var listener net.Listener
 
 const debounceInterval = 300 * time.Millisecond
 
@@ -67,22 +68,30 @@ func main() {
 		log.Fatal(err)
 	}
 
-	listener, err := net.Listen("tcp", ":0")
-	if err != nil {
+	for i := 0; i < len(httpPortTry); i++ {
+		listener, err = net.Listen("tcp", httpPortTry[i])
+		if err == nil {
+			break
+		}
+	}
+	if listener == nil {
 		panic(err)
 	}
 
 	httpPort = strconv.Itoa(listener.Addr().(*net.TCPAddr).Port)
+	httpUrlString = "http://" + addr + ":" + httpPort + "/"
 
 	// Api server
 	go server()
 
 	// _, err = lorca.New("Civ Intelligence Agency III", "http://"+addr+":"+port+"/isocss.html", 800, 600)
 	ui, err := lorca.New("", "", 1280, 720)
-	if err != nil {
-		log.Fatal(err)
+	if err == nil {
+		defer ui.Close()
+		ui.Load(httpUrlString)
+		<-ui.Done()
+	} else {
+		// fallback to fyne GUI with hyperlink
+		fyneUi()
 	}
-	defer ui.Close()
-	ui.Load("http://" + addr + ":" + httpPort + "/")
-	<-ui.Done()
 }
