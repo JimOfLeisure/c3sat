@@ -356,7 +356,7 @@ var queryType = graphql.NewObject(graphql.ObjectConfig{
 			},
 		},
 		"listSection": &graphql.Field{
-			Type:        graphql.NewList(graphql.String),
+			Type:        graphql.NewList(listSectionItem),
 			Description: "A list section has a 4-byte count of list items, and each item has a 4-byte length",
 			Args: graphql.FieldConfigArgument{
 				"section": &graphql.ArgumentConfig{
@@ -376,11 +376,18 @@ var queryType = graphql.NewObject(graphql.ObjectConfig{
 					return nil, err
 				}
 				count := ReadInt32(savSection, Signed)
-				output := make([]string, count)
+				// output := make([]string, count)
+				// offset := 4
+				// for i := 0; i < count; i++ {
+				// 	length := ReadInt32(savSection+offset, Signed)
+				// 	output[i] = hex.Dump(saveGame.data[savSection+offset+4 : savSection+offset+4+length])
+				// 	offset += 4 + length
+				// }
+				output := make([]int, count)
 				offset := 4
 				for i := 0; i < count; i++ {
+					output[i] = offset
 					length := ReadInt32(savSection+offset, Signed)
-					output[i] = hex.Dump(saveGame.data[savSection+offset+4 : savSection+offset+4+length])
 					offset += 4 + length
 				}
 				return output, nil

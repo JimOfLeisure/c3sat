@@ -32,6 +32,39 @@ func (m *mapData) spoilerFree(offset int) bool {
 	return false
 }
 
+var listSectionItem = graphql.NewObject(graphql.ObjectConfig{
+	Name: "List section Item",
+	Fields: graphql.Fields{
+		// "string": &graphql.Field{
+		// 	Type:        graphql.String,
+		// 	Description: "Null-terminated string",
+		// 	Resolve: func(p graphql.ResolveParams) (interface{}, error) {
+		// 		return "Still testing", nil
+		// 	},
+		// },
+		"int32": &graphql.Field{
+			Type:        graphql.Int,
+			Description: "4-byte integer",
+			Resolve: func(p graphql.ResolveParams) (interface{}, error) {
+				return 12345, nil
+			},
+		},
+		// "dump": &graphql.Field{
+		// 	Type:        graphql.String,
+		// 	Description: "Hex dump of the entire item",
+		// 	Resolve: func(p graphql.ResolveParams) (interface{}, error) {
+		// 		if itemOffset, ok := p.Source.(int); ok {
+		// 			if itemOffset > 0 {
+		// 				length := ReadInt32(itemOffset, Signed)
+		// 				return hex.Dump(saveGame.data[itemOffset+4 : itemOffset+4+length]), nil
+		// 			}
+		// 		}
+		// 		return nil, nil
+		// 	},
+		// },
+	},
+})
+
 var mapTileType = graphql.NewObject(graphql.ObjectConfig{
 	Name: "tile",
 	Fields: graphql.Fields{
@@ -133,7 +166,7 @@ var mapType = graphql.NewObject(graphql.ObjectConfig{
 		},
 		"tiles": &graphql.Field{
 			Type:        graphql.NewList(mapTileType),
-			Description: "Height of the currently visible map in tiles",
+			Description: "List of all visible tiles",
 			Resolve: func(p graphql.ResolveParams) (interface{}, error) {
 				if mdat, ok := p.Source.(mapData); ok {
 					return mdat.tileSetOffsets, nil
