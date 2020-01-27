@@ -32,9 +32,165 @@ func (m *mapData) spoilerFree(offset int) bool {
 	return false
 }
 
+var bogusType = graphql.NewObject(graphql.ObjectConfig{
+	Name: "bogus",
+	Fields: graphql.Fields{
+		"bar": &graphql.Field{
+			Type:        graphql.Int,
+			Description: "I am a teapot",
+			Resolve: func(p graphql.ResolveParams) (interface{}, error) {
+				return 12345, nil
+			},
+		},
+		"int32s": &graphql.Field{
+			Type:        graphql.NewList(graphql.Int),
+			Description: "Int32 array",
+			Args: graphql.FieldConfigArgument{
+				"offset": &graphql.ArgumentConfig{
+					Type:        graphql.NewNonNull(graphql.Int),
+					Description: "Offset from start of item",
+				},
+				"count": &graphql.ArgumentConfig{
+					Type:        graphql.NewNonNull(graphql.Int),
+					Description: "Number of int32s to return",
+				},
+			},
+			Resolve: func(p graphql.ResolveParams) (interface{}, error) {
+				if itemOffset, ok := p.Source.(int); ok {
+					if itemOffset > 0 {
+						offset, _ := p.Args["offset"].(int)
+						count, _ := p.Args["count"].(int)
+						intList := make([]int, count)
+						for i := 0; i < count; i++ {
+							intList[i] = ReadInt32((itemOffset+4+offset)+4*i, Signed)
+						}
+						return intList, nil
+					}
+				}
+				return nil, nil
+			},
+		},
+		"hexDump": &graphql.Field{
+			Type:        graphql.String,
+			Description: "Hex dump of the entire item",
+			Resolve: func(p graphql.ResolveParams) (interface{}, error) {
+				if itemOffset, ok := p.Source.(int); ok {
+					if itemOffset > 0 {
+						length := ReadInt32(itemOffset, Signed)
+						return hex.Dump(saveGame.data[itemOffset+4 : itemOffset+4+length]), nil
+					}
+				}
+				return "", nil
+			},
+		},
+	},
+})
+
+var gameLeadSectionType = graphql.NewObject(graphql.ObjectConfig{
+	Name: "Game LEAD section",
+	Fields: graphql.Fields{
+		// "int32s": &graphql.Field{
+		// 	Type:        graphql.NewList(graphql.Int),
+		// 	Description: "Int32 array",
+		// 	Args: graphql.FieldConfigArgument{
+		// 		"offset": &graphql.ArgumentConfig{
+		// 			Type:        graphql.NewNonNull(graphql.Int),
+		// 			Description: "Offset from start of item",
+		// 		},
+		// 		"count": &graphql.ArgumentConfig{
+		// 			Type:        graphql.NewNonNull(graphql.Int),
+		// 			Description: "Number of int32s to return",
+		// 		},
+		// 	},
+		// 	Resolve: func(p graphql.ResolveParams) (interface{}, error) {
+		// 		if itemOffset, ok := p.Source.(int); ok {
+		// 			if itemOffset > 0 {
+		// 				offset, _ := p.Args["offset"].(int)
+		// 				count, _ := p.Args["count"].(int)
+		// 				intList := make([]int, count)
+		// 				for i := 0; i < count; i++ {
+		// 					intList[i] = ReadInt32((itemOffset+4+offset)+4*i, Signed)
+		// 				}
+		// 				return intList, nil
+		// 			}
+		// 		}
+		// 		return nil, nil
+		// 	},
+		// },
+		"bar": &graphql.Field{
+			Type:        graphql.Int,
+			Description: "I am a teapot",
+			Resolve: func(p graphql.ResolveParams) (interface{}, error) {
+				return 12345, nil
+			},
+		},
+		"baz": &graphql.Field{
+			Type:        graphql.Int,
+			Description: "Short and stout",
+			Resolve: func(p graphql.ResolveParams) (interface{}, error) {
+				return 54321, nil
+			},
+		},
+		// "foo": &graphql.Field{
+		// 	Type:        graphql.String,
+		// 	Description: "Hex dump of the entire item",
+		// 	Args: graphql.FieldConfigArgument{
+		// 		"offset": &graphql.ArgumentConfig{
+		// 			Type:        graphql.NewNonNull(graphql.Int),
+		// 			Description: "Offset from start of item",
+		// 		},
+		// 		"count": &graphql.ArgumentConfig{
+		// 			Type:        graphql.NewNonNull(graphql.Int),
+		// 			Description: "Number of bytes to return",
+		// 		},
+		// 	},
+		// 	Resolve: func(p graphql.ResolveParams) (interface{}, error) {
+		// 		// offset, _ := p.Args["offset"].(int)
+		// 		// count, _ := p.Args["count"].(int)
+		// 		if itemOffset, ok := p.Source.(int); ok {
+		// 			if itemOffset > 0 {
+		// 				// return hex.Dump(saveGame.data[itemOffset+4 : itemOffset+4+count]), nil
+		// 				return strconv.Itoa(itemOffset), nil
+		// 			}
+		// 		}
+		// 		return "", nil
+		// 	},
+		// },
+		// "string": &graphql.Field{
+		// 	Type:        graphql.String,
+		// 	Description: "Null-terminated string",
+		// 	Args: graphql.FieldConfigArgument{
+		// 		"offset": &graphql.ArgumentConfig{
+		// 			Type:        graphql.NewNonNull(graphql.Int),
+		// 			Description: "Offset from start of item",
+		// 		},
+		// 		"maxLength": &graphql.ArgumentConfig{
+		// 			Type:        graphql.NewNonNull(graphql.Int),
+		// 			Description: "Max length of string / the max number of bytes to consider",
+		// 		},
+		// 	},
+		// 	Resolve: func(p graphql.ResolveParams) (interface{}, error) {
+		// 		if itemOffset, ok := p.Source.(int); ok {
+		// 			if itemOffset > 0 {
+		// 				offset, _ := p.Args["offset"].(int)
+		// 				maxLength, _ := p.Args["maxLength"].(int)
+		// 				stringBuffer := saveGame.data[itemOffset+4+offset : itemOffset+4+offset+maxLength]
+		// 				for i := 0; i < len(stringBuffer); i++ {
+		// 					if stringBuffer[i] == 0 {
+		// 						return string(stringBuffer[:i]), nil
+		// 					}
+		// 				}
+		// 				return string(stringBuffer[:]), nil
+		// 			}
+		// 		}
+		// 		return "", nil
+		// 	},
+		// },
+	},
+})
+
 var listSectionItem = graphql.NewObject(graphql.ObjectConfig{
-	Description: ":P",
-	Name:        "debugging",
+	Name: "debugging",
 	Fields: graphql.Fields{
 		"int32s": &graphql.Field{
 			Type:        graphql.NewList(graphql.Int),

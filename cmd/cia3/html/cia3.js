@@ -242,7 +242,7 @@ class HexDump extends Cia3Element {
     render() {
         this.innerText = 'Hex dump tool under construction, no controls yet.\n' + data.cia3Hexdump;
     }
-    queryPart = 'cia3Hexdump: hexDump(section: "GAME", nth: 2, offset: -4, count: 256)'
+    queryPart = 'cia3Hexdump: hexDump(section: "CONT", nth: 11, offset: 12, count: 2048)'
 }
 
 class MapX extends Cia3Element {
