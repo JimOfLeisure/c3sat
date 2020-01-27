@@ -32,8 +32,8 @@ func (m *mapData) spoilerFree(offset int) bool {
 	return false
 }
 
-var bogusType = graphql.NewObject(graphql.ObjectConfig{
-	Name: "bogus",
+var gameLeadSectionType = graphql.NewObject(graphql.ObjectConfig{
+	Name: "gameLeadSection",
 	Fields: graphql.Fields{
 		"bar": &graphql.Field{
 			Type:        graphql.Int,

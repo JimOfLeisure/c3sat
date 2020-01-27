@@ -387,7 +387,7 @@ var queryType = graphql.NewObject(graphql.ObjectConfig{
 			},
 		},
 		"civs": &graphql.Field{
-			Type:        graphql.NewList(bogusType),
+			Type:        graphql.NewList(gameLeadSectionType),
 			Description: "A list of 32 civilization/leader (LEAD) sections' data",
 			Resolve: func(p graphql.ResolveParams) (interface{}, error) {
 				// Conquests saves appear to always have 32 LEAD sections
