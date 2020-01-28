@@ -22,6 +22,23 @@ func (w *watchListType) addWatch(path string) error {
 	return nil
 }
 
+func (w *watchListType) removeWatch(path string) error {
+	err := savWatcher.Remove(path)
+	if err != nil {
+		return err
+	}
+	for i := 0; i < len(w.watches); i++ {
+		if w.watches[i] == path {
+			// remove element from array by swapping last element and replacing with one-shorter array
+			w.watches[i] = w.watches[len(w.watches)-1]
+			w.watches[len(w.watches)-1] = ""
+			w.watches = w.watches[:len(w.watches)-1]
+			break
+		}
+	}
+	return nil
+}
+
 func loadDefaultBiq(s string) error {
 	fi, err := os.Stat(s)
 	if err != nil {
