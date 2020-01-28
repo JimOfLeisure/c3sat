@@ -13,4 +13,5 @@ require (
 	github.com/urfave/cli v1.22.2
 	github.com/zserge/lorca v0.1.8
 	golang.org/x/sys v0.0.0-20200117145432-59e60aa80a0c
+	golang.org/x/text v0.3.0
 )

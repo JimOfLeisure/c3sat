@@ -76,20 +76,6 @@ var gameLeadSectionType = graphql.NewObject(graphql.ObjectConfig{
 				return "", nil
 			},
 		},
-		"string": &graphql.Field{
-			Type:        graphql.String,
-			Description: "Null-terminated string",
-			Args: graphql.FieldConfigArgument{
-				"offset": &graphql.ArgumentConfig{
-					Type:        graphql.NewNonNull(graphql.Int),
-					Description: "Offset from start of item",
-				},
-				"maxLength": &graphql.ArgumentConfig{
-					Type:        graphql.NewNonNull(graphql.Int),
-					Description: "Max length of string / the max number of bytes to consider",
-				},
-			},
-		},
 	},
 })
 
@@ -156,12 +142,11 @@ var listSectionItem = graphql.NewObject(graphql.ObjectConfig{
 						offset, _ := p.Args["offset"].(int)
 						maxLength, _ := p.Args["maxLength"].(int)
 						stringBuffer := saveGame.data[itemOffset+4+offset : itemOffset+4+offset+maxLength]
-						for i := 0; i < len(stringBuffer); i++ {
-							if stringBuffer[i] == 0 {
-								return string(stringBuffer[:i]), nil
-							}
+						s, err := civString(stringBuffer)
+						if err != nil {
+							return nil, err
 						}
-						return string(stringBuffer[:]), nil
+						return s, nil
 					}
 				}
 				return "", nil
