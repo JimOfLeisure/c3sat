@@ -374,6 +374,11 @@ var queryType = graphql.NewObject(graphql.ObjectConfig{
 			Type:        graphql.NewList(listSectionItem),
 			Description: "A list section has a 4-byte count of list items, and each item has a 4-byte length",
 			Args: graphql.FieldConfigArgument{
+				"target": &graphql.ArgumentConfig{
+					Type:         graphql.String,
+					Description:  "Target scope of the query. Can be game, bic, or file (default)",
+					DefaultValue: "file",
+				},
 				"section": &graphql.ArgumentConfig{
 					Type:        graphql.NewNonNull(graphql.String),
 					Description: "Four-character section name. e.g. TILE",
@@ -384,18 +389,29 @@ var queryType = graphql.NewObject(graphql.ObjectConfig{
 				},
 			},
 			Resolve: func(p graphql.ResolveParams) (interface{}, error) {
+				var target *saveGameType
 				section, _ := p.Args["section"].(string)
 				nth, _ := p.Args["nth"].(int)
-				savSection, err := SectionOffset(section, nth)
+				targetArg, _ := p.Args["target"].(string)
+				switch targetArg {
+				case "game":
+					target = &currentGame
+				case "bic":
+					target = &currentBic
+				default:
+					target = &saveGame
+				}
+				savSection, err := target.sectionOffset(section, nth)
 				if err != nil {
 					return nil, err
 				}
-				count := ReadInt32(savSection, Signed)
-				output := make([]int, count)
+				count := target.readInt32(savSection, Signed)
+				output := make([]saveAndOffsetType, count)
 				offset := 4
 				for i := 0; i < count; i++ {
-					output[i] = savSection + offset
-					length := ReadInt32(savSection+offset, Signed)
+					output[i].offset = savSection + offset
+					output[i].save = target
+					length := target.readInt32(savSection+offset, Signed)
 					offset += 4 + length
 				}
 				return output, nil

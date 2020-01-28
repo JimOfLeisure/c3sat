@@ -32,6 +32,12 @@ func (m *mapData) spoilerFree(offset int) bool {
 	return false
 }
 
+// To return to subqueries in GraphQL
+type saveAndOffsetType struct {
+	save   *saveGameType
+	offset int
+}
+
 var gameLeadSectionType = graphql.NewObject(graphql.ObjectConfig{
 	Name: "gameLeadSection",
 	Fields: graphql.Fields{
@@ -80,7 +86,7 @@ var gameLeadSectionType = graphql.NewObject(graphql.ObjectConfig{
 })
 
 var listSectionItem = graphql.NewObject(graphql.ObjectConfig{
-	Name: "debugging",
+	Name: "listSectionItem",
 	Fields: graphql.Fields{
 		"int32s": &graphql.Field{
 			Type:        graphql.NewList(graphql.Int),
@@ -96,13 +102,13 @@ var listSectionItem = graphql.NewObject(graphql.ObjectConfig{
 				},
 			},
 			Resolve: func(p graphql.ResolveParams) (interface{}, error) {
-				if itemOffset, ok := p.Source.(int); ok {
-					if itemOffset > 0 {
+				if item, ok := p.Source.(saveAndOffsetType); ok {
+					if item.offset > 0 {
 						offset, _ := p.Args["offset"].(int)
 						count, _ := p.Args["count"].(int)
 						intList := make([]int, count)
 						for i := 0; i < count; i++ {
-							intList[i] = ReadInt32((itemOffset+4+offset)+4*i, Signed)
+							intList[i] = item.save.readInt32((item.offset+4+offset)+4*i, Signed)
 						}
 						return intList, nil
 					}

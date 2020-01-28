@@ -99,6 +99,34 @@ func (sav *saveGameType) sectionOffset(sectionName string, nth int) (int, error)
 	return -1, errors.New("Could not find " + strconv.Itoa(nth) + " section named " + sectionName)
 }
 
+func (sav *saveGameType) readInt32(offset int, signed bool) int {
+	n := int(sav.data[offset]) +
+		int(sav.data[offset+1])*0x100 +
+		int(sav.data[offset+2])*0x10000 +
+		int(sav.data[offset+3])*0x1000000
+	if signed && n > 0x80000000 {
+		n = n - 0x80000000
+	}
+	return n
+}
+
+func (sav *saveGameType) readInt16(offset int, signed bool) int {
+	n := int(sav.data[offset]) +
+		int(sav.data[offset+1])*0x100
+	if signed && n > 0x8000 {
+		n = n - 0x8000
+	}
+	return n
+}
+
+func (sav *saveGameType) readInt8(offset int, signed bool) int {
+	n := int(sav.data[offset])
+	if signed && n > 0x80 {
+		n = n - 0x80
+	}
+	return n
+}
+
 // ChangeSavePath updates the package saveGame structure with save file data at <path>
 func ChangeSavePath(path string) error {
 	err := saveGame.loadSave(path)

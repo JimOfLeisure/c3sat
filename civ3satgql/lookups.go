@@ -13,6 +13,7 @@ import (
 const Signed = true
 const Unsigned = false
 
+//deprecating in favor of *saveGameType.readInt32()
 func ReadInt32(offset int, signed bool) int {
 	n := int(saveGame.data[offset]) +
 		int(saveGame.data[offset+1])*0x100 +
@@ -24,6 +25,7 @@ func ReadInt32(offset int, signed bool) int {
 	return n
 }
 
+//deprecating in favor of *saveGameType.readInt16()
 func ReadInt16(offset int, signed bool) int {
 	n := int(saveGame.data[offset]) +
 		int(saveGame.data[offset+1])*0x100
@@ -33,6 +35,7 @@ func ReadInt16(offset int, signed bool) int {
 	return n
 }
 
+//deprecating in favor of *saveGameType.readInt8()
 func ReadInt8(offset int, signed bool) int {
 	n := int(saveGame.data[offset])
 	if signed && n > 0x80 {
@@ -41,6 +44,7 @@ func ReadInt8(offset int, signed bool) int {
 	return n
 }
 
+//deprecating in favor of *saveGameType.sectionOffset()
 func SectionOffset(sectionName string, nth int) (int, error) {
 	var i, n int
 	for i < len(saveGame.sections) {
