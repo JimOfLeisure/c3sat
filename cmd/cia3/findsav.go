@@ -10,13 +10,23 @@ import (
 	"golang.org/x/sys/windows/registry"
 )
 
-const civInstallPathKey = `SOFTWARE\WOW6432Node\Infogrames\Conquests`
+// really should be const, but can't have literal string arrays as const
+var civInstallPathKeyTry = []string{
+	`SOFTWARE\WOW6432Node\Infogrames\Conquests`,
+	`SOFTWARE\Infogrames\Conquests`,
+}
 
 // assume go prog is 64-bit
 func findWinCivInstall() (string, error) {
-	k, err := registry.OpenKey(registry.LOCAL_MACHINE, civInstallPathKey, registry.QUERY_VALUE)
-	if err != nil {
-		return "", err
+	var k registry.Key
+	var err error
+	for i := 0; i < len(civInstallPathKeyTry); i++ {
+		k, err = registry.OpenKey(registry.LOCAL_MACHINE, civInstallPathKeyTry[i], registry.QUERY_VALUE)
+		if err != nil {
+			return "", err
+		} else {
+			break
+		}
 	}
 	defer k.Close()
 	s, _, err := k.GetStringValue("install_path")
