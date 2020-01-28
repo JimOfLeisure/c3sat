@@ -348,6 +348,28 @@ class Age extends Cia3Element {
     ];
 }
 
+class Civs extends Cia3Element {
+    numFields = 32;
+    render() {
+        // this.innerHTML = JSON.stringify(data.civs, null, '  ');
+        const table = document.createElement('table');
+        this.appendChild(table);
+        table.innerHTML = '<tr><th>Player #</th><th>RACE ID</th>' + '<th>?</th>'.repeat(this.numFields - 2) + '</tr>';
+        data.civs.forEach((e, i) => {
+            const row = document.createElement('tr');
+            e.int32s.forEach(ee => {
+                const td = document.createElement('td');
+                td.innerText = ee;
+                row.appendChild(td);
+            });
+            table.appendChild(row);
+
+        })
+        this.appendChild(table);
+    }
+    queryPart = `civs { int32s(offset:0, count: ${this.numFields}) }`;
+}
+
 window.customElements.define('cia3-error', Error);
 window.customElements.define('cia3-filename', Filename);
 window.customElements.define('cia3-fullpath', Fullpath);
@@ -366,4 +388,5 @@ window.customElements.define('cia3-oceancoverage', OceanCoverage);
 window.customElements.define('cia3-climate', Climate);
 window.customElements.define('cia3-temperature', Temperature);
 window.customElements.define('cia3-age', Age);
+window.customElements.define('cia3-civs', Civs);
 pollNow();
