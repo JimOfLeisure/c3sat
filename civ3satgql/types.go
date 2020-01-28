@@ -35,13 +35,6 @@ func (m *mapData) spoilerFree(offset int) bool {
 var gameLeadSectionType = graphql.NewObject(graphql.ObjectConfig{
 	Name: "gameLeadSection",
 	Fields: graphql.Fields{
-		"bar": &graphql.Field{
-			Type:        graphql.Int,
-			Description: "I am a teapot",
-			Resolve: func(p graphql.ResolveParams) (interface{}, error) {
-				return 12345, nil
-			},
-		},
 		"int32s": &graphql.Field{
 			Type:        graphql.NewList(graphql.Int),
 			Description: "Int32 array",
@@ -81,6 +74,20 @@ var gameLeadSectionType = graphql.NewObject(graphql.ObjectConfig{
 					}
 				}
 				return "", nil
+			},
+		},
+		"string": &graphql.Field{
+			Type:        graphql.String,
+			Description: "Null-terminated string",
+			Args: graphql.FieldConfigArgument{
+				"offset": &graphql.ArgumentConfig{
+					Type:        graphql.NewNonNull(graphql.Int),
+					Description: "Offset from start of item",
+				},
+				"maxLength": &graphql.ArgumentConfig{
+					Type:        graphql.NewNonNull(graphql.Int),
+					Description: "Max length of string / the max number of bytes to consider",
+				},
 			},
 		},
 	},
