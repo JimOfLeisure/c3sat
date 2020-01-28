@@ -9,6 +9,19 @@ import (
 	"github.com/myjimnelson/c3sat/civ3satgql"
 )
 
+type watchListType struct {
+	watches []string
+}
+
+func (w *watchListType) addWatch(path string) error {
+	err := savWatcher.Add(path)
+	if err != nil {
+		return err
+	}
+	w.watches = append(w.watches, path)
+	return nil
+}
+
 func loadDefaultBiq(s string) error {
 	fi, err := os.Stat(s)
 	if err != nil {

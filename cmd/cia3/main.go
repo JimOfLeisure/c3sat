@@ -17,8 +17,26 @@ var debounceTimer *time.Timer
 var longPoll *golongpoll.LongpollManager
 var listener net.Listener
 var errorChannel = make(chan error, 20)
+var watchList = new(watchListType)
 
 const debounceInterval = 300 * time.Millisecond
+
+func loadStartupFiles(civPath string) {
+	var err error
+	err = loadDefaultBiq(civPath + `\conquests.biq`)
+	if err != nil {
+		errorChannel <- err
+	}
+	lastSav, err := getLastSav(civPath)
+	if err != nil {
+		errorChannel <- err
+	} else {
+		err = loadNewSav(lastSav)
+		if err != nil {
+			errorChannel <- err
+		}
+	}
+}
 
 func main() {
 	var err error
@@ -39,29 +57,16 @@ func main() {
 	}
 	defer longPoll.Shutdown()
 
-	var lastSav string
 	// Read Win registry for Civ3 Conquests path
 	civPath, err := findWinCivInstall()
 	if err == nil {
-		err = loadDefaultBiq(civPath + `\conquests.biq`)
-		if err != nil {
-			errorChannel <- err
-		}
-		lastSav, err = getLastSav(civPath)
-		if err != nil {
-			errorChannel <- err
-		} else {
-			err = loadNewSav(lastSav)
-			if err != nil {
-				errorChannel <- err
-			}
-		}
+		loadStartupFiles(civPath)
 		// Add Saves and Saves\Auto folder watches
-		err = savWatcher.Add(civPath + `\Saves`)
+		err = watchList.addWatch(civPath + `\Saves`)
 		if err != nil {
 			errorChannel <- err
 		}
-		err = savWatcher.Add(civPath + `\Saves\Auto`)
+		err = watchList.addWatch(civPath + `\Saves\Auto`)
 		if err != nil {
 			errorChannel <- err
 		}
