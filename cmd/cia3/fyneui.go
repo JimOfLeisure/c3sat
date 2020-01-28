@@ -11,7 +11,7 @@ func fyneUi() {
 	app := app.New()
 	u, err := url.Parse(httpUrlString)
 	if err != nil {
-		panic(err)
+		errorChannel <- err
 	}
 	w := app.NewWindow("Civ Intelligence Agency III")
 	w.SetContent(widget.NewVBox(

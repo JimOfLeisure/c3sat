@@ -55,8 +55,8 @@ func SectionOffset(sectionName string, nth int) (int, error) {
 	return -1, errors.New("Could not find " + strconv.Itoa(nth) + " section named " + sectionName)
 }
 
-// Finds null-terminated string and converts from Windows-1252 to UTF-8
-func civString(b []byte) (string, error) {
+// CivString Finds null-terminated string and converts from Windows-1252 to UTF-8
+func CivString(b []byte) (string, error) {
 	var win1252 string
 	for i := 0; i < len(b); i++ {
 		if b[i] == 0 {

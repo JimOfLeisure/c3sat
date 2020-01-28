@@ -9,21 +9,21 @@ import (
 	"github.com/myjimnelson/c3sat/civ3satgql"
 )
 
-func loadNewSav(s string) {
+func loadNewSav(s string) error {
 	if len(s) > 4 && strings.ToLower(s[len(s)-4:]) == ".sav" {
 		fi, err := os.Stat(s)
 		if err != nil {
-			log.Fatal(err)
-			return
+			return err
 		}
 		if fi.Mode().IsRegular() {
 			err := civ3satgql.ChangeSavePath(s)
 			if err != nil {
-				log.Fatal(err)
+				return err
 			}
 			longPoll.Publish("refresh", s)
 		}
 	}
+	return nil
 }
 
 func watchSavs() {

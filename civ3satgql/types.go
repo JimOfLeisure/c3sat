@@ -142,7 +142,7 @@ var listSectionItem = graphql.NewObject(graphql.ObjectConfig{
 						offset, _ := p.Args["offset"].(int)
 						maxLength, _ := p.Args["maxLength"].(int)
 						stringBuffer := saveGame.data[itemOffset+4+offset : itemOffset+4+offset+maxLength]
-						s, err := civString(stringBuffer)
+						s, err := CivString(stringBuffer)
 						if err != nil {
 							return nil, err
 						}

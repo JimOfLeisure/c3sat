@@ -35,7 +35,7 @@ but I would look in that GAME section starting the SAV for such counts.
 Then LEAD begins. It appears every save has 32 LEADs. Each begins with a length in bytes, but there is more
 data after that. I believe they are int32 arrays whose lenths are based possibly on **types** of resources, units,
 cty improvements (buildings), techs, and maybe some other stuff. Then a couple of ESPN sections and CULT, each
-with a length in bytes. And then there is another int32 array.
+with a length in bytes. And then there is another unnamed/count-not-included int32 array.
 
 [Antal1987's dumps](https://github.com/myjimnelson/C3CPatchFramework/blob/master/Civ3/Leader.h) may be instructive in helping to look what data is there.
 
