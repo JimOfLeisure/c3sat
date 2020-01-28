@@ -120,10 +120,10 @@ var listSectionItem = graphql.NewObject(graphql.ObjectConfig{
 			Type:        graphql.String,
 			Description: "Hex dump of the entire item",
 			Resolve: func(p graphql.ResolveParams) (interface{}, error) {
-				if itemOffset, ok := p.Source.(int); ok {
-					if itemOffset > 0 {
-						length := ReadInt32(itemOffset, Signed)
-						return hex.Dump(saveGame.data[itemOffset+4 : itemOffset+4+length]), nil
+				if item, ok := p.Source.(saveAndOffsetType); ok {
+					if item.offset > 0 {
+						length := item.save.readInt32(item.offset, Signed)
+						return hex.Dump(saveGame.data[item.offset+4 : item.offset+4+length]), nil
 					}
 				}
 				return "", nil
@@ -143,11 +143,11 @@ var listSectionItem = graphql.NewObject(graphql.ObjectConfig{
 				},
 			},
 			Resolve: func(p graphql.ResolveParams) (interface{}, error) {
-				if itemOffset, ok := p.Source.(int); ok {
-					if itemOffset > 0 {
+				if item, ok := p.Source.(saveAndOffsetType); ok {
+					if item.offset > 0 {
 						offset, _ := p.Args["offset"].(int)
 						maxLength, _ := p.Args["maxLength"].(int)
-						stringBuffer := saveGame.data[itemOffset+4+offset : itemOffset+4+offset+maxLength]
+						stringBuffer := item.save.data[item.offset+4+offset : item.offset+4+offset+maxLength]
 						s, err := CivString(stringBuffer)
 						if err != nil {
 							return nil, err
