@@ -22,16 +22,24 @@ type saveGameType struct {
 }
 
 var saveGame saveGameType
+var defaultBic saveGameType
+var currentBic saveGameType
 
 // populates the structure given a path to a sav file
 func (sav *saveGameType) loadSave(path string) error {
-	var i, count, offset int
 	var err error
 	sav.data, _, err = parseciv3.ReadFile(path)
 	if err != nil {
 		return err
 	}
 	sav.path = path
+	sav.populateSections()
+	return nil
+}
+
+// Find sections demarc'ed by 4-character ASCII headers and place into sections[]
+func (sav *saveGameType) populateSections() {
+	var i, count, offset int
 	sav.sections = make([]sectionType, 0)
 	// find sections demarc'ed by 4-character ASCII headers
 	for i < len(sav.data) {
@@ -52,7 +60,6 @@ func (sav *saveGameType) loadSave(path string) error {
 			sav.sections = append(sav.sections, *s)
 		}
 	}
-	return nil
 }
 
 // returns just the filename part of the path assuming / or \ separators
