@@ -19,8 +19,8 @@ func ReadInt32(offset int, signed bool) int {
 		int(saveGame.data[offset+1])*0x100 +
 		int(saveGame.data[offset+2])*0x10000 +
 		int(saveGame.data[offset+3])*0x1000000
-	if signed && n > 0x80000000 {
-		n = n - 0x80000000
+	if signed && n&0x80000000 != 0 {
+		n = -(n ^ 0xffffffff + 1)
 	}
 	return n
 }
@@ -29,8 +29,8 @@ func ReadInt32(offset int, signed bool) int {
 func ReadInt16(offset int, signed bool) int {
 	n := int(saveGame.data[offset]) +
 		int(saveGame.data[offset+1])*0x100
-	if signed && n > 0x8000 {
-		n = n - 0x8000
+	if signed && n&0x8000 != 0 {
+		n = -(n ^ 0xffff + 1)
 	}
 	return n
 }
@@ -38,8 +38,8 @@ func ReadInt16(offset int, signed bool) int {
 //deprecating in favor of *saveGameType.readInt8()
 func ReadInt8(offset int, signed bool) int {
 	n := int(saveGame.data[offset])
-	if signed && n > 0x80 {
-		n = n - 0x80
+	if signed && n&0x80 != 0 {
+		n = -(n ^ 0xff + 1)
 	}
 	return n
 }

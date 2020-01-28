@@ -104,8 +104,8 @@ func (sav *saveGameType) readInt32(offset int, signed bool) int {
 		int(sav.data[offset+1])*0x100 +
 		int(sav.data[offset+2])*0x10000 +
 		int(sav.data[offset+3])*0x1000000
-	if signed && n > 0x80000000 {
-		n = n - 0x80000000
+	if signed && n&0x80000000 != 0 {
+		n = -(n ^ 0xffffffff + 1)
 	}
 	return n
 }
@@ -113,16 +113,16 @@ func (sav *saveGameType) readInt32(offset int, signed bool) int {
 func (sav *saveGameType) readInt16(offset int, signed bool) int {
 	n := int(sav.data[offset]) +
 		int(sav.data[offset+1])*0x100
-	if signed && n > 0x8000 {
-		n = n - 0x8000
+	if signed && n&0x8000 != 0 {
+		n = -(n ^ 0xffff + 1)
 	}
 	return n
 }
 
 func (sav *saveGameType) readInt8(offset int, signed bool) int {
 	n := int(sav.data[offset])
-	if signed && n > 0x80 {
-		n = n - 0x80
+	if signed && n&0x80 != 0 {
+		n = -(n ^ 0xff + 1)
 	}
 	return n
 }
