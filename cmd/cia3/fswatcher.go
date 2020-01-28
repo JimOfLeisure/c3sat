@@ -13,6 +13,7 @@ type watchListType struct {
 	watches []string
 }
 
+// Does not check to see if already added
 func (w *watchListType) addWatch(path string) error {
 	err := savWatcher.Add(path)
 	if err != nil {
@@ -22,6 +23,7 @@ func (w *watchListType) addWatch(path string) error {
 	return nil
 }
 
+// Only deletes one
 func (w *watchListType) removeWatch(path string) error {
 	err := savWatcher.Remove(path)
 	if err != nil {
