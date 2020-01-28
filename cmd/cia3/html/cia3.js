@@ -123,20 +123,12 @@ class Fullpath extends Cia3Element {
 
 class Difficulty extends Cia3Element {
     render() {
-        this.innerText = this.difficultyNames[data.difficulty[0]];
+        this.innerText = data.difficultyNames[data.difficulty[0]].name;
     }
-    queryPart = 'difficulty: int32s(section: "GAME", nth: 2, offset: 20, count: 1)';
-    difficultyNames = [
-        "Chieftan",
-        "Warlord",
-        "Regent",
-        "Monarch",
-        "Emperor",
-        "Demigod",
-        "Deity",
-        "Sid"
-    ];
-    
+    queryPart = `
+        difficulty: int32s(section: "GAME", nth: 2, offset: 20, count: 1)
+        difficultyNames: listSection(target: "bic", section: "DIFF", nth: 1) { name: string(offset:0, maxLength: 64) }
+    `;
 }
 
 class Map extends Cia3Element {
@@ -242,42 +234,38 @@ class HexDump extends Cia3Element {
     render() {
         this.innerText = 'Hex dump tool under construction, no controls yet.\n' + data.cia3Hexdump;
     }
-    queryPart = 'cia3Hexdump: hexDump(section: "CIV3", nth: 1, offset: -4, count: 2048)'
+    queryPart = 'cia3Hexdump: hexDump(section: "CIV3", nth: 1, offset: -4, count: 2048)';
 }
 
 class MapX extends Cia3Element {
     render() {
         this.innerText = data.mapx[0];
     }
-    queryPart = 'mapx: int32s(section: "WRLD", nth: 2, offset: 8, count: 1)'
+    queryPart = 'mapx: int32s(section: "WRLD", nth: 2, offset: 8, count: 1)';
 }
 
 class MapY extends Cia3Element {
     render() {
         this.innerText = data.mapy[0];
     }
-    queryPart = 'mapy: int32s(section: "WRLD", nth: 2, offset: 28, count: 1)'
+    queryPart = 'mapy: int32s(section: "WRLD", nth: 2, offset: 28, count: 1)';
 }
 
 class WorldSize extends Cia3Element {
     render() {
-        this.innerText = this.worldSizeNames[data.worldsize.size];
+        this.innerText = data.worldSizeNames[data.worldsize.size].name;
     }
-    queryPart = 'worldsize: civ3 { size }'
-    worldSizeNames = [
-        "Tiny",
-        "Small",
-        "Standard",
-        "Large",
-        "Huge"
-    ];
+    queryPart = `
+        worldsize: civ3 { size }
+        worldSizeNames: listSection(target: "bic", section: "WSIZ", nth: 1) { name: string(offset:32, maxLength: 32) }
+    `;
 }
 
 class Barbarians extends Cia3Element {
     render() {
         this.innerText = this.barbariansSettings[data.barbarians.barbariansFinal.toString()];
     }
-    queryPart = 'barbarians: civ3 { barbariansFinal }'
+    queryPart = 'barbarians: civ3 { barbariansFinal }';
     barbariansSettings = {
         '-1': 'No Barbarians',
         '0': 'Sedentary',
@@ -285,79 +273,79 @@ class Barbarians extends Cia3Element {
         '2': 'Restless',
         '3': 'Raging',
         '4': 'Random'
-    }
+    };
 }
 
 class WorldSeed extends Cia3Element {
     render() {
         this.innerText = data.worldseed.worldSeed;
     }
-    queryPart = 'worldseed: civ3 { worldSeed }'
+    queryPart = 'worldseed: civ3 { worldSeed }';
 }
 
 class LandMass extends Cia3Element {
     render() {
         this.innerText = this.landMassNames[data.landmass.landMassFinal];
     }
-    queryPart = 'landmass: civ3 { landMassFinal }'
+    queryPart = 'landmass: civ3 { landMassFinal }';
     landMassNames = [
         "Archipelago",
         "Continents",
         "Pangea",
         "Random"
-    ]
+    ];
 }
 
 class OceanCoverage extends Cia3Element {
     render() {
         this.innerText = this.oceanCoverageNames[data.oceancoverage.oceanCoverageFinal];
     }
-    queryPart = 'oceancoverage: civ3 { oceanCoverageFinal }'
+    queryPart = 'oceancoverage: civ3 { oceanCoverageFinal }';
     oceanCoverageNames = [
         "80% Water",
         "70% Water",
         "60% Water",
         "Random"
-    ]
+    ];
 }
 
 class Climate extends Cia3Element {
     render() {
         this.innerText = this.climateNames[data.climate.climateFinal];
     }
-    queryPart = 'climate: civ3 { climateFinal }'
+    queryPart = 'climate: civ3 { climateFinal }';
     climateNames = [
         "Arid",
         "Normal",
         "Wet",
         "Random"
-    ]
+    ];
 }
 
 class Temperature extends Cia3Element {
     render() {
         this.innerText = this.temperatureNames[data.temperature.temperatureFinal];
     }
-    queryPart = 'temperature: civ3 { temperatureFinal }'
+    queryPart = 'temperature: civ3 { temperatureFinal }';
     temperatureNames = [
         "Warm",
         "Temperate",
         "Cool",
         "Random"
-    ]
+    ];
 }
 
 class Age extends Cia3Element {
     render() {
         this.innerText = this.ageNames[data.age.ageFinal];
     }
-    queryPart = 'age: civ3 { ageFinal }'
+    queryPart = 'age: civ3 { ageFinal }';
     ageNames = [
         "3 Billion",
         "4 Billion",
         "5 Billion",
         "Random"
-    ]
+    ];
 }
 
 window.customElements.define('cia3-error', Error);
