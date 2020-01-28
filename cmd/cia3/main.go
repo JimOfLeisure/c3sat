@@ -39,29 +39,34 @@ func main() {
 	}
 	defer longPoll.Shutdown()
 
+	var lastSav string
 	// Read Win registry for Civ3 Conquests path
 	civPath, err := findWinCivInstall()
-	if err != nil {
-		errorChannel <- err
-	}
-
-	lastSav, err := getLastSav(civPath)
-	if err != nil {
-		errorChannel <- err
-	} else {
-		err = loadNewSav(lastSav)
+	if err == nil {
+		err = loadDefaultBiq(civPath + `\conquests.biq`)
 		if err != nil {
 			errorChannel <- err
 		}
-	}
+		lastSav, err = getLastSav(civPath)
+		if err != nil {
+			errorChannel <- err
+		} else {
+			err = loadNewSav(lastSav)
+			if err != nil {
+				errorChannel <- err
+			}
+		}
+		// Add Saves and Saves\Auto folder watches
+		err = savWatcher.Add(civPath + `\Saves`)
+		if err != nil {
+			errorChannel <- err
+		}
+		err = savWatcher.Add(civPath + `\Saves\Auto`)
+		if err != nil {
+			errorChannel <- err
+		}
 
-	// Add Saves and Saves\Auto folder watches
-	err = savWatcher.Add(civPath + `\Saves`)
-	if err != nil {
-		errorChannel <- err
-	}
-	err = savWatcher.Add(civPath + `\Saves\Auto`)
-	if err != nil {
+	} else {
 		errorChannel <- err
 	}
 

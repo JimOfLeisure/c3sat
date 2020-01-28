@@ -9,6 +9,20 @@ import (
 	"github.com/myjimnelson/c3sat/civ3satgql"
 )
 
+func loadDefaultBiq(s string) error {
+	fi, err := os.Stat(s)
+	if err != nil {
+		return err
+	}
+	if fi.Mode().IsRegular() {
+		err := civ3satgql.ChangeDefaultBicPath(s)
+		if err != nil {
+			return err
+		}
+	}
+	return nil
+}
+
 func loadNewSav(s string) error {
 	if len(s) > 4 && strings.ToLower(s[len(s)-4:]) == ".sav" {
 		fi, err := os.Stat(s)

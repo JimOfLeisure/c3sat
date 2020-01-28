@@ -79,6 +79,12 @@ func ChangeSavePath(path string) error {
 	return err
 }
 
+// ChangeSavePath updates the package saveGame structure with save file data at <path>
+func ChangeDefaultBicPath(path string) error {
+	err := defaultBic.loadSave(path)
+	return err
+}
+
 // Handler wrapper to allow adding headers to all responses
 // concept yoinked from http://echorand.me/dissecting-golangs-handlerfunc-handle-and-defaultservemux.html
 func setHeaders(handler http.Handler) http.Handler {
