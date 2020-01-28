@@ -34,8 +34,9 @@ func (m *mapData) spoilerFree(offset int) bool {
 
 // To return to subqueries in GraphQL
 type saveAndOffsetType struct {
-	save   *saveGameType
-	offset int
+	save    *saveGameType
+	offset  int
+	offset2 int
 }
 
 var gameLeadSectionType = graphql.NewObject(graphql.ObjectConfig{
@@ -84,6 +85,8 @@ var gameLeadSectionType = graphql.NewObject(graphql.ObjectConfig{
 		},
 	},
 })
+
+var raceSectionItemType = listSectionItem
 
 var listSectionItem = graphql.NewObject(graphql.ObjectConfig{
 	Name: "listSectionItem",

@@ -39,12 +39,22 @@ with a length in bytes. And then there is another unnamed/count-not-included int
 
 [Antal1987's dumps](https://github.com/myjimnelson/C3CPatchFramework/blob/master/Civ3/Leader.h) may be instructive in helping to look what data is there.
 
-Backing up to the BIQ's RACE section: RACE appears to be what I call a basic list section. It starts with an
-int32 count (always 32?) of 'races'/civs. Each list item has the correct byte count. However, the first
-data structure in the item is a list of cities, and the number of cities is inconsistent from civ to civ.
-It begins with a count of cities, each of which seems to be 32-character 0-terminated strings (Windows-1252 encoding). The downside of this is that the other
-civ data is not the same offset from each item starting offset, so you'll have to parse the city list
-to find the offset where the other civ data begins.
+Backing up to the BIQ's RACE section: RACE appears to be what I call a basic list section.
+
+- It starts with an int32 count (always 32?) of 'races'/civs. Each list item has the correct byte count.
+- However, the first data structure in the item is a list of cities, and the number of cities is inconsistent from civ to civ.
+- It begins with a count of cities, each of which seems to be 24-character 0-terminated strings (Windows-1252 encoding). The downside of this is that the other civ data is not the same offset from each item starting offset, so you'll have to parse the city list (and more) to find the offset where the other civ data begins.
+- Following the city list is an int32 count of 16-character military great leader names list.
+- Then leader name string 16 chars
+- Then leader title string 24 chars
+- e.g. "RACE_Romans" string 32 chars
+- e.g. "Roman" adjective string 40 chars?
+- Civ name string 40 chars
+- e.g. "Romans" object noun string 40 chars
+- start of several strings referencing 8 flc files, strings 256+ chars each
+- a few int32s I think
+- int32 count and list of scientific great leader names 
+- end of RACE section item
 
 The game data refers to the BIQ data by index, and the BIQ is where all the strings are.
 I think there might be some text files used for human language translations, but I'm not sure.

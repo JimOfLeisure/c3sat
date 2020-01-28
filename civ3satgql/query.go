@@ -434,5 +434,32 @@ var queryType = graphql.NewObject(graphql.ObjectConfig{
 				return output, nil
 			},
 		},
+		"race": &graphql.Field{
+			Type:        graphql.NewList(raceSectionItemType),
+			Description: "A list of civilizations (RACE) from the BIQ",
+			Resolve: func(p graphql.ResolveParams) (interface{}, error) {
+				target := &currentBic
+				savSection, err := target.sectionOffset("RACE", 1)
+				if err != nil {
+					return nil, err
+				}
+				count := target.readInt32(savSection, Signed)
+				output := make([]saveAndOffsetType, count)
+				offset := 4
+				for i := 0; i < count; i++ {
+					length := target.readInt32(savSection+offset, Signed)
+					output[i].offset2 = savSection + offset
+					cityNamesCount := target.readInt32(output[i].offset2+4, Signed)
+					// Each city name buffer is 24 bytes long
+					greatLeaderNamesCount := target.readInt32(output[i].offset2+4+24*cityNamesCount, Signed)
+					// Each leader name buffer is 16 bytes long
+					output[i].offset = output[i].offset2 + 4 + 24*cityNamesCount + 4 + 16*greatLeaderNamesCount
+					// output[i].offset = output[i].offset2 + 24*cityNamesCount
+					output[i].save = target
+					offset += 4 + length
+				}
+				return output, nil
+			},
+		},
 	},
 })
