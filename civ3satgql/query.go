@@ -129,6 +129,11 @@ var queryType = graphql.NewObject(graphql.ObjectConfig{
 			Type:        graphql.NewList(graphql.Int),
 			Description: "Byte array",
 			Args: graphql.FieldConfigArgument{
+				"target": &graphql.ArgumentConfig{
+					Type:         graphql.String,
+					Description:  "Target scope of the query. Can be game, bic, or file (default)",
+					DefaultValue: "file",
+				},
 				"section": &graphql.ArgumentConfig{
 					Type:        graphql.NewNonNull(graphql.String),
 					Description: "Four-character section name. e.g. TILE",
@@ -147,15 +152,25 @@ var queryType = graphql.NewObject(graphql.ObjectConfig{
 				},
 			},
 			Resolve: func(p graphql.ResolveParams) (interface{}, error) {
+				var target *saveGameType
+				targetArg, _ := p.Args["target"].(string)
 				section, _ := p.Args["section"].(string)
 				nth, _ := p.Args["nth"].(int)
 				offset, _ := p.Args["offset"].(int)
 				count, _ := p.Args["count"].(int)
-				savSection, err := SectionOffset(section, nth)
+				switch targetArg {
+				case "game":
+					target = &currentGame
+				case "bic":
+					target = &currentBic
+				default:
+					target = &saveGame
+				}
+				savSection, err := target.sectionOffset(section, nth)
 				if err != nil {
 					return nil, err
 				}
-				return saveGame.data[savSection+offset : savSection+offset+count], nil
+				return target.data[savSection+offset : savSection+offset+count], nil
 			},
 		},
 		"base64": &graphql.Field{

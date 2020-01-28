@@ -2,6 +2,7 @@ package civ3satgql
 
 import (
 	"encoding/json"
+	"errors"
 	"net/http"
 	"strconv"
 
@@ -24,6 +25,7 @@ type saveGameType struct {
 var saveGame saveGameType
 var defaultBic saveGameType
 var currentBic saveGameType
+var currentGame saveGameType
 
 // populates the structure given a path to a sav file
 func (sav *saveGameType) loadSave(path string) error {
@@ -34,6 +36,15 @@ func (sav *saveGameType) loadSave(path string) error {
 	}
 	sav.path = path
 	sav.populateSections()
+	// complete hack, DELETEME
+	currentBic = defaultBic
+	gameOff, err := saveGame.sectionOffset("GAME", 2)
+	if err != nil {
+		return nil
+	}
+	currentGame.data = saveGame.data[gameOff-4:]
+	currentGame.populateSections()
+	// end complete hack
 	return nil
 }
 
@@ -71,6 +82,21 @@ func (sav *saveGameType) fileName() string {
 		}
 	}
 	return sav.path[o+1:]
+}
+
+// Transitioning to this from the old SecionOffset stanalone function
+func (sav *saveGameType) sectionOffset(sectionName string, nth int) (int, error) {
+	var i, n int
+	for i < len(sav.sections) {
+		if sav.sections[i].name == sectionName {
+			n++
+			if n >= nth {
+				return sav.sections[i].offset + len(sectionName), nil
+			}
+		}
+		i++
+	}
+	return -1, errors.New("Could not find " + strconv.Itoa(nth) + " section named " + sectionName)
 }
 
 // ChangeSavePath updates the package saveGame structure with save file data at <path>
