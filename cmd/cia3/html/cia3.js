@@ -357,9 +357,17 @@ class Civs extends Cia3Element {
         table.innerHTML = '<tr><th>Player #</th><th>RACE ID</th>' + '<th>?</th>'.repeat(this.numFields - 2) + '</tr>';
         data.civs.forEach((e, i) => {
             const row = document.createElement('tr');
-            e.int32s.forEach(ee => {
+            e.int32s.forEach((ee, ii) => {
                 const td = document.createElement('td');
-                td.innerText = ee;
+                switch (ii) {
+                    case 1:
+                        if (ee != -1) {
+                            td.innerText = data.race[ee].civName;
+                            break;
+                        }
+                    default:
+                        td.innerText = ee;
+                }
                 row.appendChild(td);
             });
             table.appendChild(row);
@@ -367,7 +375,16 @@ class Civs extends Cia3Element {
         })
         this.appendChild(table);
     }
-    queryPart = `civs { int32s(offset:0, count: ${this.numFields}) }`;
+    queryPart = `
+        civs { int32s(offset:0, count: ${this.numFields}) }
+        race {
+            leaderName: string(offset:0, maxLength: 32)
+            leaderTitle: string(offset:32, maxLength: 24)
+            adjective:  string(offset:88, maxLength: 40)
+            civName: string(offset:128, maxLength: 40)
+            objectNoun: string(offset:168, maxLength: 40)
+          }
+    `;
 }
 
 window.customElements.define('cia3-error', Error);

@@ -62,13 +62,14 @@ func SectionOffset(sectionName string, nth int) (int, error) {
 // CivString Finds null-terminated string and converts from Windows-1252 to UTF-8
 func CivString(b []byte) (string, error) {
 	var win1252 string
-	for i := 0; i < len(b); i++ {
+	var i int
+	for i = 0; i < len(b); i++ {
 		if b[i] == 0 {
 			win1252 = string(b[:i])
 			break
 		}
 	}
-	if win1252 == "" {
+	if i == len(b) {
 		win1252 = string(b)
 	}
 	sr := strings.NewReader(win1252)

@@ -436,7 +436,7 @@ var queryType = graphql.NewObject(graphql.ObjectConfig{
 		},
 		"race": &graphql.Field{
 			Type:        graphql.NewList(raceSectionItemType),
-			Description: "A list of civilizations (RACE) from the BIQ",
+			Description: "A list of civilizations (RACE) from the BIQ. Note that offsets of sub items are from the end of the cities and military great leaders lists.",
 			Resolve: func(p graphql.ResolveParams) (interface{}, error) {
 				target := &currentBic
 				savSection, err := target.sectionOffset("RACE", 1)
@@ -451,10 +451,10 @@ var queryType = graphql.NewObject(graphql.ObjectConfig{
 					output[i].offset2 = savSection + offset
 					cityNamesCount := target.readInt32(output[i].offset2+4, Signed)
 					// Each city name buffer is 24 bytes long
-					greatLeaderNamesCount := target.readInt32(output[i].offset2+4+24*cityNamesCount, Signed)
-					// Each leader name buffer is 16 bytes long
-					output[i].offset = output[i].offset2 + 4 + 24*cityNamesCount + 4 + 16*greatLeaderNamesCount
-					// output[i].offset = output[i].offset2 + 24*cityNamesCount
+					greatLeaderNamesCount := target.readInt32(output[i].offset2+4+4+24*cityNamesCount, Signed)
+					// Each leader name buffer is 32 bytes long
+					// I am really confused why another +4 isn't needed here for the great leader count int, but it's working as-is
+					output[i].offset = output[i].offset2 + 4 + 4 + 24*cityNamesCount + 32*greatLeaderNamesCount
 					output[i].save = target
 					offset += 4 + length
 				}

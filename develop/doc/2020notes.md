@@ -37,6 +37,26 @@ data after that. I believe they are int32 arrays whose lenths are based possibly
 cty improvements (buildings), techs, and maybe some other stuff. Then a couple of ESPN sections and CULT, each
 with a length in bytes. And then there is another unnamed/count-not-included int32 array.
 
+- LEAD
+  - int32 length
+  - int32 player order? (as expected)
+  - race ID, -1 if not playing
+  - int32 starts game at 0
+  - int32 starts game at 0
+  - int32 starts game at -1
+  - int32; 2 for AI, 3 for human player?
+  - int32 0 in early game
+  - int32 0 in early game
+  - int32 -1 in early game
+  - int32 4 in early game
+  - the next few bytes make me think there's a byte or char here somewhere; need to look w/hex dump
+  - ... end of LEAD length
+- int32 array(s)
+- ESPN
+- ESPN
+- CULT
+- int32 array(s)
+
 [Antal1987's dumps](https://github.com/myjimnelson/C3CPatchFramework/blob/master/Civ3/Leader.h) may be instructive in helping to look what data is there.
 
 Backing up to the BIQ's RACE section: RACE appears to be what I call a basic list section.
@@ -45,7 +65,7 @@ Backing up to the BIQ's RACE section: RACE appears to be what I call a basic lis
 - However, the first data structure in the item is a list of cities, and the number of cities is inconsistent from civ to civ.
 - It begins with a count of cities, each of which seems to be 24-character 0-terminated strings (Windows-1252 encoding). The downside of this is that the other civ data is not the same offset from each item starting offset, so you'll have to parse the city list (and more) to find the offset where the other civ data begins.
 - Following the city list is an int32 count of 16-character military great leader names list.
-- Then leader name string 16 chars
+- Then leader name string 32 chars
 - Then leader title string 24 chars
 - e.g. "RACE_Romans" string 32 chars
 - e.g. "Roman" adjective string 40 chars?
