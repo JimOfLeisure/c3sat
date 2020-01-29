@@ -61,6 +61,9 @@ with a length in bytes. And then there is another unnamed/count-not-included int
   - 0xe4 : int32 - culture?
   - 0xec : int32 - military unit count? or garrison count?
   - 0xfc : int32 - era?
+  - 0x188 : int32 - tax luxury slider (0..10)
+  - 0x18c : int32 - tax science slider (0..10)
+  - 0x190 : int32 - tax cash (inferred) slider (0..10)
   - 0xea8: went from 00 to 01 when I made contact with player 5
   - 0xe98: went from 00 to 03 when I made contact with player 5 ("cautious" towards me? doesn't seem to line up with a bit flag for player 1)
   - ... end of LEAD length
@@ -122,17 +125,17 @@ With notes added.
   57 int Current_Research_Turns; ✓
   58 int Future_Techs_Count; ✓?
   59..78 __int16 AI_Strategy_Unit_Counts[20];
-  79..100 int field_130[22];
-  101 int Armies_Count;
-  102 int Unit_Count;
-  103 int Military_Units_Count;
-  104 int Cities_Count;
+  79..100 int field_13022];
+  91 ~~101~~ int Armies_Count; ✓?
+  92 ~~102~~ int Unit_Count; ✓
+  93 ~~103~~ int Military_Units_Count; ✓
+  94 ~~104~~ int Cities_Count; ✓
   105 int field_198;
   106 int field_19C;
   107 int field_1A0;
-  108 int Tax_Luxury;
-  109 int Tax_Cash;
-  110 int Tax_Science;
+  98 ~~108~~ int Tax_Luxury; ✓
+  100 ~~109~~ int Tax_Cash; ✓
+  99 ~~110~~ int Tax_Science; ✓
   111..846 int field_1B0[736];
   char At_War[32];
   char field_D50[32];

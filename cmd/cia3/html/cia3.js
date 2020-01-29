@@ -349,7 +349,7 @@ class Age extends Cia3Element {
 }
 
 class Civs extends Cia3Element {
-    numFields = 64;
+    numFields = 111;
     render() {
         // this.innerHTML = JSON.stringify(data.civs, null, '  ');
         this.innerHTML = '';
@@ -375,7 +375,11 @@ class Civs extends Cia3Element {
             <th>Research Beakers</th>
             <th>Current Research Tech</th>
             <th>Current Research Turns</th>
-            <th>Future Techs Count</th>
+            <th># Future Techs</th>
+            <th># Armies</th>
+            <th># Units</th>
+            <th># Miltary Units</th>
+            <th># Cities</th>
         </tr>`;
         data.civs.filter(this.civsFilter).forEach((e, i) => {
             const friendlyRow = document.createElement('tr');
@@ -389,6 +393,10 @@ class Civs extends Cia3Element {
             friendlyRow.innerHTML += `<td>${data.techNames[e.currentResearchId[0]].name}</td>`;
             friendlyRow.innerHTML += `<td>${e.currentResearchTurns[0]}</td>`;
             friendlyRow.innerHTML += `<td>${e.futureTechsCount[0]}</td>`;
+            friendlyRow.innerHTML += `<td>${e.armiesCount[0]}</td>`;
+            friendlyRow.innerHTML += `<td>${e.unitCount[0]}</td>`;
+            friendlyRow.innerHTML += `<td>${e.militaryUnitCount[0]}</td>`;
+            friendlyRow.innerHTML += `<td>${e.cityCount[0]}</td>`;
             // friendlyRow.innerHTML += `<td>${}</td>`;
             // friendlyRow.innerHTML += `<td>${}</td>`;
             // friendlyRow.innerHTML += `<td>${}</td>`;
@@ -461,6 +469,10 @@ class Civs extends Cia3Element {
             currentResearchId: int32s(offset:224, count: 1)
             currentResearchTurns: int32s(offset:228, count: 1)
             futureTechsCount: int32s(offset:232, count: 1)
+            armiesCount: int32s(offset:364, count: 1)
+            unitCount: int32s(offset:368, count: 1)
+            militaryUnitCount: int32s(offset:372, count: 1)
+            cityCount: int32s(offset:376, count: 1)
         }
         race {
             leaderName: string(offset:0, maxLength: 32)
