@@ -16,7 +16,6 @@ var civInstallPathKeyTry = []string{
 	`SOFTWARE\Infogrames\Conquests`,
 }
 
-// assume go prog is 64-bit
 func findWinCivInstall() (string, error) {
 	var k registry.Key
 	var err error

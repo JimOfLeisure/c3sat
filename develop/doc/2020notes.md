@@ -43,7 +43,7 @@ with a length in bytes. And then there is another unnamed/count-not-included int
   - race ID, -1 if not playing
   - int32 starts game at 0
   - int32 starts game at 0
-  - int32 starts game at -1
+  - int32 starts game at -1, then appears to be count from player# to 0 for non-barbs, in reverse order of index
   - int32; 2 for AI, 3 for human player?
   - int32 0 in early game
   - int32 0 in early game

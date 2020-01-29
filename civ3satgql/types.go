@@ -86,6 +86,7 @@ var gameLeadSectionType = graphql.NewObject(graphql.ObjectConfig{
 	},
 })
 
+// intending to append fields for city lists and mgl lists, but not in a hurry
 var raceSectionItemType = listSectionItem
 
 var listSectionItem = graphql.NewObject(graphql.ObjectConfig{

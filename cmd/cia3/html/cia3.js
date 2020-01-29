@@ -353,9 +353,11 @@ class Civs extends Cia3Element {
     render() {
         // this.innerHTML = JSON.stringify(data.civs, null, '  ');
         const table = document.createElement('table');
+        const hexDumps = document.createElement('div');
+        hexDumps.innerHTML += '\n*** Chrome renders this styled hexdump list VERY slowly; use Mozilla instead ***\n\n';
         this.appendChild(table);
         table.innerHTML = '<tr><th>Player #</th><th>RACE ID</th>' + '<th>?</th>'.repeat(this.numFields - 2) + '</tr>';
-        data.civs.forEach((e, i) => {
+        data.civs.filter(e => e.int32s[1] > 0).forEach((e, i) => {
             const row = document.createElement('tr');
             e.int32s.forEach((ee, ii) => {
                 const td = document.createElement('td');
@@ -371,12 +373,17 @@ class Civs extends Cia3Element {
                 row.appendChild(td);
             });
             table.appendChild(row);
-
+            hexDumps.innerHTML += '*****\n#' + e.int32s[0] + ' : ' + data.race[e.int32s[1]].civName + '\n*****\n' + e.hexDump.replace(/( 0[0 ]+0)/g, '<span class="dim">$1</span>');
+            console.log('doing the thing');
         })
         this.appendChild(table);
+        this.appendChild(hexDumps);
     }
     queryPart = `
-        civs { int32s(offset:0, count: ${this.numFields}) }
+        civs {
+            int32s(offset:0, count: ${this.numFields})
+            hexDump
+        }
         race {
             leaderName: string(offset:0, maxLength: 32)
             leaderTitle: string(offset:32, maxLength: 24)

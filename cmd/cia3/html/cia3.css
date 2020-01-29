@@ -113,3 +113,12 @@ cia3-civs > table > tr > td {
     text-align: right;
     padding: 0 1em;
 }
+cia3-civs > div {
+    font-family: 'Consolas', 'Lucidia Console', 'Courier New', Courier, monospace;
+    white-space: pre;
+    font-weight: bolder;
+    font-size: x-large;
+}
+span.dim {
+    color: lightgray;
+}
