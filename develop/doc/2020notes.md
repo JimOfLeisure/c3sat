@@ -38,19 +38,28 @@ cty improvements (buildings), techs, and maybe some other stuff. Then a couple o
 with a length in bytes. And then there is another unnamed/count-not-included int32 array.
 
 - LEAD
-  - int32 length
-  - int32 player order? (as expected)
-  - race ID, -1 if not playing
-  - int32 starts game at 0
-  - int32 starts game at 0 - Power? (in F8 histograph)
-  - int32 starts game at -1, then appears to be count from player# to 0 for non-barbs, in reverse order of index (additional: -1 until first city founded?)
-  - int32; 2 for AI, 3 for human player?
-  - int32 0 in early game
-  - int32 0 in early game
-  - int32 -1 in early game
-  - int32 4 in early game
-  - ~~the next few bytes make me think there's a byte or char here somewhere; need to look w/hex dump~~ Still looks int32-aligned, perhaps these are encoded gold or some other encoded value (gold count is protected from easy hex editing)
-  - Maybe a char or int16 array?
+  - int32 length (offsets from below start after length)
+  - 0x00: int32 player order? player index? (as expected)
+  - 0x04: int32 race ID, -1 if not playing
+  - 0x08: int32 starts game at 0
+  - 0x0c: int32 starts game at 0 - Power? (in F8 histograph)
+  - 0x10: int32 starts game at -1, then appears to be count from player# to 0 for non-barbs, in reverse order of index (additional: -1 until first city founded?)
+  - 0x14: int32; 2 for AI, 3 for human player?
+  - 0x18: int32 0 in early game
+  - 0x1c: int32 0 in early game
+  - 0x20: int32 -1 in early game
+  - 0x24: int32 4 in early game
+    - ~~the next few bytes make me think there's a byte or char here somewhere; need to look w/hex dump~~ Still looks int32-aligned, perhaps these are encoded gold or some other encoded value (gold count is protected from easy hex editing)
+  - 0x28: int32 encoded gold? but only lsb seems to change - maybe byte array? "lsb" seems to increment slowly
+  - 0x2c: int32 encoded gold? but only lsb seems to change - maybe byte array? "lsb" seems to increment slowly
+  - 0x30: possibly near start of byte or int16 array
+  - 0x8c : int32 - # of map tiles discovered (?)
+  - 0x91-ish : This seems to occasionaly get civ name strings, but I think it's a bug and data should be ints of some length
+  - 0xdc : int32 - culture?
+  - 0xe4 : int32 - culture?
+  - 0xec : int32 - military unit count? or garrison count?
+  - 0xea8: went from 00 to 01 when I made contact with player 5
+  - 0xe98: went from 00 to 03 when I made contact with player 5 ("cautious" towards me? doesn't seem to line up with a bit flag for player 1)
   - ... end of LEAD length
 - int32 array(s)
 - ESPN

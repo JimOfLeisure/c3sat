@@ -352,9 +352,10 @@ class Civs extends Cia3Element {
     numFields = 32;
     render() {
         // this.innerHTML = JSON.stringify(data.civs, null, '  ');
+        this.innerHTML = '';
         const table = document.createElement('table');
         const hexDumps = document.createElement('div');
-        hexDumps.innerHTML += '\n*** Chrome renders this styled hexdump list VERY slowly; use Mozilla instead ***\n\n';
+        hexDumps.classList += "dump";
         this.appendChild(table);
         table.innerHTML = '<tr><th>Player #</th><th>RACE ID</th>' + '<th>?</th>'.repeat(this.numFields - 2) + '</tr>';
         data.civs.filter(this.civsFilter).forEach((e, i) => {
@@ -373,18 +374,43 @@ class Civs extends Cia3Element {
                 row.appendChild(td);
             });
             table.appendChild(row);
+            if (this.oldCivsData != undefined) {
+                const hexDiff = document.createElement('div');
+                // let foo = Diff.diffWordsWithSpace(this.oldCivsData[e.int32s[0]].hexDump, data.civs[e.int32s[0]].hexDump);
+                let foo = Diff.createTwoFilesPatch("old", "new" ,this.oldCivsData[e.int32s[0]].hexDump, data.civs[e.int32s[0]].hexDump);
+                // foo.forEach(function(part){
+                //     // green for additions, red for deletions
+                //     // grey for common parts
+                //     let color = part.added ? 'green' :
+                //       part.removed ? 'red' : 'grey';
+                //     let span = document.createElement('span');
+                //     span.style.color = color;
+                //     span.appendChild(document
+                //       .createTextNode(part.value));
+                //     hexDiff.appendChild(span);
+                // });
+                let diff2Html = Diff2Html.html(foo, {
+                    drawFileList: true,
+                    matching: 'words',
+                    outputFormat: 'side-by-side',
+                });
+                hexDiff.innerHTML = '*****\n#' + e.int32s[0] + ' : ' + data.race[e.int32s[1]].civName + ' Diff\n*****\n' + diff2Html;
+                this.appendChild(hexDiff);
+            }
             hexDumps.innerHTML += '*****\n#' + e.int32s[0] + ' : ' + data.race[e.int32s[1]].civName + '\n*****\n' +
-                e.hexDump.replace(/( 00+)/g, '<span class="dim">$1</span>')
+                e.hexDump.replace(/((?: 00)+)/g, '<span class="dim">$1</span>')
                 .replace(/(\.+)/g, '<span class="dim">$1</span>')
-                .replace(/( ff+)/g, '<span class="medium">$1</span>')
+                .replace(/((?: ff)+)/g, '<span class="medium">$1</span>')
                 ;
         })
-        this.appendChild(table);
         this.appendChild(hexDumps);
+        this.oldCivsData = data.civs
     }
     civsFilter (e) {
         return e.int32s[1] > 0; // non-barb players
+        // return e.int32s[0] == 1; // first human player only
     }
+    oldCivsData = undefined;
     queryPart = `
         civs {
             int32s(offset:0, count: ${this.numFields})

@@ -5,6 +5,8 @@
 *.json
 cmd/temp/
 *.dll
+node_modules/
+diff2html/
 
 # embeded files built by pkger
 pkged.go
