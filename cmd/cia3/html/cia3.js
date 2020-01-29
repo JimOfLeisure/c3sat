@@ -349,7 +349,7 @@ class Age extends Cia3Element {
 }
 
 class Civs extends Cia3Element {
-    numFields = 32;
+    numFields = 64;
     render() {
         // this.innerHTML = JSON.stringify(data.civs, null, '  ');
         this.innerHTML = '';
@@ -357,7 +357,12 @@ class Civs extends Cia3Element {
         const hexDumps = document.createElement('div');
         hexDumps.classList += "dump";
         this.appendChild(table);
-        table.innerHTML = '<tr><th>Player #</th><th>RACE ID</th>' + '<th>?</th>'.repeat(this.numFields - 2) + '</tr>';
+        // table.innerHTML = '<tr><th>Player #</th><th>RACE ID</th>' + '<th>?</th>'.repeat(this.numFields - 2) + '</tr>';
+        let headers = "";
+        for (let i = 2; i < this.numFields; i++) {
+            headers += `<th>${i} 0x${(i*4).toString(16)} ${i*4}</th>`
+        }
+        table.innerHTML = '<tr><th>Player #</th><th>RACE ID</th>' +  headers + '</tr>';
         data.civs.filter(this.civsFilter).forEach((e, i) => {
             const row = document.createElement('tr');
             e.int32s.forEach((ee, ii) => {

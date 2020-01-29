@@ -47,17 +47,20 @@ with a length in bytes. And then there is another unnamed/count-not-included int
   - 0x14: int32; 2 for AI, 3 for human player?
   - 0x18: int32 0 in early game
   - 0x1c: int32 0 in early game
-  - 0x20: int32 -1 in early game
-  - 0x24: int32 4 in early game
+  - 0x20: int32 -1 in early game (Golden age end?)
+  - 0x24: int32 4 in early game (status?)
     - ~~the next few bytes make me think there's a byte or char here somewhere; need to look w/hex dump~~ Still looks int32-aligned, perhaps these are encoded gold or some other encoded value (gold count is protected from easy hex editing)
   - 0x28: int32 encoded gold? but only lsb seems to change - maybe byte array? "lsb" seems to increment slowly
   - 0x2c: int32 encoded gold? but only lsb seems to change - maybe byte array? "lsb" seems to increment slowly
   - 0x30: possibly near start of byte or int16 array
+  - 0x84 : int32 - mobilization level (?)
+  - 0x88 : int32 - government type (?)
   - 0x8c : int32 - # of map tiles discovered (?)
   - 0x91-ish : This seems to occasionaly get civ name strings, but I think it's a bug and data should be ints of some length
   - 0xdc : int32 - culture?
   - 0xe4 : int32 - culture?
   - 0xec : int32 - military unit count? or garrison count?
+  - 0xfc : int32 - era?
   - 0xea8: went from 00 to 01 when I made contact with player 5
   - 0xe98: went from 00 to 03 when I made contact with player 5 ("cautious" towards me? doesn't seem to line up with a bit flag for player 1)
   - ... end of LEAD length
@@ -89,3 +92,111 @@ Backing up to the BIQ's RACE section: RACE appears to be what I call a basic lis
 The game data refers to the BIQ data by index, and the BIQ is where all the strings are.
 I think there might be some text files used for human language translations, but I'm not sure.
 
+## from Antal1987's Lead.h
+
+With notes added.
+
+```
+  int field_4[6]; - length?
+  0 int ID; ✓ 
+  1 int RaceID; ✓
+  2, 3 int field_24[2];
+  4 int CapitalID;
+  5 int field_30;
+  6 int field_34;
+  7 int field_38;
+  8 int Golden_Age_End;
+  9 int Status;
+  10 int Gold_Decrement;
+  11 int Gold_Encoded;
+  12..32 int field_4C[21];
+  33 int GovenmentType;
+  34 int Mobilization_Level;
+  35 int Tiles_Discovered;
+  36..49 int field_AC[14];
+  50 int field_E4;
+  60..62 int field_E8[3];
+  63 int Era;
+  64 int Research_Bulbs;
+  65 int Current_Research_ID;
+  66 int Current_Research_Turns;
+  65 int Future_Techs_Count;
+  __int16 AI_Strategy_Unit_Counts[20];
+  int field_130[22];
+  int Armies_Count;
+  int Unit_Count;
+  int Military_Units_Count;
+  int Cities_Count;
+  int field_198;
+  int field_19C;
+  int field_1A0;
+  int Tax_Luxury;
+  int Tax_Cash;
+  int Tax_Science;
+  int field_1B0[736];
+  char At_War[32];
+  char field_D50[32];
+  char field_D70[32];
+  int field_D90[72];
+  int Contacts[32];
+  int Relation_Treaties[32];
+  int Military_Allies[32];
+  int Trade_Embargos[32];
+  int field_10B0[18];
+  int Color_Table_ID;
+  int field_10FC;
+  int field_1100[7];
+  int field_111C[36];
+  int field_11AC[8];
+  int field_11CC;
+  int field_11D0[252];
+  int field_15C0;
+  int field_15C4;
+  int field_15C8;
+  int field_15CC;
+  int Science_Age_Status;
+  int Science_Age_End;
+  int field_15D8;
+  __int16 *Improvement_Counts;
+  int field_15E0;
+  int Improvements_Counts;
+  int *Small_Wonders;
+  int field_15EC;
+  __int16 *Units_Counts;
+  int field_15F4;
+  int field_15F8;
+  __int16 *Spaceship_Parts_Count;
+  int *ContinentStat4;
+  int ContinentStat3;
+  int *ContinentCities;
+  int ContinentStat2;
+  int *ContinentStat1;
+  byte *Available_Resources;
+  byte *Available_Resources_Counts;
+  class_Civ_Treaties Treaties[32];
+  class_Culture Culture;
+  class_Espionage Espionage_1;
+  class_Espionage Espionage_2;
+  int field_18C0[260];
+  class_Leader_Data_10 Data_10_Array2[32];
+  class_Leader_Data_10 Data_10_Array3[32];
+  class_Hash_Table Auto_Improvements;
+```
+
+gql query:
+
+```
+{
+  civs {
+    raceId: int32s(offset:4, count: 1)
+    governmentType: int32s(offset:132, count: 1)
+    mobilizationLevel: int32s(offset:136, count: 1)
+    tilesDiscovered: int32s(offset:140, count: 1)
+    era: int32s(offset:252, count: 1)
+    UNSUREresearchBulbs: int32s(offset:256, count: 1)
+    UNSUREcurrentResearchId: int32s(offset:260, count: 1)
+    UNSUREcurrentResearchTurns: int32s(offset:264, count: 1)
+    UNSUREfutureTechsCount: int32s(offset:268, count: 1)
+  }
+}
+```
