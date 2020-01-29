@@ -115,25 +115,25 @@ With notes added.
   35 int Tiles_Discovered;
   36..49 int field_AC[14];
   50 int field_E4;
-  60..62 int field_E8[3];
-  63 int Era;
-  64 int Research_Bulbs;
-  65 int Current_Research_ID;
-  66 int Current_Research_Turns;
-  65 int Future_Techs_Count;
-  __int16 AI_Strategy_Unit_Counts[20];
-  int field_130[22];
-  int Armies_Count;
-  int Unit_Count;
-  int Military_Units_Count;
-  int Cities_Count;
-  int field_198;
-  int field_19C;
-  int field_1A0;
-  int Tax_Luxury;
-  int Tax_Cash;
-  int Tax_Science;
-  int field_1B0[736];
+  51..53 int field_E8[3];
+  54 int Era; ✓
+  55 int Research_Bulbs; ✓
+  56 int Current_Research_ID; ✓
+  57 int Current_Research_Turns; ✓
+  58 int Future_Techs_Count; ✓?
+  59..78 __int16 AI_Strategy_Unit_Counts[20];
+  79..100 int field_130[22];
+  101 int Armies_Count;
+  102 int Unit_Count;
+  103 int Military_Units_Count;
+  104 int Cities_Count;
+  105 int field_198;
+  106 int field_19C;
+  107 int field_1A0;
+  108 int Tax_Luxury;
+  109 int Tax_Cash;
+  110 int Tax_Science;
+  111..846 int field_1B0[736];
   char At_War[32];
   char field_D50[32];
   char field_D70[32];

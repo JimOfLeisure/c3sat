@@ -372,6 +372,10 @@ class Civs extends Cia3Element {
             <th>Mobilization</th>
             <th>Tiles Discovered</th>
             <th>Era</th>
+            <th>Research Beakers</th>
+            <th>Current Research Tech</th>
+            <th>Current Research Turns</th>
+            <th>Future Techs Count</th>
         </tr>`;
         data.civs.filter(this.civsFilter).forEach((e, i) => {
             const friendlyRow = document.createElement('tr');
@@ -381,6 +385,13 @@ class Civs extends Cia3Element {
             friendlyRow.innerHTML += `<td>${e.mobilizationLevel[0]}</td>`;
             friendlyRow.innerHTML += `<td>${e.tilesDiscovered[0]}</td>`;
             friendlyRow.innerHTML += `<td>${data.eraNames[e.era[0]].name}</td>`;
+            friendlyRow.innerHTML += `<td>${e.researchBeakers[0]}</td>`;
+            friendlyRow.innerHTML += `<td>${data.techNames[e.currentResearchId[0]].name}</td>`;
+            friendlyRow.innerHTML += `<td>${e.currentResearchTurns[0]}</td>`;
+            friendlyRow.innerHTML += `<td>${e.futureTechsCount[0]}</td>`;
+            // friendlyRow.innerHTML += `<td>${}</td>`;
+            // friendlyRow.innerHTML += `<td>${}</td>`;
+            // friendlyRow.innerHTML += `<td>${}</td>`;
             // friendlyRow.innerHTML += `<td>${}</td>`;
             // friendlyRow.innerHTML += `<td>${}</td>`;
             friendlyTable.appendChild(friendlyRow);
@@ -446,10 +457,10 @@ class Civs extends Cia3Element {
             mobilizationLevel: int32s(offset:136, count: 1)
             tilesDiscovered: int32s(offset:140, count: 1)
             era: int32s(offset:252, count: 1)
-            UNSUREresearchBulbs: int32s(offset:256, count: 1)
-            UNSUREcurrentResearchId: int32s(offset:260, count: 1)
-            UNSUREcurrentResearchTurns: int32s(offset:264, count: 1)
-            UNSUREfutureTechsCount: int32s(offset:268, count: 1)
+            researchBeakers: int32s(offset:220, count: 1)
+            currentResearchId: int32s(offset:224, count: 1)
+            currentResearchTurns: int32s(offset:228, count: 1)
+            futureTechsCount: int32s(offset:232, count: 1)
         }
         race {
             leaderName: string(offset:0, maxLength: 32)
@@ -460,6 +471,7 @@ class Civs extends Cia3Element {
         }
         governmentNames: listSection(target: "bic", section: "GOVT", nth: 1) { name: string(offset:24, maxLength: 64) }
         eraNames: listSection(target: "bic", section: "ERAS", nth: 1) { name: string(offset:0, maxLength: 64) }
+        techNames: listSection(target: "bic", section: "TECH", nth: 1) { name: string(offset:0, maxLength: 32) }
     `;
 }
 
