@@ -37,12 +37,12 @@ data after that. I believe they are int32 arrays whose lenths are based possibly
 cty improvements (buildings), techs, and maybe some other stuff. Then a couple of ESPN sections and CULT, each
 with a length in bytes. And then there is another unnamed/count-not-included int32 array.
 
-- LEAD
+## LEAD
   - int32 length (offsets from below start after length)
   - 0x00: int32 player order? player index? (as expected)
   - 0x04: int32 race ID, -1 if not playing
   - 0x08: int32 starts game at 0
-  - 0x0c: int32 starts game at 0 - Power? (in F8 histograph)
+  - 0x0c: int32 starts game at 0 - Power (in F8 histograph) ✓
   - 0x10: int32 starts game at -1, then appears to be count from player# to 0 for non-barbs, in reverse order of index (additional: -1 until first city founded?)
   - 0x14: int32; 2 for AI, 3 for human player?
   - 0x18: int32 0 in early game
@@ -57,15 +57,52 @@ with a length in bytes. And then there is another unnamed/count-not-included int
   - 0x88 : int32 - government type (?)
   - 0x8c : int32 - # of map tiles discovered (?)
   - 0x91-ish : This seems to occasionaly get civ name strings, but I think it's a bug and data should be ints of some length
-  - 0xdc : int32 - culture?
-  - 0xe4 : int32 - culture?
-  - 0xec : int32 - military unit count? or garrison count?
+  - 0xdc : int32 - ~~culture?~~ no, but have only seen it increment so far, but believe it must go down as I saw a 0
+  - 0xe4 : int32 - ~~culture?~~ no, but have only seen it increment so far, but believe it must go down as I saw a 0
+  - 0xec : ~~int32 - military unit count? or garrison count?~~ No, I think this part of an array, maybe int16s
+  - 0xf2 (not int32 boundary, part of int32[60]) : started incrementing 1 per turn around turn 10/11?
+    - I seem to be 2 ahead of 4 other civs, and two are still at 0
+    - Then it didn't change for anyone
   - 0xfc : int32 - era?
+  - 0x12c : 00 to 01 2950bc but don't know why
+  - 0x132 : 00 to 01 2950bc but don't know why
   - 0x188 : int32 - tax luxury slider (0..10)
   - 0x18c : int32 - tax science slider (0..10)
   - 0x190 : int32 - tax cash (inferred) slider (0..10)
+  - 0x1e0 : player 8 went from 0 to 1 when I declared war on player 8
+  - 0x41c : went from 00 to 01, not sure why
+  - 0xb18 : player 8 decremented 0x17 to 0x16 during war w/me, unsure if related
+    - decremented to 0x15 to 0x14, now will talk, unsure if related
+    - not related to war or peace w/me
+  - 0xb98 : int32? - (array, 0 if player willing to talk?) player 8 went from 5 ~~(furious?)~~ to 4 ~~(annoyed?)~~ during war but won't speak
+    - went to 3 next turn but still no speak, and annoyed
+    - went to 2 next turn but still no speak, and annoyed
+    - when went to 0, will speak!
+    - player 8 00 to 07 when made peace after war, they're annoyed. Peace treaty related?
+  - 0xc98 : int32 - player 8 went from 0 to 0xffffffe2 (-30) when I declared war on player 8, they refuse to speak
+### war
+  - 0xd14 : Guessing this is always 01 for war vs barbs, presuming this is start of byte array for war.
+  - 0xd15 : player 8 went from 0 to 1 when I declared war on player 8, they refuse to speak
+    - player 8 went 1 to 0 when made peace
+  - 0xd1c : went from 0 to 1 when I declared war on player 8
+    - and back to 0 when made peace with player 8
+  - 0xd98 : player 8 went from 1 to 0 when I declared war on player 8, they refuse to speak
+### contact
+  - 0xe94 : presumed start of int32 contact array. This is 0 for barb player
+  - 0xe98: player 5 went from 00 to 03 when I made contact with player 5 ("cautious" towards me? doesn't seem to line up with a bit flag for player 1)
+    - player 8 also went 00 to 03 when met, and they are cautious
+    - player 3 also went 00 to 03 when met, and they are cautious ("cautious" is not in the BIQ)
+    - player 2 00 to 01 when met, and they are annoyed
+  - 0xe9c: went from 00 to 01 when I made contact with player 2
+  - 0xea0: went from 00 to 01 when I made contact with player 3
   - 0xea8: went from 00 to 01 when I made contact with player 5
-  - 0xe98: went from 00 to 03 when I made contact with player 5 ("cautious" towards me? doesn't seem to line up with a bit flag for player 1)
+  - 0xeb4: went from 00 to 01 when I made contact with player 8
+
+### ?
+
+  - 0x11a0 & 0x11a4 ints radically changed on turn 10 when borders expanded; also happened to the AI civs same location same time, but no making sense of the numbers yet
+    - also changed on turn 11 for all civs
+    - and 12, and continually, apparently
   - ... end of LEAD length
 - int32 array(s)
 - ESPN
@@ -137,11 +174,11 @@ With notes added.
   100 ~~109~~ int Tax_Cash; ✓
   99 ~~110~~ int Tax_Science; ✓
   111..846 int field_1B0[736];
-  char At_War[32];
+  0xd14 : char At_War[32];
   char field_D50[32];
   char field_D70[32];
   int field_D90[72];
-  int Contacts[32];
+  0xe94 : int Contacts[32];
   int Relation_Treaties[32];
   int Military_Allies[32];
   int Trade_Embargos[32];
