@@ -357,7 +357,7 @@ class Civs extends Cia3Element {
         hexDumps.innerHTML += '\n*** Chrome renders this styled hexdump list VERY slowly; use Mozilla instead ***\n\n';
         this.appendChild(table);
         table.innerHTML = '<tr><th>Player #</th><th>RACE ID</th>' + '<th>?</th>'.repeat(this.numFields - 2) + '</tr>';
-        data.civs.filter(e => e.int32s[1] > 0).forEach((e, i) => {
+        data.civs.filter(this.civsFilter).forEach((e, i) => {
             const row = document.createElement('tr');
             e.int32s.forEach((ee, ii) => {
                 const td = document.createElement('td');
@@ -373,11 +373,17 @@ class Civs extends Cia3Element {
                 row.appendChild(td);
             });
             table.appendChild(row);
-            hexDumps.innerHTML += '*****\n#' + e.int32s[0] + ' : ' + data.race[e.int32s[1]].civName + '\n*****\n' + e.hexDump.replace(/( 0[0 ]+0)/g, '<span class="dim">$1</span>');
-            console.log('doing the thing');
+            hexDumps.innerHTML += '*****\n#' + e.int32s[0] + ' : ' + data.race[e.int32s[1]].civName + '\n*****\n' +
+                e.hexDump.replace(/( 00+)/g, '<span class="dim">$1</span>')
+                .replace(/(\.+)/g, '<span class="dim">$1</span>')
+                .replace(/( ff+)/g, '<span class="medium">$1</span>')
+                ;
         })
         this.appendChild(table);
         this.appendChild(hexDumps);
+    }
+    civsFilter (e) {
+        return e.int32s[1] > 0; // non-barb players
     }
     queryPart = `
         civs {

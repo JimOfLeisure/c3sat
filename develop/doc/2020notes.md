@@ -42,14 +42,15 @@ with a length in bytes. And then there is another unnamed/count-not-included int
   - int32 player order? (as expected)
   - race ID, -1 if not playing
   - int32 starts game at 0
-  - int32 starts game at 0
-  - int32 starts game at -1, then appears to be count from player# to 0 for non-barbs, in reverse order of index
+  - int32 starts game at 0 - Power? (in F8 histograph)
+  - int32 starts game at -1, then appears to be count from player# to 0 for non-barbs, in reverse order of index (additional: -1 until first city founded?)
   - int32; 2 for AI, 3 for human player?
   - int32 0 in early game
   - int32 0 in early game
   - int32 -1 in early game
   - int32 4 in early game
-  - the next few bytes make me think there's a byte or char here somewhere; need to look w/hex dump
+  - ~~the next few bytes make me think there's a byte or char here somewhere; need to look w/hex dump~~ Still looks int32-aligned, perhaps these are encoded gold or some other encoded value (gold count is protected from easy hex editing)
+  - Maybe a char or int16 array?
   - ... end of LEAD length
 - int32 array(s)
 - ESPN
