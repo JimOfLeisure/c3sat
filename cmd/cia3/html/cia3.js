@@ -354,8 +354,10 @@ class Civs extends Cia3Element {
         // this.innerHTML = JSON.stringify(data.civs, null, '  ');
         this.innerHTML = '';
         const table = document.createElement('table');
+        const friendlyTable = document.createElement('table');
         const hexDumps = document.createElement('div');
         hexDumps.classList += "dump";
+        this.appendChild(friendlyTable);
         this.appendChild(table);
         // table.innerHTML = '<tr><th>Player #</th><th>RACE ID</th>' + '<th>?</th>'.repeat(this.numFields - 2) + '</tr>';
         let headers = "";
@@ -363,7 +365,25 @@ class Civs extends Cia3Element {
             headers += `<th>${i} 0x${(i*4).toString(16)} ${i*4}</th>`
         }
         table.innerHTML = '<tr><th>Player #</th><th>RACE ID</th>' +  headers + '</tr>';
+        friendlyTable.innerHTML = `<tr>
+            <th>Player #</th>
+            <th>Civ Name</th>
+            <th>Government</th>
+            <th>Mobilization</th>
+            <th>Tiles Discovered</th>
+            <th>Era</th>
+        </tr>`;
         data.civs.filter(this.civsFilter).forEach((e, i) => {
+            const friendlyRow = document.createElement('tr');
+            friendlyRow.innerHTML += `<td>${e.playerNumber[0]}</td>`;
+            friendlyRow.innerHTML += `<td>${data.race[e.raceId[0]].civName}</td>`;
+            friendlyRow.innerHTML += `<td>${data.governmentNames[e.governmentType[0]].name}</td>`;
+            friendlyRow.innerHTML += `<td>${e.mobilizationLevel[0]}</td>`;
+            friendlyRow.innerHTML += `<td>${e.tilesDiscovered[0]}</td>`;
+            friendlyRow.innerHTML += `<td>${data.eraNames[e.era[0]].name}</td>`;
+            // friendlyRow.innerHTML += `<td>${}</td>`;
+            // friendlyRow.innerHTML += `<td>${}</td>`;
+            friendlyTable.appendChild(friendlyRow);
             const row = document.createElement('tr');
             e.int32s.forEach((ee, ii) => {
                 const td = document.createElement('td');
@@ -420,6 +440,16 @@ class Civs extends Cia3Element {
         civs {
             int32s(offset:0, count: ${this.numFields})
             hexDump
+            playerNumber: int32s(offset:0, count: 1)
+            raceId: int32s(offset:4, count: 1)
+            governmentType: int32s(offset:132, count: 1)
+            mobilizationLevel: int32s(offset:136, count: 1)
+            tilesDiscovered: int32s(offset:140, count: 1)
+            era: int32s(offset:252, count: 1)
+            UNSUREresearchBulbs: int32s(offset:256, count: 1)
+            UNSUREcurrentResearchId: int32s(offset:260, count: 1)
+            UNSUREcurrentResearchTurns: int32s(offset:264, count: 1)
+            UNSUREfutureTechsCount: int32s(offset:268, count: 1)
         }
         race {
             leaderName: string(offset:0, maxLength: 32)
@@ -427,7 +457,9 @@ class Civs extends Cia3Element {
             adjective:  string(offset:88, maxLength: 40)
             civName: string(offset:128, maxLength: 40)
             objectNoun: string(offset:168, maxLength: 40)
-          }
+        }
+        governmentNames: listSection(target: "bic", section: "GOVT", nth: 1) { name: string(offset:24, maxLength: 64) }
+        eraNames: listSection(target: "bic", section: "ERAS", nth: 1) { name: string(offset:0, maxLength: 64) }
     `;
 }
 
