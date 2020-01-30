@@ -76,8 +76,9 @@ with a length in bytes. And then there is another unnamed/count-not-included int
   - 0x1e0 : player 8 went from 0 to 1 when I declared war on player 8
     - same for player 7 when I dow'ed player 7
   - 0x200 : player 5 went from 0 to 2 when they declared war on me
-  - 0x320 : 00 to 01 when player 6 dow'ed after demand refulal
-  - 0x328 : 00 to 01 when player 6 dow'ed after demand refulal
+    - player 2 went from 0 to 1 after making a demand and backing down when I refused
+  - 0x320 : 00 to 01 when player 6 dow'ed after demand refusal
+  - 0x328 : 00 to 01 when player 6 dow'ed after demand refusal
   - 0x338 : player 7 00 to 01 when I dow'ed
   - 0x41c : went from 00 to 01, not sure why
     - player 5 went 0 to 1 when dow'ing me
@@ -86,6 +87,7 @@ with a length in bytes. And then there is another unnamed/count-not-included int
     - not related to war or peace w/me
     - noticed player 7 decrementing after dow...maybe turns left on research? wild guess
     - player 5 went 0 to 20 after dow'ing me
+    - player 2 went 1 to 20 after demanding money and backing down when I refused
   - 0xb98 : int32? - (array, 0 if player willing to talk?) player 8 went from 5 ~~(furious?)~~ to 4 ~~(annoyed?)~~ during war but won't speak
     - went to 3 next turn but still no speak, and annoyed
     - went to 2 next turn but still no speak, and annoyed

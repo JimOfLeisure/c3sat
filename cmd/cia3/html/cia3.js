@@ -378,6 +378,7 @@ class Civs extends Cia3Element {
         friendlyTable.innerHTML = `<tr>
             <th>Player #</th>
             <th>Civ Name</th>
+            <th>Contact with player ${player.toString()}</th>
             <th>Relationship with player ${player.toString()}</th>
             <th>Will Talk to player ${player.toString()}</th>
             <th>Government</th>
@@ -397,8 +398,11 @@ class Civs extends Cia3Element {
             const friendlyRow = document.createElement('tr');
             friendlyRow.innerHTML += `<td>${e.playerNumber[0]}</td>`;
             friendlyRow.innerHTML += `<td>${data.race[e.raceId[0]].civName}</td>`;
+            friendlyRow.innerHTML += `<td>${this.contactWithName(e.contactWith[player])}</td>`;
             friendlyRow.innerHTML += `<td>${this.relationshipName(data.civs[player].atWar[e.playerNumber[0]])}</td>`;
             // Unsure of willTalkTo data location, and unsure if it's an int32[32] array. Only see it for player 1 so far
+            // Seems to be turns until they talk without battle impacts, but also counts down a few turns after making peace
+            //   Maybe this prevents them from redeclaring war for a few turns, too?
             friendlyRow.innerHTML += `<td>${this.willTalkToName(e.willTalkTo[player])}</td>`;
             friendlyRow.innerHTML += `<td>${data.governmentNames[e.governmentType[0]].name}</td>`;
             friendlyRow.innerHTML += `<td>${e.mobilizationLevel[0]}</td>`;
@@ -489,6 +493,7 @@ class Civs extends Cia3Element {
             cityCount: int32s(offset:376, count: 1)
             atWar: bytes(offset:3348, count: 32)
             willTalkTo: int32s(offset:2964, count: 32)
+            contactWith: int32s(offset:3732, count: 32)
         }
         race {
             leaderName: string(offset:0, maxLength: 32)
@@ -501,6 +506,11 @@ class Civs extends Cia3Element {
         eraNames: listSection(target: "bic", section: "ERAS", nth: 1) { name: string(offset:0, maxLength: 64) }
         techNames: listSection(target: "bic", section: "TECH", nth: 1) { name: string(offset:0, maxLength: 32) }
     `;
+    contactWithName (i) {
+        if (i==0) return "No";
+        if (i==1) return "Yes";
+        return i.toString(); // don't know what else there is
+    }
     relationshipName (i) {
         if (i==0) return "Peace";
         if (i==1) return "WAR";
