@@ -1,5 +1,3 @@
-fyne.io/fyne v1.2.1 h1:0hicR1E+hZGwZUwN5LheR5SoPr/ror8fGzQR2qJcZkA=
-fyne.io/fyne v1.2.1/go.mod h1:Ab+3DIB/FVteW0y4DXfmZv4N3JdnCBh2lHkINI02BOU=
 fyne.io/fyne v1.2.2 h1:mf7EseASp3CAC5vLWVPLnsoKxvp/ARdu3Seh0HvAQak=
 fyne.io/fyne v1.2.2/go.mod h1:Ab+3DIB/FVteW0y4DXfmZv4N3JdnCBh2lHkINI02BOU=
 github.com/BurntSushi/toml v0.3.1/go.mod h1:xHWCNGjB5oqiDr8zfno3MHue2Ht5sIBksp03qcyfWMU=
