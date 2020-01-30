@@ -1,46 +1,58 @@
-## Civ3 Show-And-Tell
+# This repo's develop branch
 
-Civ3 Show-And-Tell reads `sav` and `biq` files from Civilization III Conquests and Civilization III Complete v1.22. It can:
+## Build notes
 
-- Show world seed and map settings needed to regenerate the same map
-- Decompress a `sav` or `biq` file
-- Hex dump the file data, automatically decompressing if needed
-- Return data based on GraphQL queries
+### CIA3
 
-Other features are in development such as:
+- Run "[pkger](https://github.com/markbates/pkger) -o /cmd/cia3" from within this repo before building to embed the html/* files into the executable, otherwise the exe will try to serve files from ./html/ and probably not find them.
+- To get rid of the console window on Windows, build with `go build <path/to/cmd/cia3> -ldflags="-H windowsgui"`
 
-- Generating maps viewable in a web browser
-- Reports on other game information
+## A "Map" of the repo
 
-### Use
+This repo now provides two executable programs. The executables either primarily or optionally start a GraphQL server on localhost for access to Civ3 save data.
 
-`civ3sat.exe --path <file> <command>`
+- civ3sat in civ3sat/main.go , probably soon to be moved to cmd/civ3sat
+  - Civ 3 Show-and-Tell. The original intent was to generate sharable maps from Civ3 save files. In its latest versioned release it's a command-line utility to decompress or query Civ3 save files.
+- cia3 in cmd/cia3
+    - Civ Intelligence Agency III (CIA3) is intended to be a non-spoiling, non-cheating game assistant for single-human-player games of Sid Meier's Civilization III Complete and/or Conquests. Multiplayer non-spoiling support may be possible in the future.
 
-This example runs the `seed` command against a save file. To generate the same
-map you must use all the choices in the "choose your world" screen as shown in
-the Choice column when starting a new game. The Result column shows the end
-result which is only different if the original generator chose random.
+The Go packages:
 
-Note that world size behaves differently. If a map was generated with random
-world size, and you want to recreate it, you have to choose the resulting map
-size or else the map may be different. 
+Somewhere in here there is/was some REST API server code. I don't see it in the recent branches, so I may have deleted it in favor of the GraphQL server code.
+The GraphQL code is much more versatile.
 
-    >civ3sat.exe seed "C:\Program Files (x86)\Steam\steamapps\common\Sid Meier's Civilization III Complete\Conquests\Saves\Auto\Conquests Autosave 4000 BC.SAV"
+- parseciv3 in parseciv3/* : Originally intended to read the Civ3 save file data into defined structures, but it's not all the way there. I still use it to read save and BIC/X/Q files (compressed or uncompressed).
+- civ3decompress in civ3decompress/ implements an i/o reader for compressed Civ3 files. The parseciv3 package uses it when it detects a compressed file.
+  - Decompress is implemented based on the description of PKWare Data Compression Library at https://groups.google.com/forum/#!msg/comp.compression/M5P064or93o/W1ca1-ad6kgJ
+  - However this is only a partial implementation; The Huffman-coded literals of header 0x01 are not implemented here as they are not needed for my purpose
+- civ3satgql in civ3satgql/* : This is the main workhorse of the current versions of executables. It implements a GraphQL query api server to pull data from Civ3 saves by seeking to known offsets from named or known reference points.
 
-    Setting         Choice          Result
-    World Seed      156059380
-    World Size      Huge
-    Barbarians      Random          No Barbarians
-    Land Mass       Random          Archipelago
-    Water Coverage  Random          70% Water
-    Climate         Random          Arid
-    Temperature     Random          Warm
-    Age             Random          3 Billion
+Non-Go code:
 
-### Commands
+- CIA3's UI is web-based, and its code is in cmd/cia3/html and is served at / on localhost by cia3.
+  - This may include code from jsdiff and diff2html, at least in the develop branch
+- Other HTML / JS code is in develop/html. It generated a map based on the save file, but it is not updated for the GraphQL API.
+- Python 2: This repo originally started as Python, and the abandonedpydevelop branch points to the last dev version of that code. (Not in this develop branch)
 
-- `seed` - Returns world map info as shown above.
-- `decompress` - Writes a decompressed version of the file as `out.sav` in the current working directory.
-- `hexdump` - Prints a hex dump of all game data to the console. If the file is compressed, it will automatically decompress first. 
-- `graphql <query>` - Executes a GraphQL query
-- `api` - Starts http server with GraphQL API at http://127.0.0.1/graphql
+Notes/documentation:
+
+- develop/ has a collection of notes from myself and other places about the Civ3 save file format. It is not very organized.
+
+## Future direction
+
+At the moment, work is going into cmd/cia3 and civ3satgql with the intent of making a usable game assistant for others to use.
+
+Taking a fresh look at this repo, here are some things that might be done, in no particular order:
+
+- civ3sat
+    - Move civ3sat/ to cmd/civ3sat/
+    - Update past map renderers to work with gql and have it make maps again
+    - See about setting up a public upload/map server
+    - Actually, not sure it needs to exist apart from cia3 as the work is being done by the GQL server and JavaScript
+- civ3satgql
+    - Rename civ3satgql to...something like civ3query, civ3gql, gqlciv3...to emphasize it's a query engine
+    - Move servers out and just provide http handlers and support functions
+    - Add 'native' ability to read in file, wean off of parseciv3
+- parseciv3
+    - quit using it for auto-detecting compression and reading files when not using its other functions
+    - leave it in place / in mothballs in case I want to take another crack at reading direct to structures later
