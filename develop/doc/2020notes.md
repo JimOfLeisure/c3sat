@@ -111,6 +111,14 @@ with a length in bytes. And then there is another unnamed/count-not-included int
   - 0xd98 : player 8 went from 1 to 0 when I declared war on player 8, they refuse to speak
     - player 8 went from 1 to 0 when I declared war, refuse to speak
 ### contact
+
+Bit flags?
+```
+0x1 = Contact
+0x2 = ? unit in sight? Never spoke? Got this after saving after seeing new contact between turns
+    seems to mean have contact but never actually spoke (spoke & saved game immediately, changed to just 0x1 from 3)
+0x8 = their foreign unit in civ territory, seen when my scout is in their territory. same if I have a warrier in their territory
+```
   - 0xe94 : presumed start of int32 contact array. This is 0 for barb player
   - 0xe98: player 5 went from 00 to 03 when I made contact with player 5 ("cautious" towards me? doesn't seem to line up with a bit flag for player 1)
     - player 8 also went 00 to 03 when met, and they are cautious
