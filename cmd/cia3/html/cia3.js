@@ -359,6 +359,124 @@ class Age extends Cia3Element {
 
 class Civs extends Cia3Element {
     numFields = 111;
+    player = 1;
+    render() {
+        this.innerHTML = '';
+        const friendlyTable = document.createElement('table');
+        this.appendChild(friendlyTable);
+        friendlyTable.innerHTML = `<tr>
+            <th>Player #</th>
+            <th>Civ Name</th>
+            <th>Contact with player ${this.player.toString()}</th>
+            <th>Player ${this.player.toString()} Contact With Them</th>
+            <th>Relationship with player ${this.player.toString()}</th>
+            <th>Player ${this.player.toString()} Relationship With Them</th>
+            <th>Will Talk to player ${this.player.toString()}</th>
+            <th>Government</th>
+            <th>Mobilization</th>
+            <th>Tiles Discovered</th>
+            <th>Era</th>
+            <th>Research Beakers</th>
+            <th>Current Research Tech</th>
+            <th>Current Research Turns</th>
+            <th># Future Techs</th>
+            <th># Armies</th>
+            <th># Units</th>
+            <th># Miltary Units</th>
+            <th># Cities</th>
+        </tr>`;
+        data.civs.filter(this.civsFilter).forEach((e, i) => {
+            const friendlyRow = document.createElement('tr');
+            friendlyRow.innerHTML += `<td>${e.playerNumber[0]}</td>`;
+            friendlyRow.innerHTML += `<td>${data.race[e.raceId[0]].civName}</td>`;
+            friendlyRow.innerHTML += `<td>${this.contactWithName(e.contactWith[this.player])}</td>`;
+            friendlyRow.innerHTML += `<td>${this.contactWithName(data.civs[this.player].contactWith[e.playerNumber[0]])}</td>`;
+            friendlyRow.innerHTML += `<td>${this.relationshipName(e.atWar[this.player])}</td>`;
+            friendlyRow.innerHTML += `<td>${this.relationshipName(data.civs[this.player].atWar[e.playerNumber[0]])}</td>`;
+            // Unsure of willTalkTo data location, and unsure if it's an int32[32] array. Only see it for player 1 so far
+            // Seems to be turns until they talk without battle impacts, but also counts down a few turns after making peace
+            //   Maybe this prevents them from redeclaring war for a few turns, too?
+            friendlyRow.innerHTML += `<td>${this.willTalk(e)}</td>`;
+            friendlyRow.innerHTML += `<td>${data.governmentNames[e.governmentType[0]].name}</td>`;
+            friendlyRow.innerHTML += `<td>${e.mobilizationLevel[0]}</td>`;
+            friendlyRow.innerHTML += `<td>${e.tilesDiscovered[0]}</td>`;
+            friendlyRow.innerHTML += `<td>${data.eraNames[e.era[0]].name}</td>`;
+            friendlyRow.innerHTML += `<td>${e.researchBeakers[0]}</td>`;
+            friendlyRow.innerHTML += `<td>${data.techNames[e.currentResearchId[0]].name}</td>`;
+            friendlyRow.innerHTML += `<td>${e.currentResearchTurns[0]}</td>`;
+            friendlyRow.innerHTML += `<td>${e.futureTechsCount[0]}</td>`;
+            friendlyRow.innerHTML += `<td>${e.armiesCount[0]}</td>`;
+            friendlyRow.innerHTML += `<td>${e.unitCount[0]}</td>`;
+            friendlyRow.innerHTML += `<td>${e.militaryUnitCount[0]}</td>`;
+            friendlyRow.innerHTML += `<td>${e.cityCount[0]}</td>`;
+            friendlyTable.appendChild(friendlyRow);
+            // if (this.oldCivsData != undefined) {
+            //     // put alerts code in here
+            // }
+        })
+        this.oldCivsData = data.civs
+    }
+    civsFilter (e) {
+        return e.raceId[0] > 0; // non-barb players
+    }
+    oldCivsData = undefined;
+    queryPart = `
+        civs {
+            playerNumber: int32s(offset:0, count: 1)
+            raceId: int32s(offset:4, count: 1)
+            governmentType: int32s(offset:132, count: 1)
+            mobilizationLevel: int32s(offset:136, count: 1)
+            tilesDiscovered: int32s(offset:140, count: 1)
+            era: int32s(offset:252, count: 1)
+            researchBeakers: int32s(offset:220, count: 1)
+            currentResearchId: int32s(offset:224, count: 1)
+            currentResearchTurns: int32s(offset:228, count: 1)
+            futureTechsCount: int32s(offset:232, count: 1)
+            armiesCount: int32s(offset:364, count: 1)
+            unitCount: int32s(offset:368, count: 1)
+            militaryUnitCount: int32s(offset:372, count: 1)
+            cityCount: int32s(offset:376, count: 1)
+            atWar: bytes(offset:3348, count: 32)
+            willTalkTo: int32s(offset:2964, count: 32)
+            contactWith: int32s(offset:3732, count: 32)
+        }
+        race {
+            leaderName: string(offset:0, maxLength: 32)
+            leaderTitle: string(offset:32, maxLength: 24)
+            adjective:  string(offset:88, maxLength: 40)
+            civName: string(offset:128, maxLength: 40)
+            objectNoun: string(offset:168, maxLength: 40)
+        }
+        governmentNames: listSection(target: "bic", section: "GOVT", nth: 1) { name: string(offset:24, maxLength: 64) }
+        eraNames: listSection(target: "bic", section: "ERAS", nth: 1) { name: string(offset:0, maxLength: 64) }
+        techNames: listSection(target: "bic", section: "TECH", nth: 1) { name: string(offset:0, maxLength: 32) }
+    `;
+    contactWithName (i) {
+        if (i==0) return "No";
+        if (i==1) return "Yes";
+        return "Yes (" + i.toString() + ")"; // apparently other flags exist for units in territory
+    }
+    relationshipName (i) {
+        if (i==0) return "Peace";
+        if (i==1) return "WAR";
+        return i.toString(); // don't know what else there is
+    }
+    willTalkToName (i) {
+        if (i==0) return "Yes";
+        if (i==1) return "No";
+        return "No: " + i.toString(); // don't know what else there is
+    }
+    willTalk (e) {
+        if (e.atWar[this.player]) {
+            return this.willTalkToName(e.willTalkTo[this.player]);
+        } else {
+            return this.willTalkToName(0);
+        }
+    }
+}
+
+class CivsDev extends Cia3Element {
+    numFields = 111;
     render() {
         const player = 1;
         // this.innerHTML = JSON.stringify(data.civs, null, '  ');
@@ -473,8 +591,8 @@ class Civs extends Cia3Element {
         this.oldCivsData = data.civs
     }
     civsFilter (e) {
-        return e.int32s[1] > 0; // non-barb players
-        // return e.int32s[0] == 1; // first human player only
+        return e.raceId[0] > 0; // non-barb players
+        // return e.playerNumber[0] == 1; // first human player only
     }
     oldCivsData = undefined;
     queryPart = `
@@ -546,4 +664,5 @@ window.customElements.define('cia3-climate', Climate);
 window.customElements.define('cia3-temperature', Temperature);
 window.customElements.define('cia3-age', Age);
 window.customElements.define('cia3-civs', Civs);
+window.customElements.define('cia3-civsdev', CivsDev);
 pollNow();
