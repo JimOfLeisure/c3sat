@@ -7,8 +7,10 @@ import (
 
 	"github.com/fsnotify/fsnotify"
 	"github.com/jcuga/golongpoll"
-	"github.com/zserge/lorca"
 )
+
+// build with `-ldflags "-X main.appVersion=myVersionName"` to set version at compile time
+var appVersion = "0.4.1-devbuild"
 
 var savWatcher *fsnotify.Watcher
 var debounceTimer *time.Timer
@@ -98,14 +100,6 @@ func main() {
 		}
 	}()
 
-	ui, err := lorca.New("", "", 1280, 720)
-	if err == nil {
-		defer ui.Close()
-		ui.Load(httpUrlString)
-		<-ui.Done()
-	} else {
-		errorChannel <- err
-		// fallback to fyne GUI with hyperlink
-		fyneUi()
-	}
+	// fyne GUI with hyperlink
+	fyneUi()
 }

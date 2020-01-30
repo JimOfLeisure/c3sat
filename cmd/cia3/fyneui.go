@@ -16,6 +16,7 @@ func fyneUi() {
 	w := app.NewWindow("Civ Intelligence Agency III")
 	w.SetContent(widget.NewVBox(
 		widget.NewLabel("Civ Intelligence Agency III"),
+		widget.NewLabel("v"+appVersion),
 		widget.NewLabel("Browse to the following link"),
 		widget.NewHyperlink(httpUrlString, u),
 		widget.NewButton("Quit", func() {
