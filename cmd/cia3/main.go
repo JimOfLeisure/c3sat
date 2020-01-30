@@ -1,8 +1,6 @@
 package main
 
 import (
-	// "fmt"
-
 	"net"
 	"strconv"
 	"time"
@@ -90,6 +88,15 @@ func main() {
 
 	// Api server
 	go server()
+
+	go func() {
+		for {
+			select {
+			case err := <-errorChannel:
+				longPoll.Publish("exeError", err.Error())
+			}
+		}
+	}()
 
 	ui, err := lorca.New("", "", 1280, 720)
 	if err == nil {

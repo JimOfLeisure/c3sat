@@ -1,0 +1,52 @@
+<!doctype html>
+<html>
+    <head>
+        <title>CIA3 Errors</title>
+        <meta name="robots" content="noindex, nofollow, noarchive">
+        <meta name="viewport" content="width=device-width, initial-scale=1, minimal-ui">
+<script type="module">
+    const errorDiv = document.getElementById('serverErrors');
+    const pageErrors = document.getElementById('pageErrors')
+    let pollXhr = new XMLHttpRequest();
+    let pollSince = Date.now() - 86400000;
+    const longPollTimeout = 30;
+
+    let pollNow = () => {
+        pollXhr.open('GET', `/events?timeout=${longPollTimeout}&category=exeError&since_time=${pollSince}`);
+        pollXhr.send();
+    }
+
+    pollXhr.onload = () => {
+        if (pollXhr.status >= 200 & pollXhr.status < 300) {
+            let pollData = JSON.parse(pollXhr.responseText);
+            if (typeof pollData.events != 'undefined') {
+                pollSince = pollData.events[0].timestamp;
+                pollData.events.forEach((e) => {
+                    errorDiv.innerText += e.data + '\n';
+                });
+            }
+            if (pollData.timeout != undefined) {
+                pollSince = pollData.timestamp;
+            }
+            pollNow();
+        } else {
+            console.log("failed xhr request:", pollXhr);
+            pageErrors.innerText += `Received non-2xx response on polling query. Live updates have stopped.`;
+        }
+    }
+
+    pollXhr.onerror = e => {
+        console.error("Long poll returned error");
+        console.log(e);
+        pageErrors.innerText += `Polling error. Live updates have stopped. Correct and refresh page.`;
+    }
+    pollNow();
+</script>
+    </head>
+    <body>
+        <a href="/">Main menu</a>
+        <div id="pageErrors" style="white-space: pre; color: red;"><noscript>This page requires JavaScript to run. </noscript></div>
+        <h2>Errors from cia3.exe</h2>
+        <div id="serverErrors" style="white-space: pre;"></div>
+    </body>
+</html>
