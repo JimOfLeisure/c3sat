@@ -379,7 +379,9 @@ class Civs extends Cia3Element {
             <th>Player #</th>
             <th>Civ Name</th>
             <th>Contact with player ${player.toString()}</th>
+            <th>Player ${player.toString()} Contact With Them</th>
             <th>Relationship with player ${player.toString()}</th>
+            <th>Player ${player.toString()} Relationship With Them</th>
             <th>Will Talk to player ${player.toString()}</th>
             <th>Government</th>
             <th>Mobilization</th>
@@ -399,7 +401,9 @@ class Civs extends Cia3Element {
             friendlyRow.innerHTML += `<td>${e.playerNumber[0]}</td>`;
             friendlyRow.innerHTML += `<td>${data.race[e.raceId[0]].civName}</td>`;
             friendlyRow.innerHTML += `<td>${this.contactWithName(e.contactWith[player])}</td>`;
-            friendlyRow.innerHTML += `<td>${this.relationshipName(data.civs[player].atWar[e.playerNumber[0]])}</td>`;
+            friendlyRow.innerHTML += `<td>${this.contactWithName(data.civs[player].contactWith[e.playerNumber[0]])}</td>`;
+            friendlyRow.innerHTML += `<td>${this.relationshipName(e.atWar[e.playerNumber[0]])}</td>`;
+            friendlyRow.innerHTML += `<td>${this.relationshipName(data.civs[player].atWar[player])}</td>`;
             // Unsure of willTalkTo data location, and unsure if it's an int32[32] array. Only see it for player 1 so far
             // Seems to be turns until they talk without battle impacts, but also counts down a few turns after making peace
             //   Maybe this prevents them from redeclaring war for a few turns, too?
