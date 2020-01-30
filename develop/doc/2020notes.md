@@ -49,6 +49,7 @@ with a length in bytes. And then there is another unnamed/count-not-included int
   - 0x1c: int32 0 in early game
   - 0x20: int32 -1 in early game (Golden age end?)
   - 0x24: int32 4 in early game (status?)
+    - Noticed it changed to 12 for me. saw it a turn or two after making peace. Wonder if this is bit mask and 0x8 is declared war on someone?
     - ~~the next few bytes make me think there's a byte or char here somewhere; need to look w/hex dump~~ Still looks int32-aligned, perhaps these are encoded gold or some other encoded value (gold count is protected from easy hex editing)
   - 0x28: int32 encoded gold? but only lsb seems to change - maybe byte array? "lsb" seems to increment slowly
   - 0x2c: int32 encoded gold? but only lsb seems to change - maybe byte array? "lsb" seems to increment slowly
@@ -69,33 +70,55 @@ with a length in bytes. And then there is another unnamed/count-not-included int
   - 0x188 : int32 - tax luxury slider (0..10)
   - 0x18c : int32 - tax science slider (0..10)
   - 0x190 : int32 - tax cash (inferred) slider (0..10)
+
+### some sort of diplomatic stuff, perhaps?
+
   - 0x1e0 : player 8 went from 0 to 1 when I declared war on player 8
+    - same for player 7 when I dow'ed player 7
+  - 0x200 : player 5 went from 0 to 2 when they declared war on me
+  - 0x320 : 00 to 01 when player 6 dow'ed after demand refulal
+  - 0x328 : 00 to 01 when player 6 dow'ed after demand refulal
+  - 0x338 : player 7 00 to 01 when I dow'ed
   - 0x41c : went from 00 to 01, not sure why
+    - player 5 went 0 to 1 when dow'ing me
   - 0xb18 : player 8 decremented 0x17 to 0x16 during war w/me, unsure if related
     - decremented to 0x15 to 0x14, now will talk, unsure if related
     - not related to war or peace w/me
+    - noticed player 7 decrementing after dow...maybe turns left on research? wild guess
+    - player 5 went 0 to 20 after dow'ing me
   - 0xb98 : int32? - (array, 0 if player willing to talk?) player 8 went from 5 ~~(furious?)~~ to 4 ~~(annoyed?)~~ during war but won't speak
     - went to 3 next turn but still no speak, and annoyed
     - went to 2 next turn but still no speak, and annoyed
     - when went to 0, will speak!
     - player 8 00 to 07 when made peace after war, they're annoyed. Peace treaty related?
+    - player 7 00 to 07 when I declared war. not peace/war-related?
+    - player 5 00 to 08 when they declared war
+  - 0xc20 : int32 - player 7 went from 03 to 06 when I declared war
+  - 0xc28 : int32 - player 7 went from 03 to 01 when I declared war
   - 0xc98 : int32 - player 8 went from 0 to 0xffffffe2 (-30) when I declared war on player 8, they refuse to speak
 ### war
   - 0xd14 : Guessing this is always 01 for war vs barbs, presuming this is start of byte array for war.
   - 0xd15 : player 8 went from 0 to 1 when I declared war on player 8, they refuse to speak
     - player 8 went 1 to 0 when made peace
+    - player 7 went from 0 to 1 when I declared war
+    - player 5 went from 0 to 1 when they declared war
+  - 0xd18 : went from 0 to 1 when I declared war on player 7
+  - 0xd19 : went from 0 to 1 when player 5 declared war on me
   - 0xd1c : went from 0 to 1 when I declared war on player 8
     - and back to 0 when made peace with player 8
   - 0xd98 : player 8 went from 1 to 0 when I declared war on player 8, they refuse to speak
+    - player 8 went from 1 to 0 when I declared war, refuse to speak
 ### contact
   - 0xe94 : presumed start of int32 contact array. This is 0 for barb player
   - 0xe98: player 5 went from 00 to 03 when I made contact with player 5 ("cautious" towards me? doesn't seem to line up with a bit flag for player 1)
     - player 8 also went 00 to 03 when met, and they are cautious
     - player 3 also went 00 to 03 when met, and they are cautious ("cautious" is not in the BIQ)
     - player 2 00 to 01 when met, and they are annoyed
+    - player 7 00 to 03 when met, and they are polite
   - 0xe9c: went from 00 to 01 when I made contact with player 2
   - 0xea0: went from 00 to 01 when I made contact with player 3
   - 0xea8: went from 00 to 01 when I made contact with player 5
+  - 0xeb0: went from 00 to 01 when I made contact with player 7
   - 0xeb4: went from 00 to 01 when I made contact with player 8
 
 ### ?

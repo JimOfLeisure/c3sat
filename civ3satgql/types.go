@@ -42,6 +42,34 @@ type saveAndOffsetType struct {
 var gameLeadSectionType = graphql.NewObject(graphql.ObjectConfig{
 	Name: "gameLeadSection",
 	Fields: graphql.Fields{
+		"bytes": &graphql.Field{
+			Type:        graphql.NewList(graphql.Int),
+			Description: "Byte array",
+			Args: graphql.FieldConfigArgument{
+				"offset": &graphql.ArgumentConfig{
+					Type:        graphql.NewNonNull(graphql.Int),
+					Description: "Offset from start of item",
+				},
+				"count": &graphql.ArgumentConfig{
+					Type:        graphql.NewNonNull(graphql.Int),
+					Description: "Number of int32s to return",
+				},
+			},
+			Resolve: func(p graphql.ResolveParams) (interface{}, error) {
+				if itemOffset, ok := p.Source.(int); ok {
+					if itemOffset > 0 {
+						offset, _ := p.Args["offset"].(int)
+						count, _ := p.Args["count"].(int)
+						intList := make([]int, count)
+						for i := 0; i < count; i++ {
+							intList[i] = ReadInt8((itemOffset+4+offset)+i, Unsigned)
+						}
+						return intList, nil
+					}
+				}
+				return nil, nil
+			},
+		},
 		"int32s": &graphql.Field{
 			Type:        graphql.NewList(graphql.Int),
 			Description: "Int32 array",
@@ -92,6 +120,34 @@ var raceSectionItemType = listSectionItem
 var listSectionItem = graphql.NewObject(graphql.ObjectConfig{
 	Name: "listSectionItem",
 	Fields: graphql.Fields{
+		"bytes": &graphql.Field{
+			Type:        graphql.NewList(graphql.Int),
+			Description: "Byte array",
+			Args: graphql.FieldConfigArgument{
+				"offset": &graphql.ArgumentConfig{
+					Type:        graphql.NewNonNull(graphql.Int),
+					Description: "Offset from start of item",
+				},
+				"count": &graphql.ArgumentConfig{
+					Type:        graphql.NewNonNull(graphql.Int),
+					Description: "Number of int32s to return",
+				},
+			},
+			Resolve: func(p graphql.ResolveParams) (interface{}, error) {
+				if item, ok := p.Source.(saveAndOffsetType); ok {
+					if item.offset > 0 {
+						offset, _ := p.Args["offset"].(int)
+						count, _ := p.Args["count"].(int)
+						intList := make([]int, count)
+						for i := 0; i < count; i++ {
+							intList[i] = item.save.readInt8((item.offset+4+offset)+4*i, Unsigned)
+						}
+						return intList, nil
+					}
+				}
+				return nil, nil
+			},
+		},
 		"int32s": &graphql.Field{
 			Type:        graphql.NewList(graphql.Int),
 			Description: "Int32 array",

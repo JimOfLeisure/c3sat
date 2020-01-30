@@ -21,6 +21,15 @@ xhr.onload = () => {
         data = JSON.parse(xhr.responseText).data;
         const refreshData = new CustomEvent("refresh");
         dispatchEvent(refreshData);
+        /* tried to see if can make alert come to front. Not with Chrome or FF, apparently
+            maybe check out web notifications instead
+                https://www.w3.org/TR/notifications/
+                https://developer.mozilla.org/en-US/docs/Web/API/Notifications_API/Using_the_Notifications_API
+                https://developers.google.com/web/fundamentals/push-notifications
+                https://www.google.com/search?q=web+push+notifications
+            also, would not notify on every refresh; this would only be for alerts
+        */
+        // window.focus();
 	} else {
         console.log(xhr);
         let cia3Error = new CustomEvent("cia3Error", { 'detail' : `Received non-2xx response on data query. Live updates will continue, but the latest save file is not shown here.`});
@@ -351,6 +360,7 @@ class Age extends Cia3Element {
 class Civs extends Cia3Element {
     numFields = 111;
     render() {
+        const player = 1;
         // this.innerHTML = JSON.stringify(data.civs, null, '  ');
         this.innerHTML = '';
         const table = document.createElement('table');
@@ -368,6 +378,8 @@ class Civs extends Cia3Element {
         friendlyTable.innerHTML = `<tr>
             <th>Player #</th>
             <th>Civ Name</th>
+            <th>Relationship with player ${player.toString()}</th>
+            <th>Will Talk to player ${player.toString()}</th>
             <th>Government</th>
             <th>Mobilization</th>
             <th>Tiles Discovered</th>
@@ -385,6 +397,9 @@ class Civs extends Cia3Element {
             const friendlyRow = document.createElement('tr');
             friendlyRow.innerHTML += `<td>${e.playerNumber[0]}</td>`;
             friendlyRow.innerHTML += `<td>${data.race[e.raceId[0]].civName}</td>`;
+            friendlyRow.innerHTML += `<td>${this.relationshipName(data.civs[player].atWar[e.playerNumber[0]])}</td>`;
+            // Unsure of willTalkTo data location, and unsure if it's an int32[32] array. Only see it for player 1 so far
+            friendlyRow.innerHTML += `<td>${this.willTalkToName(e.willTalkTo[player])}</td>`;
             friendlyRow.innerHTML += `<td>${data.governmentNames[e.governmentType[0]].name}</td>`;
             friendlyRow.innerHTML += `<td>${e.mobilizationLevel[0]}</td>`;
             friendlyRow.innerHTML += `<td>${e.tilesDiscovered[0]}</td>`;
@@ -397,7 +412,6 @@ class Civs extends Cia3Element {
             friendlyRow.innerHTML += `<td>${e.unitCount[0]}</td>`;
             friendlyRow.innerHTML += `<td>${e.militaryUnitCount[0]}</td>`;
             friendlyRow.innerHTML += `<td>${e.cityCount[0]}</td>`;
-            // friendlyRow.innerHTML += `<td>${}</td>`;
             // friendlyRow.innerHTML += `<td>${}</td>`;
             // friendlyRow.innerHTML += `<td>${}</td>`;
             // friendlyRow.innerHTML += `<td>${}</td>`;
@@ -473,6 +487,8 @@ class Civs extends Cia3Element {
             unitCount: int32s(offset:368, count: 1)
             militaryUnitCount: int32s(offset:372, count: 1)
             cityCount: int32s(offset:376, count: 1)
+            atWar: bytes(offset:3348, count: 32)
+            willTalkTo: int32s(offset:2964, count: 32)
         }
         race {
             leaderName: string(offset:0, maxLength: 32)
@@ -485,6 +501,16 @@ class Civs extends Cia3Element {
         eraNames: listSection(target: "bic", section: "ERAS", nth: 1) { name: string(offset:0, maxLength: 64) }
         techNames: listSection(target: "bic", section: "TECH", nth: 1) { name: string(offset:0, maxLength: 32) }
     `;
+    relationshipName (i) {
+        if (i==0) return "Peace";
+        if (i==1) return "WAR";
+        return i.toString(); // don't know what else there is
+    }
+    willTalkToName (i) {
+        if (i==0) return "Yes";
+        if (i==1) return "No";
+        return "No: " + i.toString(); // don't know what else there is
+    }
 }
 
 window.customElements.define('cia3-error', Error);
