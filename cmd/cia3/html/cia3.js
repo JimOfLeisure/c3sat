@@ -459,12 +459,12 @@ class Civs extends Cia3Element {
     relationshipName (i) {
         if (i==0) return "Peace";
         if (i==1) return "WAR";
-        return i.toString(); // don't know what else there is
+        return "war? (" + i.toString() + ")"; // don't know what else there is
     }
     willTalkToName (i) {
         if (i==0) return "Yes";
         if (i==1) return "No";
-        return "No: " + i.toString(); // don't know what else there is
+        return "No (" + i.toString() + ")"; // don't know what else there is
     }
     willTalk (e) {
         if (e.atWar[this.player]) {
