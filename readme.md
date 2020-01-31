@@ -56,3 +56,23 @@ Taking a fresh look at this repo, here are some things that might be done, in no
 - parseciv3
     - ~~quit using it for auto-detecting compression and reading files when not using its other functions~~ done
     - leave it in place / in mothballs in case I want to take another crack at reading direct to structures later
+
+## Wish list
+
+Stuff I'd like to find and add.
+
+- Civ attitude (polite/cautious/annoyed/etc.)
+- Culture opinion both directions ("The Indian people are impressed with our culture")
+- Best known enemy unit
+- Trades
+  - Techs (next priority)
+  - Gold
+  - Resources
+  - Workers
+  - Contacts (hide column until tech is known?)
+  - Maps (hide column until tech is known?)
+- Alerts
+  - Civ at war will talk
+  - New contact
+  - New tech trades available
+  - Unhappiness
