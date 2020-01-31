@@ -372,13 +372,6 @@ class Civs extends Cia3Element {
             <th>Will Talk</th>
             <th>Government</th>
             <th>Era</th>
-            <th>Research Beakers</th>
-            <th>Current Research Tech</th>
-            <th>Current Research Turns</th>
-            <th># Future Techs</th>
-            <th># Armies</th>
-            <th># Units</th>
-            <th># Miltary Units</th>
             <th># Cities</th>
         </tr>`;
         data.civs.filter(this.civsFilter, this).forEach((e, i) => {
@@ -393,20 +386,6 @@ class Civs extends Cia3Element {
             friendlyRow.innerHTML += `<td>${this.willTalk(e)}</td>`;
             friendlyRow.innerHTML += `<td>${data.governmentNames[e.governmentType[0]].name}</td>`;
             friendlyRow.innerHTML += `<td>${data.eraNames[e.era[0]].name}</td>`;
-            friendlyRow.innerHTML += `<td>${e.researchBeakers[0]}</td>`;
-            let currentResearchId = e.currentResearchId[0];
-            let currentResearchName;
-            if (currentResearchId < 0 ) {
-                currentResearchName = "-"
-            } else {
-                currentResearchName = data.techNames[currentResearchId].name
-            }
-            friendlyRow.innerHTML += `<td>${currentResearchName}</td>`;
-            friendlyRow.innerHTML += `<td>${e.currentResearchTurns[0]}</td>`;
-            friendlyRow.innerHTML += `<td>${e.futureTechsCount[0]}</td>`;
-            friendlyRow.innerHTML += `<td>${e.armiesCount[0]}</td>`;
-            friendlyRow.innerHTML += `<td>${e.unitCount[0]}</td>`;
-            friendlyRow.innerHTML += `<td>${e.militaryUnitCount[0]}</td>`;
             friendlyRow.innerHTML += `<td>${e.cityCount[0]}</td>`;
             friendlyTable.appendChild(friendlyRow);
             // if (this.oldCivsData != undefined) {
@@ -425,13 +404,6 @@ class Civs extends Cia3Element {
             raceId: int32s(offset:4, count: 1)
             governmentType: int32s(offset:132, count: 1)
             era: int32s(offset:252, count: 1)
-            researchBeakers: int32s(offset:220, count: 1)
-            currentResearchId: int32s(offset:224, count: 1)
-            currentResearchTurns: int32s(offset:228, count: 1)
-            futureTechsCount: int32s(offset:232, count: 1)
-            armiesCount: int32s(offset:364, count: 1)
-            unitCount: int32s(offset:368, count: 1)
-            militaryUnitCount: int32s(offset:372, count: 1)
             cityCount: int32s(offset:376, count: 1)
             atWar: bytes(offset:3348, count: 32)
             willTalkTo: int32s(offset:2964, count: 32)
@@ -446,7 +418,6 @@ class Civs extends Cia3Element {
         }
         governmentNames: listSection(target: "bic", section: "GOVT", nth: 1) { name: string(offset:24, maxLength: 64) }
         eraNames: listSection(target: "bic", section: "ERAS", nth: 1) { name: string(offset:0, maxLength: 64) }
-        techNames: listSection(target: "bic", section: "TECH", nth: 1) { name: string(offset:0, maxLength: 32) }
     `;
     contactWithName (i) {
         if (i==0) return "No";
