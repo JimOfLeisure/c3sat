@@ -11,7 +11,7 @@
 
 This repo now provides two executable programs. The executables either primarily or optionally start a GraphQL server on localhost for access to Civ3 save data.
 
-- civ3sat in civ3sat/main.go , probably soon to be moved to cmd/civ3sat
+- civ3sat in cmd/civ3sat
   - Civ 3 Show-and-Tell. The original intent was to generate sharable maps from Civ3 save files. In its latest versioned release it's a command-line utility to decompress or query Civ3 save files.
 - cia3 in cmd/cia3
     - Civ Intelligence Agency III (CIA3) is intended to be a non-spoiling, non-cheating game assistant for single-human-player games of Sid Meier's Civilization III Complete and/or Conquests. Multiplayer non-spoiling support may be possible in the future.

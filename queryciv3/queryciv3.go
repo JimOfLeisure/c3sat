@@ -9,7 +9,6 @@ import (
 	"github.com/graphql-go/graphql"
 	"github.com/graphql-go/handler"
 	"github.com/myjimnelson/c3sat/civ3decompress"
-	// "github.com/myjimnelson/c3sat/parseciv3"
 )
 
 type sectionType struct {
@@ -37,15 +36,27 @@ func (sav *saveGameType) loadSave(path string) error {
 	}
 	sav.path = path
 	sav.populateSections()
-	// complete hack, DELETEME
-	currentBic = defaultBic
-	gameOff, err := saveGame.sectionOffset("GAME", 2)
-	if err != nil {
-		return nil
+	// If this is a save game, populate BIQ and save vars
+	// This is still hackish
+	if string(sav.data[0:4]) == "CIV3" {
+		gameOff, err := sav.sectionOffset("GAME", 2)
+		if err != nil {
+			return nil
+		}
+		currentGame.data = sav.data[gameOff-4:]
+		currentGame.populateSections()
+		bicOff, err := sav.sectionOffset("VER#", 1)
+		if err != nil {
+			return nil
+		}
+		if sav.readInt32(bicOff+8, Unsigned) == 0xcdcdcdcd {
+			currentBic = defaultBic
+		} else {
+			currentBic.data = sav.data[bicOff-8 : gameOff]
+			currentBic.populateSections()
+		}
+		currentGame.data = saveGame.data[gameOff-4:]
 	}
-	currentGame.data = saveGame.data[gameOff-4:]
-	currentGame.populateSections()
-	// end complete hack
 	return nil
 }
 
