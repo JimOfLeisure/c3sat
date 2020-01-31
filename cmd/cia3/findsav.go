@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"io/ioutil"
 	"os"
+	"strings"
 
 	"github.com/myjimnelson/c3sat/queryciv3"
 
@@ -57,7 +58,7 @@ func getLastSav(path string) (string, error) {
 	}
 	for i := pathStart; i < (len(ini)); i++ {
 		if ini[i] == '\r' || ini[i] == '\n' {
-			pathEnd = i - 1
+			pathEnd = i
 			break
 		}
 	}
@@ -66,5 +67,6 @@ func getLastSav(path string) (string, error) {
 	}
 	//  Assuming conquests.ini file is not UTF-8
 	s, err := queryciv3.CivString(ini[pathStart:pathEnd])
-	return s + ".SAV", err
+	// My .ini has a space after the filename, so trimming leading/trailing whitespace
+	return strings.TrimSpace(s) + ".SAV", err
 }
