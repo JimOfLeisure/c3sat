@@ -66,12 +66,12 @@ Stuff I'd like to find and add.
     - Culture opinion both directions ("The Indian people are impressed with our culture")
     - Best known enemy unit
     - Trades
-    - Techs (next priority)
-    - Gold
-    - Resources
-    - Workers
-    - Contacts (hide column until tech is known?)
-    - Maps (hide column until tech is known?)
+        - Techs (next priority)
+        - Gold
+        - Resources
+        - Workers
+        - Contacts (hide column until tech is known?)
+        - Maps (hide column until tech is known?)
     - Embassy / spy
 - Alerts
     - Civ at war will talk
