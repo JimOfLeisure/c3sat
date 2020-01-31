@@ -62,17 +62,18 @@ Taking a fresh look at this repo, here are some things that might be done, in no
 Stuff I'd like to find and add.
 
 - Civ list
-    - Civ attitude (polite/cautious/annoyed/etc.)
-    - Culture opinion both directions ("The Indian people are impressed with our culture")
-    - Best known enemy unit
+    - Civ attitude (polite/cautious/annoyed/etc.) (maybe not low-hanging fruit; this wasn't obvious from LEAD section, may be a formula based on attitude/diplomacy table)
+    - Culture opinion both directions ("The Indian people are impressed with our culture") (**low-hanging fruit?**)
+    - Best known enemy unit  (does not seem to be low-hanging fruit, did not appear to be in LEAD section)
     - Trades
-        - Techs (next priority)
+        - Techs (**next priority**)
         - Gold
         - Resources
         - Workers
         - Contacts (hide column until tech is known?)
         - Maps (hide column until tech is known?)
     - Embassy / spy
+    - Reputation broken (for per-turn trades)
 - Alerts
     - Civ at war will talk
     - New contact
@@ -100,3 +101,18 @@ Stuff I'd like to find and add.
     - Especially tiles towards domination
     - Detect enabled victory conditions
     - Culture progress and projections
+
+## Random references
+
+<https://forums.civfanatics.com/threads/the-civilization-iii-save-format.48270/> - early save file format focusing on city and lead; could be quite relevant to me at this moment.
+
+<https://apolyton.net/forum/civilization-series/civilization-iii/122361-civilization-iii-bix-biq-file-format> - Apolyton format info for BIQ, could be useful for tech & resource prerequisites
+
+```
+{
+    unitNames: listSection(target: "bic", section: "PRTO", nth: 1) {
+    name: string(offset:4, maxLength: 32)
+  }
+}
+```
+

@@ -449,18 +449,26 @@ class CivsDev extends Cia3Element {
         this.innerHTML = '';
         const table = document.createElement('table');
         const friendlyTable = document.createElement('table');
+        const diplomaticTable = document.createElement('table');
         const hexDumps = document.createElement('div');
         hexDumps.classList += "dump";
         this.appendChild(friendlyTable);
         this.appendChild(table);
+        this.appendChild(diplomaticTable);
         // table.innerHTML = '<tr><th>Player #</th><th>RACE ID</th>' + '<th>?</th>'.repeat(this.numFields - 2) + '</tr>';
         let headers = "";
         for (let i = 2; i < this.numFields; i++) {
             headers += `<th>${i} 0x${(i*4).toString(16)} ${i*4}</th>`
         }
-        table.innerHTML = '<tr><th>Player #</th><th>RACE ID</th>' +  headers + '</tr>';
+        table.innerHTML = `<tr><th>First ${this.numFields} int32s / Player</th><th>RACE ID</th>` +  headers + '</tr>';
+        const attitudeFieldCount = 23;
+        headers = "";
+        for (let i = 0; i < attitudeFieldCount; i++) {
+            headers += `<th>${i} 0x${(i*4).toString(16)} ${i*4}</th>`
+        }
+        diplomaticTable.innerHTML = '<tr><th>attitude/diplomacy? Player - Opponent</th>' +  headers + '</tr>';
         friendlyTable.innerHTML = `<tr>
-            <th>Player #</th>
+            <th>Friendly Table / Player #</th>
             <th>Civ Name</th>
             <th>Contact with player ${player.toString()}</th>
             <th>Player ${player.toString()} Contact With Them</th>
@@ -531,6 +539,19 @@ class CivsDev extends Cia3Element {
                 row.appendChild(td);
             });
             table.appendChild(row);
+
+            for (let i = 1; i < 9; i++) {
+                const intOffset = 23 * i;
+                const diploRow = document.createElement('tr');
+                diploRow.style = "color: lightgray;";
+                diploRow.innerHTML += `<td>${e.playerNumber[0].toString()} - ${i}</td>`;
+                for (let i = 0; i < 23; i++) {
+                    let myValue = e.attitudes[intOffset + i]
+                    diploRow.innerHTML += `<td${myValue !=0 ? ' style="color: black; font-weight: bold;"': ''}>${myValue.toString()}</td>`;
+                }
+                diplomaticTable.appendChild(diploRow);
+            }
+
             if (this.oldCivsData != undefined) {
                 const hexDiff = document.createElement('div');
                 // let foo = Diff.diffWordsWithSpace(this.oldCivsData[e.int32s[0]].hexDump, data.civs[e.int32s[0]].hexDump);
@@ -586,6 +607,7 @@ class CivsDev extends Cia3Element {
             unitCount: int32s(offset:368, count: 1)
             militaryUnitCount: int32s(offset:372, count: 1)
             cityCount: int32s(offset:376, count: 1)
+            attitudes: int32s(offset:404, count: 736)
             atWar: bytes(offset:3348, count: 32)
             willTalkTo: int32s(offset:2964, count: 32)
             contactWith: int32s(offset:3732, count: 32)

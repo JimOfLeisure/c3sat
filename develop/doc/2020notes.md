@@ -71,15 +71,36 @@ with a length in bytes. And then there is another unnamed/count-not-included int
   - 0x18c : int32 - tax science slider (0..10)
   - 0x190 : int32 - tax cash (inferred) slider (0..10)
 
-### some sort of diplomatic stuff, perhaps?
+### attitude and/or reputation between civs?
 
+But seems to be related reflexively to a different array.
+
+Or maybe this isn't an [32]int32 array. There is a [3 or 4]int32 struct in a 32 array in Antal1987's dumps, but it wouldn't seem to be this early
+
+Other possibility / conjecture: 0x194 (last known value) - 0xd14 (start of atWar array) is [32][23]int32, 23 ints for each civ. 32*23 is 736, and Antal1987's dumps show [736]in32 immediately after tax slider values and before atWar array. Yes, this appears to be right.
+
+  - 0x194 - Start of 32 arrays of int32[23], one for each civ. The following offsets/indexes are relative to the opponent player offset
+    - 2 - 0x08 - Goes up when making demands (refused?) of opponent, seemingly reflective of 0x0c for opponent
+    - 3 - 0x0c - Goes up when opponent makes demands (refused?) of player, seemingly reflective of 0x08 for opponent
+
+### The following through 0xd1f is covered by immediately above
+
+  - 0x1c0 : presumed start of [32]int32 for attitude and/or reputation between civs
   - 0x1e0 : player 8 went from 0 to 1 when I declared war on player 8
     - same for player 7 when I dow'ed player 7
+  - 0x1f8 : player 7 value changed for me (player 1) aggravating them; see 0x368
+  
+### some sort of diplomatic stuff, perhaps?
+  
   - 0x200 : player 5 went from 0 to 2 when they declared war on me
     - player 2 went from 0 to 1 after making a demand and backing down when I refused
   - 0x320 : 00 to 01 when player 6 dow'ed after demand refusal
   - 0x328 : 00 to 01 when player 6 dow'ed after demand refusal
   - 0x338 : player 7 00 to 01 when I dow'ed
+  - 0x368 : player 7 00 to 01 when I demanded stuff intraturn to make them go from polite to cautious
+    - 01 to 02 when cautious to annoyed
+    - 02 to 07 when annoyed to furious (took several demands; 0x1f8 seems to be the other civ's data point for this action, same values)
+    - bit mask?
   - 0x41c : went from 00 to 01, not sure why
     - player 5 went 0 to 1 when dow'ing me
   - 0xb18 : player 8 decremented 0x17 to 0x16 during war w/me, unsure if related
