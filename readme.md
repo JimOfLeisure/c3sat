@@ -21,11 +21,11 @@ The Go packages:
 Somewhere in here there is/was some REST API server code. I don't see it in the recent branches, so I may have deleted it in favor of the GraphQL server code.
 The GraphQL code is much more versatile.
 
-- parseciv3 in parseciv3/* : Originally intended to read the Civ3 save file data into defined structures, but it's not all the way there. I still use it to read save and BIC/X/Q files (compressed or uncompressed).
-- civ3decompress in civ3decompress/ implements an i/o reader for compressed Civ3 files. The parseciv3 package uses it when it detects a compressed file.
+- parseciv3 in parseciv3/* : Originally intended to read the Civ3 save file data into defined structures, but it's not all the way there.
+- civ3decompress in civ3decompress/ implements an i/o reader for compressed Civ3 files. Its ReadFile will auto-detect whether or not a Civ3 file is compressed.
   - Decompress is implemented based on the description of PKWare Data Compression Library at https://groups.google.com/forum/#!msg/comp.compression/M5P064or93o/W1ca1-ad6kgJ
   - However this is only a partial implementation; The Huffman-coded literals of header 0x01 are not implemented here as they are not needed for my purpose
-- civ3satgql in civ3satgql/* : This is the main workhorse of the current versions of executables. It implements a GraphQL query api server to pull data from Civ3 saves by seeking to known offsets from named or known reference points.
+- queryciv3 in queryciv3/* : This is the main workhorse of the current versions of executables. It implements a GraphQL query api server to pull data from Civ3 saves by seeking to known offsets from named or known reference points.
 
 Non-Go code:
 
@@ -40,17 +40,17 @@ Notes/documentation:
 
 ## Future direction
 
-At the moment, work is going into cmd/cia3 and civ3satgql with the intent of making a usable game assistant for others to use.
+At the moment, work is going into cmd/cia3 and queryciv3 with the intent of making a usable game assistant for others to use.
 
 Taking a fresh look at this repo, here are some things that might be done, in no particular order:
 
 - civ3sat
-    - Move civ3sat/ to cmd/civ3sat/
+    - ~~Move civ3sat/ to cmd/civ3sat/~~ done
     - Update past map renderers to work with gql and have it make maps again
     - See about setting up a public upload/map server
     - Actually, not sure it needs to exist apart from cia3 as the work is being done by the GQL server and JavaScript
-- civ3satgql
-    - Rename civ3satgql to...something like civ3query, civ3gql, gqlciv3...to emphasize it's a query engine
+- ~~civ3satgql~~ queryciv3
+    - ~~Rename civ3satgql to...something like civ3query, civ3gql, gqlciv3...to emphasize it's a query engine~~ done
     - Move servers out and just provide http handlers and support functions
     - ~~Add 'native' ability to read in file, wean off of parseciv3~~ just moved ReadFile() to civ3decompress which is a needed package, anyway
 - parseciv3
