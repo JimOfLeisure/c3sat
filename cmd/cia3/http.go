@@ -5,7 +5,7 @@ import (
 	"net/http"
 
 	"github.com/markbates/pkger"
-	"github.com/myjimnelson/c3sat/civ3satgql"
+	"github.com/myjimnelson/c3sat/queryciv3"
 )
 
 const addr = "127.0.0.1"
@@ -36,7 +36,7 @@ func setHeaders(handler http.Handler) http.Handler {
 }
 
 func server() {
-	gQlHandler, err := civ3satgql.GraphQlHandler()
+	gQlHandler, err := queryciv3.GraphQlHandler()
 	if err != nil {
 		log.Fatal(err)
 	}

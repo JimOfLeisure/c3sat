@@ -1,4 +1,4 @@
-package civ3satgql
+package queryciv3
 
 import (
 	"encoding/json"

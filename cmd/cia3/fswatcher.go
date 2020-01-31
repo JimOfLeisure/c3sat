@@ -6,7 +6,7 @@ import (
 	"strings"
 
 	"github.com/fsnotify/fsnotify"
-	"github.com/myjimnelson/c3sat/civ3satgql"
+	"github.com/myjimnelson/c3sat/queryciv3"
 )
 
 type watchListType struct {
@@ -47,7 +47,7 @@ func loadDefaultBiq(s string) error {
 		return err
 	}
 	if fi.Mode().IsRegular() {
-		err := civ3satgql.ChangeDefaultBicPath(s)
+		err := queryciv3.ChangeDefaultBicPath(s)
 		if err != nil {
 			return err
 		}
@@ -62,7 +62,7 @@ func loadNewSav(s string) error {
 			return err
 		}
 		if fi.Mode().IsRegular() {
-			err := civ3satgql.ChangeSavePath(s)
+			err := queryciv3.ChangeSavePath(s)
 			if err != nil {
 				return err
 			}

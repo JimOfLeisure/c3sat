@@ -5,7 +5,7 @@ import (
 	"io/ioutil"
 	"os"
 
-	"github.com/myjimnelson/c3sat/civ3satgql"
+	"github.com/myjimnelson/c3sat/queryciv3"
 
 	"golang.org/x/sys/windows/registry"
 )
@@ -65,6 +65,6 @@ func getLastSav(path string) (string, error) {
 		return "", fmt.Errorf("Failed to find Latest Save in conquests.ini")
 	}
 	//  Assuming conquests.ini file is not UTF-8
-	s, err := civ3satgql.CivString(ini[pathStart:pathEnd])
+	s, err := queryciv3.CivString(ini[pathStart:pathEnd])
 	return s + ".SAV", err
 }

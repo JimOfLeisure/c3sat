@@ -52,7 +52,7 @@ Taking a fresh look at this repo, here are some things that might be done, in no
 - civ3satgql
     - Rename civ3satgql to...something like civ3query, civ3gql, gqlciv3...to emphasize it's a query engine
     - Move servers out and just provide http handlers and support functions
-    - Add 'native' ability to read in file, wean off of parseciv3
+    - ~~Add 'native' ability to read in file, wean off of parseciv3~~ just moved ReadFile() to civ3decompress which is a needed package, anyway
 - parseciv3
-    - quit using it for auto-detecting compression and reading files when not using its other functions
+    - ~~quit using it for auto-detecting compression and reading files when not using its other functions~~ done
     - leave it in place / in mothballs in case I want to take another crack at reading direct to structures later
