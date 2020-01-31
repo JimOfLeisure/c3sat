@@ -82,6 +82,7 @@ Stuff I'd like to find and add.
     - Turn #
     - Year
     - Player leader, title, and civ
+    - Optimal City Number
 - Far future
     - If spy planted, appropriate enemy info
         - Military info
@@ -91,6 +92,8 @@ Stuff I'd like to find and add.
     - City report
         - Improvements
         - Corruption & waste
+        - Culture flip probability
+        - Culture flips enabled/disabled
 - Tech
     - Tech costs
 - Victory status
