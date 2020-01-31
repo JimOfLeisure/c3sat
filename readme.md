@@ -61,18 +61,39 @@ Taking a fresh look at this repo, here are some things that might be done, in no
 
 Stuff I'd like to find and add.
 
-- Civ attitude (polite/cautious/annoyed/etc.)
-- Culture opinion both directions ("The Indian people are impressed with our culture")
-- Best known enemy unit
-- Trades
-  - Techs (next priority)
-  - Gold
-  - Resources
-  - Workers
-  - Contacts (hide column until tech is known?)
-  - Maps (hide column until tech is known?)
+- Civ list
+    - Civ attitude (polite/cautious/annoyed/etc.)
+    - Culture opinion both directions ("The Indian people are impressed with our culture")
+    - Best known enemy unit
+    - Trades
+    - Techs (next priority)
+    - Gold
+    - Resources
+    - Workers
+    - Contacts (hide column until tech is known?)
+    - Maps (hide column until tech is known?)
+    - Embassy / spy
 - Alerts
-  - Civ at war will talk
-  - New contact
-  - New tech trades available
-  - Unhappiness
+    - Civ at war will talk
+    - New contact
+    - New tech trades available
+    - Unhappiness
+- Generic / player info
+    - Turn #
+    - Year
+    - Player leader, title, and civ
+- Far future
+    - If spy planted, appropriate enemy info
+        - Military info
+    - If embassy, appropriate info
+        - RoPs, alliances, embargoes, trades
+    - Diplomatic action costs
+    - City report
+        - Improvements
+        - Corruption & waste
+- Tech
+    - Tech costs
+- Victory status
+    - Especially tiles towards domination
+    - Detect enabled victory conditions
+    - Culture progress and projections
