@@ -8,7 +8,8 @@ import (
 
 	"github.com/graphql-go/graphql"
 	"github.com/graphql-go/handler"
-	"github.com/myjimnelson/c3sat/parseciv3"
+	"github.com/myjimnelson/c3sat/civ3decompress"
+	// "github.com/myjimnelson/c3sat/parseciv3"
 )
 
 type sectionType struct {
@@ -30,7 +31,7 @@ var currentGame saveGameType
 // populates the structure given a path to a sav file
 func (sav *saveGameType) loadSave(path string) error {
 	var err error
-	sav.data, _, err = parseciv3.ReadFile(path)
+	sav.data, _, err = civ3decompress.ReadFile(path)
 	if err != nil {
 		return err
 	}

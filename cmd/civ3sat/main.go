@@ -8,6 +8,7 @@ import (
 	"os"
 	"text/tabwriter"
 
+	"github.com/myjimnelson/c3sat/civ3decompress"
 	"github.com/myjimnelson/c3sat/civ3satgql"
 	"github.com/myjimnelson/c3sat/parseciv3"
 	"github.com/urfave/cli"
@@ -60,7 +61,7 @@ func main() {
 				pathFlag,
 			},
 			Action: func(c *cli.Context) error {
-				filedata, _, err := parseciv3.ReadFile(saveFilePath)
+				filedata, _, err := civ3decompress.ReadFile(saveFilePath)
 				if err != nil {
 					return err
 				}
@@ -83,7 +84,7 @@ func main() {
 				pathFlag,
 			},
 			Action: func(c *cli.Context) error {
-				filedata, _, err := parseciv3.ReadFile(saveFilePath)
+				filedata, _, err := civ3decompress.ReadFile(saveFilePath)
 				if err != nil {
 					return err
 				}
