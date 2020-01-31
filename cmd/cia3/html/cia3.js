@@ -234,7 +234,7 @@ class Url extends HTMLElement {
     }
     render() {
         let url = location.protocol + "//" + location.host;
-        this.innerHTML = `<a href="${url}" target="_blank">${url}</a>`;
+        this.innerHTML = `<a href="${url}">${url}</a>`;
     }
 }
 
@@ -372,21 +372,23 @@ class Civs extends Cia3Element {
             <th>Will Talk</th>
             <th>Government</th>
             <th>Era</th>
-            <th># Cities</th>
+            <th>City Count</th>
         </tr>`;
         data.civs.filter(this.civsFilter, this).forEach((e, i) => {
             const friendlyRow = document.createElement('tr');
+            const contactValue = data.civs[this.player].contactWith[e.playerNumber[0]];
+            const haveContact = contactValue != 0;
+            const warVarlue = data.civs[this.player].atWar[e.playerNumber[0]];
+            const atWar = warVarlue != 0;
             friendlyRow.innerHTML += `<td>${e.playerNumber[0]}</td>`;
             friendlyRow.innerHTML += `<td>${data.race[e.raceId[0]].civName}</td>`;
-            friendlyRow.innerHTML += `<td>${this.contactWithName(data.civs[this.player].contactWith[e.playerNumber[0]])}</td>`;
-            friendlyRow.innerHTML += `<td>${this.relationshipName(data.civs[this.player].atWar[e.playerNumber[0]])}</td>`;
-            // Unsure of willTalkTo data location, and unsure if it's an int32[32] array. Only see it for player 1 so far
-            // Seems to be turns until they talk without battle impacts, but also counts down a few turns after making peace
-            //   Maybe this prevents them from redeclaring war for a few turns, too?
-            friendlyRow.innerHTML += `<td>${this.willTalk(e)}</td>`;
-            friendlyRow.innerHTML += `<td>${data.governmentNames[e.governmentType[0]].name}</td>`;
-            friendlyRow.innerHTML += `<td>${data.eraNames[e.era[0]].name}</td>`;
-            friendlyRow.innerHTML += `<td>${e.cityCount[0]}</td>`;
+            friendlyRow.innerHTML += `<td>${this.contactWithName(contactValue)}</td>`;
+            friendlyRow.innerHTML += `<td>${haveContact ? this.relationshipName(warVarlue) : '-'}</td>`;
+            friendlyRow.innerHTML += `<td>${haveContact ? this.willTalk(e) : '-'}</td>`;
+            friendlyRow.innerHTML += `<td>${haveContact ? data.governmentNames[e.governmentType[0]].name : '-'}</td>`;
+            friendlyRow.innerHTML += `<td>${haveContact ? data.eraNames[e.era[0]].name : '-'}</td>`;
+            // TODO: I don't like using the string value here. Figure out how to use the number without repeating code
+            friendlyRow.innerHTML += `<td>${haveContact && this.willTalk(e) == "Yes" ? e.cityCount[0] : '-'}</td>`;
             friendlyTable.appendChild(friendlyRow);
             // if (this.oldCivsData != undefined) {
             //     // put alerts code in here
@@ -410,11 +412,7 @@ class Civs extends Cia3Element {
             contactWith: int32s(offset:3732, count: 32)
         }
         race {
-            leaderName: string(offset:0, maxLength: 32)
-            leaderTitle: string(offset:32, maxLength: 24)
-            adjective:  string(offset:88, maxLength: 40)
             civName: string(offset:128, maxLength: 40)
-            objectNoun: string(offset:168, maxLength: 40)
         }
         governmentNames: listSection(target: "bic", section: "GOVT", nth: 1) { name: string(offset:24, maxLength: 64) }
         eraNames: listSection(target: "bic", section: "ERAS", nth: 1) { name: string(offset:0, maxLength: 64) }
