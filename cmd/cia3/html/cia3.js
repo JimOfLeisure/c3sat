@@ -646,12 +646,17 @@ class CivTech extends Cia3Element {
         
         data.techList.forEach((e, i) => {
             if (data.techCivMask[i] != 0) {
-                this.innerHTML += `${e.name}<br>`;
-
+                this.innerHTML += `${e.name} -`;
+                data.civs.forEach((ee, ii) => {
+                    if ((2**ii & data.techCivMask[i]) !=0) {
+                        this.innerHTML += ` ${data.race[ee.raceId[0]].civName}`;
+                    }
+                });
+                this.innerHTML += `<br>`;
             }
         });
     }
-    queryPart = `techs: civs {
+    queryPart = `civs {
         playerNumber: int32s(offset:0, count: 1)
         raceId: int32s(offset:4, count: 1)
     }
