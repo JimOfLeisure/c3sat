@@ -67,21 +67,33 @@ with a length in bytes. And then there is another unnamed/count-not-included int
   - 0xfc : int32 - era?
   - 0x12c : 00 to 01 2950bc but don't know why
   - 0x132 : 00 to 01 2950bc but don't know why
+  - 0x184 : # of techs known (?)
   - 0x188 : int32 - tax luxury slider (0..10)
   - 0x18c : int32 - tax science slider (0..10)
   - 0x190 : int32 - tax cash (inferred) slider (0..10)
 
 ### attitude and/or reputation between civs?
 
-But seems to be related reflexively to a different array.
+~~But seems to be related reflexively to a different array.~~
 
-Or maybe this isn't an [32]int32 array. There is a [3 or 4]int32 struct in a 32 array in Antal1987's dumps, but it wouldn't seem to be this early
+~~Or maybe this isn't an [32]int32 array. There is a [3 or 4]int32 struct in a 32 array in Antal1987's dumps, but it wouldn't seem to be this early~~
 
 Other possibility / conjecture: 0x194 (last known value) - 0xd14 (start of atWar array) is [32][23]int32, 23 ints for each civ. 32*23 is 736, and Antal1987's dumps show [736]in32 immediately after tax slider values and before atWar array. Yes, this appears to be right.
 
-  - 0x194 - Start of 32 arrays of int32[23], one for each civ. The following offsets/indexes are relative to the opponent player offset
+Attitude (annoyed, cautious, etc.) seems like it might be a forumula based on this table and not a distinct value in the file. Certainly not in the length-defined LEAD section.
+
+Notes:
+
+  - No changes here when I asked for a gold loan and was denied.
+  - No changes here when I declard war (after making demands, gifting tech, gifting gold)
+
+  - 0x194 - Start of 32 arrays of int32[23], one for each civ. The following offsets/indexes are relative to the opponent player offset (23 * 4 * player index) (plus 0x194 depending on where you're counting from)
     - 2 - 0x08 - Goes up when making demands (refused?) of opponent, seemingly reflective of 0x0c for opponent
     - 3 - 0x0c - Goes up when opponent makes demands (refused?) of player, seemingly reflective of 0x08 for opponent
+    - 5 - 0x14 - Goes up when opponent gifts tech; does not seem to have a counterpart; 0 to 158 when I gifted Pottery early game
+      - jumped from 158 to 227 when I gifted 70g
+      - Maybe gold value of collective gifts? But maybe not exactly.
+    - 9 - 0x36 - guess: value of tributes taken from opponent?
 
 ### The following through 0xd1f is covered by immediately above
 
@@ -296,3 +308,62 @@ gql query:
   }
 }
 ```
+
+## Huniting for tech info
+
+Expecting to find it after the length-specified portion of LEAD and before the CULT.
+
+0x153e long (5438)
+(by the way, the second LEAD section seems to be off of the 4-byte alignment by one. :P)
+
+83 techs in the default biq.
+
+Made techs.html and civs { techHunt } for hexdump between end of LEAD and start of CULT.
+
+0x0 - 0x1000 - A LOT goes on here interturn, even early game.
+
+0x1400 - 0x1544 - don't think this is tech
+
+NOPE: techs are NOT in this area.
+
+back to LEAD section diffs:
+
+Traded India (player 7): gave them Pottery (index 3), got Ceremonial Burial (index 6). Both of us already had Alpha (index 2).
+
+Me (got index 6):
+0x184 02 to 03
+0x3d0 00 to 01
+
+Player 7 (got index 3):
+0x184 02 to 03 (tech count?)
+0x208 00 to 01
+
+That spacing suggests 38 ints per tech.
+
+No, this is in what I believe to be the attitude / diplomatic area.
+
+## Hunting for tech (and random) info comparing intraturn saves all data
+
+offsets are from *the start of* "GAMEP", start of save data
+
+- save, gift Pottery to player 7, save:
+  - 0x8 0x5c 0x00 to 0xa3 0x03
+  - 0x25c e3 7e to 86 f3
+  - 0x3b4 16 to 96 - That could be a bit flag at 0x80
+  - 0x117938 02 to 03 (tech count for player 7)
+  - 0x1179b0 00 to 9e (player 7's attitude/diplo table value of gifted items from player 1)
+- save, trade Pottery to player 7 for CB, save:
+  - 0x8 a5 01 to ba 00
+  - 0x25c 41 8c 1e to e5 4e 1f
+  - 0x3b4 16 to 96 - That could be a bit flag at 0x80
+  - 0x3c0 e0 to e2 - That could be a bit flag at 0x2, ~~but by process of elimination this has to be CB for player 1; why would player 1 be after player 7?~~ This is a list of techs with 32-bit flag int32s for which civs have the tech
+  - 0x106bda 02 to 03 (tech count for player 1)
+  - 0x117938 02 to 03 (tech count for player 7)
+  - Some other value mised the first time, 00 to 01 - maybe player 7 table indicating (recent) trade?
+- save a few seconds apart, no actions taken
+  - 0x8 7c 03 to 87 02 - This seems to be time, or at least it's incremented in my three samples so far
+  - 0x25c ad 4a to ee 61 - would guess key or seed, but gold values didn't change, so the key couldn't have changed
+
+Briefly checked whole file in case pre-GAMEP stuff changing. The CIV3 section does change save to save
+
+0x3a8 : start of [numTechs]int32, a bitmask of which civs have the tech

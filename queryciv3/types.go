@@ -111,6 +111,19 @@ var gameLeadSectionType = graphql.NewObject(graphql.ObjectConfig{
 				return "", nil
 			},
 		},
+		"techHunt": &graphql.Field{
+			Type:        graphql.String,
+			Description: "Hex dump after the LEAD section's length",
+			Resolve: func(p graphql.ResolveParams) (interface{}, error) {
+				if itemOffset, ok := p.Source.(int); ok {
+					if itemOffset > 0 {
+						length := ReadInt32(itemOffset, Signed)
+						return hex.Dump(saveGame.data[itemOffset+4+length : itemOffset+4+length+5444]), nil
+					}
+				}
+				return "", nil
+			},
+		},
 	},
 })
 

@@ -640,6 +640,53 @@ class CivsDev extends Cia3Element {
     }
 }
 
+class CivTech extends Cia3Element {
+    render () {
+        this.innerHTML = '';
+        
+        data.techList.forEach((e, i) => {
+            if (data.techCivMask[i] != 0) {
+                this.innerHTML += `${e.name}<br>`;
+
+            }
+        });
+    }
+    queryPart = `techs: civs {
+        playerNumber: int32s(offset:0, count: 1)
+        raceId: int32s(offset:4, count: 1)
+    }
+    race {
+        civName: string(offset:128, maxLength: 40)
+    }
+    techCivMask: int32s(section: "GAME", nth: 2, offset: 932, count: 83)
+    techList: listSection(target: "bic", section: "TECH", nth: 1) {
+        name: string(offset:0, maxLength: 32)
+    }
+    `;
+}
+
+class HexDiffAll extends Cia3Element {
+    render () {
+        this.innerHTML = '';
+        
+        this.innerHTML += `${data.fileName}<br>`;
+        if (this.oldData != undefined) {
+            const hexDiff = document.createElement('div');
+            let foo = Diff.createTwoFilesPatch(this.oldData.fileName, data.fileName ,this.oldData.hexDumpAll, data.hexDumpAll);
+            let diff2Html = Diff2Html.html(foo, {
+                drawFileList: true,
+                matching: 'none',
+                outputFormat: 'side-by-side',
+            });
+            hexDiff.innerHTML = diff2Html;
+            this.appendChild(hexDiff);
+        }
+        this.oldData = data;
+    }
+    oldData = undefined;
+    queryPart = `fileName hexDumpAll`;
+}
+
 window.customElements.define('cia3-error', Error);
 window.customElements.define('cia3-filename', Filename);
 window.customElements.define('cia3-fullpath', Fullpath);
@@ -660,4 +707,6 @@ window.customElements.define('cia3-temperature', Temperature);
 window.customElements.define('cia3-age', Age);
 window.customElements.define('cia3-civs', Civs);
 window.customElements.define('cia3-civsdev', CivsDev);
+window.customElements.define('cia3-civstech', CivTech);
+window.customElements.define('cia3-hexdiffall', HexDiffAll);
 pollNow();

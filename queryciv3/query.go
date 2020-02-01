@@ -272,6 +272,30 @@ var queryType = graphql.NewObject(graphql.ObjectConfig{
 				return hex.Dump(saveGame.data[savSection+offset : savSection+offset+count]), nil
 			},
 		},
+		"hexDumpAll": &graphql.Field{
+			Type:        graphql.String,
+			Description: "Hex dump of all the data",
+			Args: graphql.FieldConfigArgument{
+				"target": &graphql.ArgumentConfig{
+					Type:         graphql.String,
+					Description:  "Target scope of the query. Can be game (default), bic, or file",
+					DefaultValue: "game",
+				},
+			},
+			Resolve: func(p graphql.ResolveParams) (interface{}, error) {
+				var target *saveGameType
+				targetArg, _ := p.Args["target"].(string)
+				switch targetArg {
+				case "file":
+					target = &saveGame
+				case "bic":
+					target = &currentBic
+				default:
+					target = &currentGame
+				}
+				return hex.Dump(target.data), nil
+			},
+		},
 		"int16s": &graphql.Field{
 			Type:        graphql.NewList(graphql.Int),
 			Description: "Int16 array",
