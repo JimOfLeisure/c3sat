@@ -243,7 +243,7 @@ class HexDump extends Cia3Element {
     render() {
         this.innerText = 'Hex dump tool under construction, no controls yet.\n' + data.cia3Hexdump;
     }
-    queryPart = 'cia3Hexdump: hexDump(section: "CIV3", nth: 1, offset: -4, count: 8192)';
+    queryPart = 'cia3Hexdump: hexDump(section: "GAME", nth: 2, offset: 0, count: 8192)';
 }
 
 class MapX extends Cia3Element {
@@ -405,7 +405,7 @@ class Civs extends Cia3Element {
             playerNumber: int32s(offset:0, count: 1)
             raceId: int32s(offset:4, count: 1)
             governmentType: int32s(offset:132, count: 1)
-            era: int32s(offset:252, count: 1)
+            era: int32s(offset:216, count: 1)
             cityCount: int32s(offset:376, count: 1)
             atWar: bytes(offset:3348, count: 32)
             willTalkTo: int32s(offset:2964, count: 32)
@@ -663,7 +663,7 @@ class CivTech extends Cia3Element {
     race {
         civName: string(offset:128, maxLength: 40)
     }
-    techCivMask: int32s(section: "GAME", nth: 2, offset: 932, count: 83)
+    techCivMask: int32s(section: "GAME", nth: 2, offset: 972, count: 83)
     techList: listSection(target: "bic", section: "TECH", nth: 1) {
         name: string(offset:0, maxLength: 32)
     }

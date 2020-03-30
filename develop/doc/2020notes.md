@@ -60,11 +60,12 @@ with a length in bytes. And then there is another unnamed/count-not-included int
   - 0x91-ish : This seems to occasionaly get civ name strings, but I think it's a bug and data should be ints of some length
   - 0xdc : int32 - ~~culture?~~ no, but have only seen it increment so far, but believe it must go down as I saw a 0
   - 0xe4 : int32 - ~~culture?~~ no, but have only seen it increment so far, but believe it must go down as I saw a 0
+  - 0xe8 : int32 - Era index
   - 0xec : ~~int32 - military unit count? or garrison count?~~ No, I think this part of an array, maybe int16s
   - 0xf2 (not int32 boundary, part of int32[60]) : started incrementing 1 per turn around turn 10/11?
     - I seem to be 2 ahead of 4 other civs, and two are still at 0
     - Then it didn't change for anyone
-  - 0xfc : int32 - era?
+  - 0xfc : int32 - ~~era?~~ NO, see 0xe8
   - 0x12c : 00 to 01 2950bc but don't know why
   - 0x132 : 00 to 01 2950bc but don't know why
   - 0x184 : # of techs known (?)
@@ -300,7 +301,7 @@ gql query:
     governmentType: int32s(offset:132, count: 1)
     mobilizationLevel: int32s(offset:136, count: 1)
     tilesDiscovered: int32s(offset:140, count: 1)
-    era: int32s(offset:252, count: 1)
+    era: int32s(offset:216, count: 1)
     UNSUREresearchBulbs: int32s(offset:256, count: 1)
     UNSUREcurrentResearchId: int32s(offset:260, count: 1)
     UNSUREcurrentResearchTurns: int32s(offset:264, count: 1)
@@ -366,4 +367,24 @@ offsets are from *the start of* "GAMEP", start of save data
 
 Briefly checked whole file in case pre-GAMEP stuff changing. The CIV3 section does change save to save
 
-0x3a8 : start of [numTechs]int32, a bitmask of which civs have the tech
+- ~~0x3a8~~ : start of [numTechs]int32, a bitmask of which civs have the tech
+  - Nope, the offset changes from game to game, even with the same default BIQ, number of players, and map size.
+  - Offset seems to stay a multiple of 4 in limited checks so far
+  - idea: look for pattern of bitmask-altered 0s for games with \< 31 civs (but what about 31-civ games?)
+  - idea: look for pattern of bitmask-altered 0s for barbs (but do ALL BIQs give barbs no tech? have doubts, especially with DyP, Rhyes, RoR, etc.; and what about Horseback Riding & Map Making in default BIQ?)
+  - idea: see if negative offset from end of setion is consistent
+  - deduction: The changing offset must be related to (a) map-dependent feature(s)
+    - Number of continents? (this is the most likely thing I can think of and should be easily testable)
+    - doubtful: opponent civ features (like unique traits)
+    - ~~doubtful: number of units (then it would change from turn to turn)~~
+  - idea: test offset against continents count across games
+  - idea: test same world seed with different opponent selections
+  - alternate idea: Antal1987's dumps suggest a city stats array before ResearchedAdvances; could the offset be based on city count?
+  - Also NOTE: The resource count may impact the offset, too, looking at Antal1987's dumps; `int field_374[27];` is before City_Stat_Int_Array and ResearchedAdvances
+
+## Random info while tech hunting in GAME section
+
+- 0x1c int32 unit count
+  - `unitCount: int32s(section:"GAME", nth: 2, offset: 28, count: 1)`
+- 0x20 int32 city count
+  - `cityCount: int32s(section:"GAME", nth: 2, offset: 32, count: 1)`
