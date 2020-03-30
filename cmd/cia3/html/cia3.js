@@ -644,9 +644,9 @@ class CivsDev extends Cia3Element {
 class CivTech extends Cia3Element {
     render () {
         this.innerHTML = '';
-        // tech list offset 148 + 4*cityCount? Max 512 cities, so grab techCount (83 in default) + 512 int32s?
-        // NO, but nice try
-        let intOffset = data.cityCount[0];
+        // tech list offset 852 + 4*numContinents? Grab a bunch more "techs" to ensure have all of them
+        // SEEMS TO WORK! TODO: better handle the tech count and offset; right now I'm just picking enough to hopefully cover likely continents and default # of techs
+        let intOffset = data.numContinents[0];
         console.log(intOffset);
         data.techList.forEach((e, i) => {
             if (data.techCivMask[i+intOffset] != 0) {
@@ -668,11 +668,11 @@ class CivTech extends Cia3Element {
     race {
         civName: string(offset:128, maxLength: 40)
     }
-    techCivMask: int32s(section: "GAME", nth: 2, offset: 148, count: 595)
+    techCivMask: int32s(section: "GAME", nth: 2, offset: 852, count: 140)
     techList: listSection(target: "bic", section: "TECH", nth: 1) {
         name: string(offset:0, maxLength: 32)
     }
-    cityCount: int32s(section:"GAME", nth: 2, offset: 32, count: 1)
+    numContinents: int16s(section:"WRLD", nth: 1, offset: 4, count: 1)
     `;
 }
 
