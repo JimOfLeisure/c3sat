@@ -243,6 +243,7 @@ class HexDump extends Cia3Element {
     render() {
         this.innerText = 'Hex dump tool under construction, no controls yet.\n' + data.cia3Hexdump;
     }
+    // queryPart = 'cia3Hexdump: hexDump(section: "WRLD", nth: 1, offset: 0, count: 8192)';
     queryPart = 'cia3Hexdump: hexDump(section: "GAME", nth: 2, offset: 0, count: 8192)';
 }
 
@@ -643,12 +644,16 @@ class CivsDev extends Cia3Element {
 class CivTech extends Cia3Element {
     render () {
         this.innerHTML = '';
-        
+        // tech list offset 148 + 4*cityCount? Max 512 cities, so grab techCount (83 in default) + 512 int32s?
+        // NO, but nice try
+        let intOffset = data.cityCount[0];
+        console.log(intOffset);
         data.techList.forEach((e, i) => {
-            if (data.techCivMask[i] != 0) {
+            if (data.techCivMask[i+intOffset] != 0) {
                 this.innerHTML += `${e.name} -`;
                 data.civs.forEach((ee, ii) => {
-                    if ((2**ii & data.techCivMask[i]) !=0) {
+                    if ((2**ii & data.techCivMask[i+intOffset]) !=0) {
+                        console.log(i, i+intOffset, ii);
                         this.innerHTML += ` ${data.race[ee.raceId[0]].civName}`;
                     }
                 });
@@ -663,10 +668,11 @@ class CivTech extends Cia3Element {
     race {
         civName: string(offset:128, maxLength: 40)
     }
-    techCivMask: int32s(section: "GAME", nth: 2, offset: 972, count: 83)
+    techCivMask: int32s(section: "GAME", nth: 2, offset: 148, count: 595)
     techList: listSection(target: "bic", section: "TECH", nth: 1) {
         name: string(offset:0, maxLength: 32)
     }
+    cityCount: int32s(section:"GAME", nth: 2, offset: 32, count: 1)
     `;
 }
 
