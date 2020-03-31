@@ -702,6 +702,11 @@ class HexDiffAll extends Cia3Element {
 class Trade extends Cia3Element {
     player = 1;
     render () {
+        // tech list offset 852 + 4*numContinents? Grab a bunch more "techs" to ensure have all of them
+        // SEEMS TO WORK! TODO: better handle the tech count and offset; right now I'm just picking enough to hopefully cover likely continents and default # of techs
+        // Also TODO: I'm grabbing numContinents from *after* the tech data, so the real authoritative count must be elsewhere.
+        let intOffset = data.numContinents[0];
+
         this.innerHTML = '';
         const friendlyTable = document.createElement('table');
         this.appendChild(friendlyTable);
@@ -711,11 +716,34 @@ class Trade extends Cia3Element {
             <th>Techs to Sell</th>
         </tr>`;
         data.tradeCivs.filter(this.willTalk, this).forEach((e, i) => {
-            console.log(i);
             const friendlyRow = document.createElement('tr');
+            // const techsToBuy = document.createElement('td');
+            // const techsToSell = document.createElement('td');
             friendlyRow.innerHTML += `<td>${data.race[e.raceId[0]].civName}</td>`;
-            friendlyRow.innerHTML += `<td>${data.race[e.raceId[0]].civName}</td>`;
-            friendlyRow.innerHTML += `<td>${e.playerNumber[0]}</td>`;
+            // friendlyRow.appendChild(techsToBuy);
+            // friendlyRow.appendChild(techsToSell);
+            // techsToBuy.innerText += `${data.race[e.raceId[0]].civName}`;
+            // techsToSell.innerText += `${e.playerNumber[0]}`;
+            let techsToBuy = new Array();
+            let techsToSell = new Array();
+            // techsToBuy.push("foo");
+            // techsToBuy.push("bar");
+            // techsToSell.push("bar");
+            // techsToSell.push("baz");
+            data.techList.forEach((ee, ii) => {
+                const thisTech = data.techCivMask[ii+intOffset];
+                console.log(thisTech, e.playerNumber[0], this.player);
+                // If mismatched truthiness, one player has it and the other doesn't
+                if (!!(thisTech & 2**e.playerNumber[0]) != !!(thisTech & 2**this.player)) {
+                    if (!(thisTech & 2**this.player)) {
+                        techsToBuy.push(ee.name);
+                    } else {
+                        techsToSell.push(ee.name);
+                    }
+                }
+            });
+            friendlyRow.innerHTML += `<td>${techsToBuy.join(", ")}</td>`;
+            friendlyRow.innerHTML += `<td>${techsToSell.join(", ")}</td>`;
             friendlyTable.appendChild(friendlyRow);
         })
     
@@ -723,10 +751,6 @@ class Trade extends Cia3Element {
 
 
 
-        // tech list offset 852 + 4*numContinents? Grab a bunch more "techs" to ensure have all of them
-        // SEEMS TO WORK! TODO: better handle the tech count and offset; right now I'm just picking enough to hopefully cover likely continents and default # of techs
-        // Also TODO: I'm grabbing numContinents from *after* the tech data, so the real authoritative count must be elsewhere.
-        let intOffset = data.numContinents[0];
         data.techList.forEach((e, i) => {
             if (data.techCivMask[i+intOffset] != 0) {
                 this.innerHTML += `${e.name} -`;
@@ -740,8 +764,7 @@ class Trade extends Cia3Element {
         });
     }
     willTalk(e) {
-        // Non-barb, non-player civs that exist, and will talk (not atWar OR willTalkTo == 0)
-        console.log(e.raceId[0], this.player, e.playerNumber[0]);
+        // Non-barb, non-player civs that exist, has contact with player, and will talk (not atWar OR willTalkTo == 0)
         return e.raceId[0] > 0
             && this.player != e.playerNumber[0]
             && data.tradeCivs[this.player].contactWith[e.playerNumber[0]]
