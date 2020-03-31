@@ -485,5 +485,31 @@ var queryType = graphql.NewObject(graphql.ObjectConfig{
 				return output, nil
 			},
 		},
+		"techCivMask": &graphql.Field{
+			Type:        graphql.NewList(graphql.Int),
+			Description: "Int32 array, each is a bit mask to flag which players have the tech by index.",
+			Resolve: func(p graphql.ResolveParams) (interface{}, error) {
+				techSection, err := currentBic.sectionOffset("TECH", 1)
+				if err != nil {
+					return nil, err
+				}
+				gameSection, err := currentGame.sectionOffset("GAME", 1)
+				if err != nil {
+					return nil, err
+				}
+				wrldSection, err := currentGame.sectionOffset("WRLD", 1)
+				if err != nil {
+					return nil, err
+				}
+				techCount := currentBic.readInt32(techSection, Signed)
+				continentCount := currentGame.readInt16(wrldSection+4, Signed)
+				techCivMaskOffset := 852 + 4*continentCount
+				intList := make([]int, techCount)
+				for i := 0; i < techCount; i++ {
+					intList[i] = currentGame.readInt32(gameSection+techCivMaskOffset+4*i, Unsigned)
+				}
+				return intList, nil
+			},
+		},
 	},
 })

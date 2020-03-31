@@ -706,6 +706,7 @@ class Trade extends Cia3Element {
         // SEEMS TO WORK! TODO: better handle the tech count and offset; right now I'm just picking enough to hopefully cover likely continents and default # of techs
         // Also TODO: I'm grabbing numContinents from *after* the tech data, so the real authoritative count must be elsewhere.
         let intOffset = data.numContinents[0];
+        intOffset = 0;
 
         this.innerHTML = '';
         const friendlyTable = document.createElement('table');
@@ -771,7 +772,8 @@ class Trade extends Cia3Element {
     race {
         civName: string(offset:128, maxLength: 40)
     }
-    techCivMask: int32s(section: "GAME", nth: 2, offset: 852, count: 140)
+    FOOtechCivMask: int32s(section: "GAME", nth: 2, offset: 852, count: 140)
+    techCivMask
     techList: listSection(target: "bic", section: "TECH", nth: 1) {
         name: string(offset:0, maxLength: 32)
         era: int32s(offset: 68, count: 1)
