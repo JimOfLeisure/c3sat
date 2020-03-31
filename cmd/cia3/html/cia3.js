@@ -646,6 +646,7 @@ class CivTech extends Cia3Element {
         this.innerHTML = '';
         // tech list offset 852 + 4*numContinents? Grab a bunch more "techs" to ensure have all of them
         // SEEMS TO WORK! TODO: better handle the tech count and offset; right now I'm just picking enough to hopefully cover likely continents and default # of techs
+        // Also TODO: I'm grabbing numContinents from *after* the tech data, so the real authoritative count must be elsewhere.
         let intOffset = data.numContinents[0];
         console.log(intOffset);
         data.techList.forEach((e, i) => {
@@ -698,6 +699,81 @@ class HexDiffAll extends Cia3Element {
     queryPart = `fileName hexDumpAll`;
 }
 
+class Trade extends Cia3Element {
+    player = 1;
+    render () {
+        this.innerHTML = '';
+        const friendlyTable = document.createElement('table');
+        this.appendChild(friendlyTable);
+        friendlyTable.innerHTML = `<tr>
+            <th>Civ Name</th>
+            <th>Techs to Buy</th>
+            <th>Techs to Sell</th>
+        </tr>`;
+        data.tradeCivs.filter(this.willTalk, this).forEach((e, i) => {
+            console.log(i);
+            const friendlyRow = document.createElement('tr');
+            friendlyRow.innerHTML += `<td>${data.race[e.raceId[0]].civName}</td>`;
+            friendlyRow.innerHTML += `<td>${data.race[e.raceId[0]].civName}</td>`;
+            friendlyRow.innerHTML += `<td>${e.playerNumber[0]}</td>`;
+            friendlyTable.appendChild(friendlyRow);
+        })
+    
+
+
+
+
+        // tech list offset 852 + 4*numContinents? Grab a bunch more "techs" to ensure have all of them
+        // SEEMS TO WORK! TODO: better handle the tech count and offset; right now I'm just picking enough to hopefully cover likely continents and default # of techs
+        // Also TODO: I'm grabbing numContinents from *after* the tech data, so the real authoritative count must be elsewhere.
+        let intOffset = data.numContinents[0];
+        data.techList.forEach((e, i) => {
+            if (data.techCivMask[i+intOffset] != 0) {
+                this.innerHTML += `${e.name} -`;
+                data.civs.forEach((ee, ii) => {
+                    if ((2**ii & data.techCivMask[i+intOffset]) !=0) {
+                        this.innerHTML += ` ${data.race[ee.raceId[0]].civName}`;
+                    }
+                });
+                this.innerHTML += `<br>`;
+            }
+        });
+    }
+    willTalk(e) {
+        // Non-barb, non-player civs that exist, and will talk (not atWar OR willTalkTo == 0)
+        console.log(e.raceId[0], this.player, e.playerNumber[0]);
+        return e.raceId[0] > 0
+            && this.player != e.playerNumber[0]
+            && data.tradeCivs[this.player].contactWith[e.playerNumber[0]]
+            && (
+                e.atWar[this.player] !=0
+                || e.willTalkTo[this.player] == 0
+            )
+            ;
+    }
+    queryPart = `civs {
+        playerNumber: int32s(offset:0, count: 1)
+        raceId: int32s(offset:4, count: 1)
+    }
+    race {
+        civName: string(offset:128, maxLength: 40)
+    }
+    techCivMask: int32s(section: "GAME", nth: 2, offset: 852, count: 140)
+    techList: listSection(target: "bic", section: "TECH", nth: 1) {
+        name: string(offset:0, maxLength: 32)
+    }
+    numContinents: int16s(section:"WRLD", nth: 1, offset: 4, count: 1)
+    tradeCivs: civs {
+        playerNumber: int32s(offset:0, count: 1)
+        raceId: int32s(offset:4, count: 1)
+        atWar: bytes(offset:3348, count: 32)
+        willTalkTo: int32s(offset:2964, count: 32)
+        contactWith: int32s(offset:3732, count: 32)
+    }
+`;
+}
+
+
 window.customElements.define('cia3-error', Error);
 window.customElements.define('cia3-filename', Filename);
 window.customElements.define('cia3-fullpath', Fullpath);
@@ -720,4 +796,5 @@ window.customElements.define('cia3-civs', Civs);
 window.customElements.define('cia3-civsdev', CivsDev);
 window.customElements.define('cia3-civstech', CivTech);
 window.customElements.define('cia3-hexdiffall', HexDiffAll);
+window.customElements.define('cia3-trade', Trade);
 pollNow();
