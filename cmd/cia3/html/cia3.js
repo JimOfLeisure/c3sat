@@ -366,8 +366,7 @@ class Civs extends Cia3Element {
         const friendlyTable = document.createElement('table');
         this.appendChild(friendlyTable);
         friendlyTable.innerHTML = `<tr>
-            <th>Player #</th>
-            <th>Civ Name</th>
+            <th>Civ</th>
             <th>Contact</th>
             <th>Relationship</th>
             <th>Will Talk</th>
@@ -381,7 +380,7 @@ class Civs extends Cia3Element {
             const haveContact = contactValue != 0;
             const warVarlue = data.civs[this.player].atWar[e.playerNumber[0]];
             const atWar = warVarlue != 0;
-            friendlyRow.innerHTML += `<td>${e.playerNumber[0]}</td>`;
+            // friendlyRow.innerHTML += `<td>${e.playerNumber[0]}</td>`;
             friendlyRow.innerHTML += `<td>${data.race[e.raceId[0]].civName}</td>`;
             friendlyRow.innerHTML += `<td>${this.contactWithName(contactValue)}</td>`;
             friendlyRow.innerHTML += `<td>${haveContact ? this.relationshipName(warVarlue) : '-'}</td>`;
@@ -702,12 +701,6 @@ class HexDiffAll extends Cia3Element {
 class Trade extends Cia3Element {
     player = 1;
     render () {
-        // tech list offset 852 + 4*numContinents? Grab a bunch more "techs" to ensure have all of them
-        // SEEMS TO WORK! TODO: better handle the tech count and offset; right now I'm just picking enough to hopefully cover likely continents and default # of techs
-        // Also TODO: I'm grabbing numContinents from *after* the tech data, so the real authoritative count must be elsewhere.
-        let intOffset = data.numContinents[0];
-        intOffset = 0;
-
         this.innerHTML = '';
         const friendlyTable = document.createElement('table');
         this.appendChild(friendlyTable);
@@ -718,19 +711,19 @@ class Trade extends Cia3Element {
         </tr>`;
         data.tradeCivs.filter(this.willTalk, this).forEach((e, i) => {
             const friendlyRow = document.createElement('tr');
-            friendlyRow.innerHTML += `<td>${data.race[e.raceId[0]].civName}</td>`;
+            friendlyRow.innerHTML += `<td>${data.tradeRace[e.raceId[0]].civName}</td>`;
             let techsToBuy = new Array();
             let techsToSell = new Array();
             data.techList.forEach((ee, ii) => {
-                const thisTech = data.techCivMask[ii+intOffset];
+                const thisTech = data.techCivMask[ii];
                 // If mismatched truthiness, one player has it and the other doesn't
                 if (!!(thisTech & 2**e.playerNumber[0]) != !!(thisTech & 2**this.player)) {
                     if (!(thisTech & 2**this.player)) {
-                        if (this.hasPreReq(ii, this.player, intOffset)) {
+                        if (this.hasPreReq(ii, this.player)) {
                             techsToBuy.push(ee.name);
                         }
                     } else {
-                        if (this.hasPreReq(ii, e.playerNumber[0], intOffset)) {
+                        if (this.hasPreReq(ii, e.playerNumber[0])) {
                             techsToSell.push(ee.name);
                         }
                     }
@@ -753,33 +746,28 @@ class Trade extends Cia3Element {
             ;
     }
     // Check tech prereqs for player, and also era requirement. return boolean
-    hasPreReq(techIndex, playerNumber, intOffset) {
+    hasPreReq(techIndex, playerNumber) {
         return (data.tradeCivs[playerNumber].era[0] >= data.techList[techIndex].era[0]) &&
             data.techList[techIndex].prereqs.every(e => {
                 if (e < 0) {
                     return true;
                 }
-                if (!!(data.techCivMask[e+intOffset] & 2**playerNumber)) {
+                if (!!(data.techCivMask[e] & 2**playerNumber)) {
                     return true;
                 }
                 return false;
             });
     }
-    queryPart = `civs {
-        playerNumber: int32s(offset:0, count: 1)
-        raceId: int32s(offset:4, count: 1)
-    }
-    race {
+    queryPart = `
+    tradeRace: race {
         civName: string(offset:128, maxLength: 40)
     }
-    FOOtechCivMask: int32s(section: "GAME", nth: 2, offset: 852, count: 140)
     techCivMask
     techList: listSection(target: "bic", section: "TECH", nth: 1) {
         name: string(offset:0, maxLength: 32)
         era: int32s(offset: 68, count: 1)
         prereqs: int32s(offset: 84, count: 4)
     }
-    numContinents: int16s(section:"WRLD", nth: 1, offset: 4, count: 1)
     tradeCivs: civs {
         playerNumber: int32s(offset:0, count: 1)
         raceId: int32s(offset:4, count: 1)
