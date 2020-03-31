@@ -753,19 +753,16 @@ class Trade extends Cia3Element {
     }
     // Check tech prereqs for player, and also era requirement. return boolean
     hasPreReq(techIndex, playerNumber, intOffset) {
-        // console.log(techIndex, playerNumber, data.techList[techIndex].prereqs);
-        return data.techList[techIndex].prereqs.every(e => {
-            // console.log(e);
-            if (e < 0) {
-                return true;
-            }
-            if (!!(data.techCivMask[e+intOffset] & 2**playerNumber)) {
-                // console.log("woo!");
-                return true;
-            }
-            // console.log(data.race[data.tradeCivs[playerNumber].raceId[0]].civName, data.techList[techIndex].name, !!(data.techCivMask[e+intOffset] & 2**playerNumber));
-            return false;
-        });
+        return (data.tradeCivs[playerNumber].era[0] >= data.techList[techIndex].era[0]) &&
+            data.techList[techIndex].prereqs.every(e => {
+                if (e < 0) {
+                    return true;
+                }
+                if (!!(data.techCivMask[e+intOffset] & 2**playerNumber)) {
+                    return true;
+                }
+                return false;
+            });
     }
     queryPart = `civs {
         playerNumber: int32s(offset:0, count: 1)
@@ -777,6 +774,7 @@ class Trade extends Cia3Element {
     techCivMask: int32s(section: "GAME", nth: 2, offset: 852, count: 140)
     techList: listSection(target: "bic", section: "TECH", nth: 1) {
         name: string(offset:0, maxLength: 32)
+        era: int32s(offset: 68, count: 1)
         prereqs: int32s(offset: 84, count: 4)
     }
     numContinents: int16s(section:"WRLD", nth: 1, offset: 4, count: 1)
@@ -786,6 +784,7 @@ class Trade extends Cia3Element {
         atWar: bytes(offset:3348, count: 32)
         willTalkTo: int32s(offset:2964, count: 32)
         contactWith: int32s(offset:3732, count: 32)
+        era: int32s(offset:216, count: 1)
     }
 `;
 }
