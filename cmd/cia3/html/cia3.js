@@ -711,28 +711,17 @@ class Trade extends Cia3Element {
         const friendlyTable = document.createElement('table');
         this.appendChild(friendlyTable);
         friendlyTable.innerHTML = `<tr>
-            <th>Civ Name</th>
-            <th>Techs to Buy</th>
-            <th>Techs to Sell</th>
+            <th>Civ</th>
+            <th>Tech to Buy</th>
+            <th>Tech to Sell</th>
         </tr>`;
         data.tradeCivs.filter(this.willTalk, this).forEach((e, i) => {
             const friendlyRow = document.createElement('tr');
-            // const techsToBuy = document.createElement('td');
-            // const techsToSell = document.createElement('td');
             friendlyRow.innerHTML += `<td>${data.race[e.raceId[0]].civName}</td>`;
-            // friendlyRow.appendChild(techsToBuy);
-            // friendlyRow.appendChild(techsToSell);
-            // techsToBuy.innerText += `${data.race[e.raceId[0]].civName}`;
-            // techsToSell.innerText += `${e.playerNumber[0]}`;
             let techsToBuy = new Array();
             let techsToSell = new Array();
-            // techsToBuy.push("foo");
-            // techsToBuy.push("bar");
-            // techsToSell.push("bar");
-            // techsToSell.push("baz");
             data.techList.forEach((ee, ii) => {
                 const thisTech = data.techCivMask[ii+intOffset];
-                console.log(thisTech, e.playerNumber[0], this.player);
                 // If mismatched truthiness, one player has it and the other doesn't
                 if (!!(thisTech & 2**e.playerNumber[0]) != !!(thisTech & 2**this.player)) {
                     if (!(thisTech & 2**this.player)) {
@@ -745,22 +734,6 @@ class Trade extends Cia3Element {
             friendlyRow.innerHTML += `<td>${techsToBuy.join(", ")}</td>`;
             friendlyRow.innerHTML += `<td>${techsToSell.join(", ")}</td>`;
             friendlyTable.appendChild(friendlyRow);
-        })
-    
-
-
-
-
-        data.techList.forEach((e, i) => {
-            if (data.techCivMask[i+intOffset] != 0) {
-                this.innerHTML += `${e.name} -`;
-                data.civs.forEach((ee, ii) => {
-                    if ((2**ii & data.techCivMask[i+intOffset]) !=0) {
-                        this.innerHTML += ` ${data.race[ee.raceId[0]].civName}`;
-                    }
-                });
-                this.innerHTML += `<br>`;
-            }
         });
     }
     willTalk(e) {
