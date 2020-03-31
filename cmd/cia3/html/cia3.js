@@ -725,9 +725,13 @@ class Trade extends Cia3Element {
                 // If mismatched truthiness, one player has it and the other doesn't
                 if (!!(thisTech & 2**e.playerNumber[0]) != !!(thisTech & 2**this.player)) {
                     if (!(thisTech & 2**this.player)) {
-                        techsToBuy.push(ee.name);
+                        if (this.hasPreReq(ii, this.player, intOffset)) {
+                            techsToBuy.push(ee.name);
+                        }
                     } else {
-                        techsToSell.push(ee.name);
+                        if (this.hasPreReq(ii, e.playerNumber[0], intOffset)) {
+                            techsToSell.push(ee.name);
+                        }
                     }
                 }
             });
@@ -747,6 +751,22 @@ class Trade extends Cia3Element {
             )
             ;
     }
+    // Check tech prereqs for player, and also era requirement. return boolean
+    hasPreReq(techIndex, playerNumber, intOffset) {
+        // console.log(techIndex, playerNumber, data.techList[techIndex].prereqs);
+        return data.techList[techIndex].prereqs.every(e => {
+            // console.log(e);
+            if (e < 0) {
+                return true;
+            }
+            if (!!(data.techCivMask[e+intOffset] & 2**playerNumber)) {
+                // console.log("woo!");
+                return true;
+            }
+            // console.log(data.race[data.tradeCivs[playerNumber].raceId[0]].civName, data.techList[techIndex].name, !!(data.techCivMask[e+intOffset] & 2**playerNumber));
+            return false;
+        });
+    }
     queryPart = `civs {
         playerNumber: int32s(offset:0, count: 1)
         raceId: int32s(offset:4, count: 1)
@@ -757,6 +777,7 @@ class Trade extends Cia3Element {
     techCivMask: int32s(section: "GAME", nth: 2, offset: 852, count: 140)
     techList: listSection(target: "bic", section: "TECH", nth: 1) {
         name: string(offset:0, maxLength: 32)
+        prereqs: int32s(offset: 84, count: 4)
     }
     numContinents: int16s(section:"WRLD", nth: 1, offset: 4, count: 1)
     tradeCivs: civs {

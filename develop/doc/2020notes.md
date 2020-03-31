@@ -388,3 +388,30 @@ Briefly checked whole file in case pre-GAMEP stuff changing. The CIV3 section do
   - `unitCount: int32s(section:"GAME", nth: 2, offset: 28, count: 1)`
 - 0x20 int32 city count
   - `cityCount: int32s(section:"GAME", nth: 2, offset: 32, count: 1)`
+
+## TECH section
+
+Looking for prerequisites. Antal1987's dumps appear to be spot-on for the data I currently understand. Aside from the leading int which I've omitted below.
+
+Cost is clearly a base cost and multiplied by other stuff. Not sure what X and Y are for.
+
+```
+char Name[32];
+char Civilopedia_Entry[32];
+int Cost;
+int Era;
+int Civ_Entry_Index;
+int X;
+int Y;
+int Reqs[4];
+int Flags;
+int Flavours;
+int field_70;
+
+techList: listSection(target: "bic", section: "TECH", nth: 1) {
+    name: string(offset:0, maxLength: 32)
+    era: int32s(offset: 68, count: 1)
+    prereqs: int32s(offset: 84, count: 4)
+}
+
+```
