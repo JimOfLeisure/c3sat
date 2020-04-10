@@ -7,19 +7,6 @@ There are two executables, c3sat and cia3.
 The libraries implement a GraphQL API local web server to query the data, and the cia3 executable includes embedded JavaScript to
 query the saves and present useful information.
 
-### Current Features
-
-- Available tech trades
-- Map highlighting forest chopped squares
-- Contact, will-talk and war/peace status for opponent civs
-- Display of map generation settings, world seed, and difficulty
-- Should work with custom scenarios/conquests
-
-### Known Issues
-
-- Eliminated civs still show up in lists
-- At-war won't-talk civs will disappear from tech trades table until they're willing to talk
-
 ## Civ Intelligence Agency III (CIA3)
 
 Civ Intelligence Agency III is intended to be a non-spoiling, non-cheating game assistant for single-human-player games of Sid Meier's Civilization III Complete and/or Conquests. Multiplayer non-spoiling support may be possible in the future.
@@ -36,6 +23,18 @@ I, Jim Nelson, or <a href="https://forums.civfanatics.com/members/puppeteer.3635
 
 <a href="https://forums.civfanatics.com/threads/cia3-civ-intelligence-agency-iii.656876/">Release thread on CivFanatics Forums</a> where new releases are announced. <a href="https://forums.civfanatics.com/threads/civ3-show-and-tell.493582/">Discussion thread on CivFanatics Forums</a> where I babble about development progress. CIA3 discussion begins on <a href="https://forums.civfanatics.com/threads/civ3-show-and-tell.493582/page-10#post-15638589">page 10</a>
 
+### Current Features
+
+- Available tech trades
+- Map highlighting forest chopped squares
+- Contact, will-talk and war/peace status for opponent civs
+- Display of map generation settings, world seed, and difficulty
+- Should work with custom scenarios/conquests
+
+### Known Issues
+
+- Eliminated civs still show up in lists
+- At-war won't-talk civs will disappear from tech trades table until they're willing to talk
 
 ## Civ3 Show-And-Tell (C3SAT)
 
