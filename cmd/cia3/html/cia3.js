@@ -433,7 +433,7 @@ class Civs extends Cia3Element {
         if (i==0) return "Yes";
         // if (i==1) return "No";
         // return "No (" + i.toString() + ")"; // don't know what else there is
-        return "No";
+        return "NO";
     }
     willTalk (e) {
         if (e.atWar[this.player]) {
@@ -628,18 +628,21 @@ class CivsDev extends Cia3Element {
     `;
     contactWithName (i) {
         if (i==0) return "No";
-        if (i==1) return "Yes";
-        return i.toString(); // don't know what else there is
+        // if (i==1) return "Yes";
+        // return i.toString(); // don't know what else there is
+        return "Yes";
     }
     relationshipName (i) {
         if (i==0) return "Peace";
-        if (i==1) return "WAR";
-        return i.toString(); // don't know what else there is
+        // if (i==1) return "WAR";
+        // return i.toString(); // don't know what else there is
+        return "WAR";
     }
     willTalkToName (i) {
         if (i==0) return "Yes";
-        if (i==1) return "No";
-        return "No: " + i.toString(); // don't know what else there is
+        // if (i==1) return "No";
+        // return "No: " + i.toString(); // don't know what else there is
+        return "No";
     }
 }
 
