@@ -1,0 +1,130 @@
+*,::before,::after {
+    box-sizing: border-box
+}
+body>*+*,main>*+* {
+    margin-top: 1em
+}
+body {
+    font-family: Verdana, Geneva, Tahoma, sans-serif;
+    min-height: 100vh;
+    text-rendering: optimizeSpeed;
+    color: #363940;
+    font-size: 1em;
+    line-height: 1.5em
+
+}
+li {
+    /* for click target size */
+    line-height: 1.5em;
+}
+li+li {
+    margin-top: 0.5em;
+}
+cia3-map {
+    --tile-width: 5em;
+    --tile-height: calc(var(--tile-width) / 2);
+    --tile-color: black;
+    --map-width: 3;
+
+    --desert: khaki;
+    --plains: goldenrod;
+    --grassland: yellowgreen;
+    --tundra: white;
+    --coast: lightseagreen;
+    --sea: mediumseagreen;
+    --ocean: seagreen;
+}
+
+cia3-error {
+    color: red;
+    display: block;
+}
+cia3-map {
+    display: flex;
+    /* flex-wrap and width needed to align the tiles into a map */
+    flex-wrap: wrap;
+    background-color: black;
+    width: calc(calc(var(--map-width) + 0.5) * var(--tile-width));
+    padding-bottom: calc(var(--tile-height) / 2);
+}
+cia3-tile {
+    display: flex;
+    margin-bottom: calc(var(--tile-height) * -0.5);
+    box-sizing: border-box;
+    /* margin: 0 0; */
+    /* needed to allow text div to overlay shape div */
+    position: relative;
+    /* need height & width here because of the 0-w/h div below */
+    width: var(--tile-width);
+    height: var(--tile-height);
+}
+cia3-tile.odd-row {
+    /* shift half-tile to the right */
+    margin-left: calc(var(--tile-width) / 2);
+}
+div.isotile {
+    display: flex;
+    box-sizing: border-box;
+    /* margin: 0 0; */
+    /* using borders and 0-w/h to make top half of a diamond */
+    width: 0;
+    height: 0;
+    border: calc(var(--tile-width) / 2) solid transparent;
+    border-bottom: calc(var(--tile-height) / 2) solid var(--tile-color);
+    position: absolute;
+    top: calc(var(--tile-width) / -2);
+}
+div.isotile:after {
+    /* using borders and 0-w/h to make bottom half of a diamond */
+    content: '';
+    position: absolute;
+    left: calc(var(--tile-width) / -2);
+    top: calc(var(--tile-height) / 2);
+    width: 0;
+    height: 0;
+    border: calc(var(--tile-width) / 2) solid transparent;
+    border-top: calc(var(--tile-height) / 2) solid var(--tile-color);
+}
+.tiletext, .terrain-overlay {
+    position: absolute;
+    width: var(--tile-width);
+    height: var(--tile-height);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+.chopped {
+    --size-ratio: 0.7;
+    position: absolute;
+    left: calc(var(--tile-width) / 2 - calc(var(--size-ratio) * var(--tile-width) / 2));
+    top: calc(var(--tile-height) / 2 - calc(var(--size-ratio) * var(--tile-height) / 2));
+    width: calc(var(--size-ratio) * var(--tile-width));
+    height: calc(var(--size-ratio) * var(--tile-height));
+    background: red;
+    border-radius: 50%;
+    opacity: 0.3;
+}
+cia3-hexdump {
+    display: block;
+    font-family: 'Consolas', 'Lucidia Console', 'Courier New', Courier, monospace;
+}
+cia3-civs > table > tr > td {
+    font-family: 'Consolas', 'Lucidia Console', 'Courier New', Courier, monospace;
+    text-align: right;
+    padding: 0 1em;
+}
+.dump {
+    font-family: 'Consolas', 'Lucidia Console', 'Courier New', Courier, monospace;
+    white-space: pre;
+    /* font-weight: bolder; */
+    font-size: x-large;
+}
+span.dim {
+    opacity: 0.33;
+}
+span.medium {
+    opacity: 0.66;
+}
+span.changed {
+    color: red;
+}

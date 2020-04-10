@@ -1,6 +1,6 @@
 package parseciv3
 
-// Copyright (c) 2016 Jim Nelson
+// Copyright (c) 2020 Jim Nelson
 
 // Permission is hereby granted, free of charge, to any person obtaining
 // a copy of this software and associated documentation files (the
@@ -26,51 +26,9 @@ import (
 	"encoding/binary"
 	"encoding/hex"
 	"io"
-	"io/ioutil"
-	"os"
 
 	"github.com/myjimnelson/c3sat/civ3decompress"
 )
-
-// ReadFile takes a filename and returns the decompressed file data or the raw data if it's not compressed. Also returns true if compressed.
-func ReadFile(path string) ([]byte, bool, error) {
-	// Open file, hanlde errors, defer close
-	file, err := os.Open(path)
-	if err != nil {
-		return nil, false, FileError{err}
-	}
-	defer file.Close()
-
-	var compressed bool
-	var data []byte
-	header := make([]byte, 2)
-	_, err = file.Read(header)
-	if err != nil {
-		return nil, false, FileError{err}
-	}
-	// reset pointer to parse from beginning
-	_, err = file.Seek(0, 0)
-	if err != nil {
-		return nil, false, FileError{err}
-	}
-	switch {
-	case header[0] == 0x00 && (header[1] == 0x04 || header[1] == 0x05 || header[1] == 0x06):
-		compressed = true
-		data, err = civ3decompress.Decompress(file)
-		if err != nil {
-			return nil, false, err
-		}
-	default:
-		// log.Println("Not a compressed file. Proceeding with uncompressed stream.")
-		// TODO: I'm sure I'm doing this in a terribly inefficient way. Need to refactor everything to pass around file pointers I think
-		data, err = ioutil.ReadFile(path)
-		if err != nil {
-			return nil, false, FileError{err}
-		}
-	}
-	return data, compressed, error(nil)
-
-}
 
 // TODO: Do I really need or want rawFile in the struct?
 // A: yes, while decoding, anyway. Or maybe I can include a lookahead dumping field instead of the entire file?
@@ -86,7 +44,7 @@ func NewCiv3Data(path string) (Civ3Data, error) {
 	civ3data.FileName = path
 
 	// Load file into struct for parsing
-	rawFile, compressed, err := ReadFile(path)
+	rawFile, compressed, err := civ3decompress.ReadFile(path)
 	if err != nil {
 		return civ3data, err
 	}

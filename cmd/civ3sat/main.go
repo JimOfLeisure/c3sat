@@ -8,8 +8,8 @@ import (
 	"os"
 	"text/tabwriter"
 
-	"github.com/myjimnelson/c3sat/civ3satgql"
-	"github.com/myjimnelson/c3sat/parseciv3"
+	"github.com/myjimnelson/c3sat/civ3decompress"
+	"github.com/myjimnelson/c3sat/queryciv3"
 	"github.com/urfave/cli"
 )
 
@@ -42,7 +42,7 @@ func main() {
 				w := new(tabwriter.Writer)
 				defer w.Flush()
 				w.Init(os.Stdout, 0, 8, 0, '\t', 0)
-				settings, err := civ3satgql.WorldSettings(saveFilePath)
+				settings, err := queryciv3.WorldSettings(saveFilePath)
 				if err != nil {
 					return cli.NewExitError(err, 1)
 				}
@@ -60,7 +60,7 @@ func main() {
 				pathFlag,
 			},
 			Action: func(c *cli.Context) error {
-				filedata, _, err := parseciv3.ReadFile(saveFilePath)
+				filedata, _, err := civ3decompress.ReadFile(saveFilePath)
 				if err != nil {
 					return err
 				}
@@ -83,7 +83,7 @@ func main() {
 				pathFlag,
 			},
 			Action: func(c *cli.Context) error {
-				filedata, _, err := parseciv3.ReadFile(saveFilePath)
+				filedata, _, err := civ3decompress.ReadFile(saveFilePath)
 				if err != nil {
 					return err
 				}
@@ -104,7 +104,7 @@ func main() {
 				// var gameData parseciv3.Civ3Data
 				var err error
 				query := c.Args().First()
-				result, err := civ3satgql.Query(query, saveFilePath)
+				result, err := queryciv3.Query(query, saveFilePath)
 				if err != nil {
 					return cli.NewExitError(err, 1)
 				}
@@ -136,7 +136,7 @@ func main() {
 				fmt.Println("Starting API server for save file at " + saveFilePath)
 				fmt.Println("GraphQL at http://" + c.String("addr") + ":" + c.String("port") + "/graphql")
 				fmt.Println("Press control-C to exit")
-				err = civ3satgql.Server(saveFilePath, c.String("addr"), c.String("port"))
+				err = queryciv3.Server(saveFilePath, c.String("addr"), c.String("port"))
 				if err != nil {
 					return cli.NewExitError(err, 1)
 				}

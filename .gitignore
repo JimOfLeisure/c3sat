@@ -3,6 +3,12 @@
 *.sav
 *.csv
 *.json
+cmd/temp/
+*.dll
+node_modules/
+
+# embeded files built by pkger
+pkged.go
 
 # built executables
 civ3sat/civ3sat
