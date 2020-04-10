@@ -10,7 +10,7 @@ import (
 )
 
 // build with `-ldflags "-X main.appVersion=myVersionName"` to set version at compile time
-var appVersion = "0.4.1-devbuild"
+var appVersion = "0.4.1"
 
 var savWatcher *fsnotify.Watcher
 var debounceTimer *time.Timer
