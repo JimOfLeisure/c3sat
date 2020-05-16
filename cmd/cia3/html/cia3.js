@@ -746,7 +746,7 @@ class Trade extends Cia3Element {
             && this.player != e.playerNumber[0]
             && data.tradeCivs[this.player].contactWith[e.playerNumber[0]]
             && (
-                e.atWar[this.player] !=0
+                ! e.atWar[this.player]
                 || e.willTalkTo[this.player] == 0
             )
             ;
