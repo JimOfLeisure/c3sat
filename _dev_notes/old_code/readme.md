@@ -23,7 +23,7 @@ _test.go files instead of an external script.
 with all the shapes defined, and I'd include this from the map SVG. I don't
 think this has been used since the project was in Python.
 
-## Other git point~~s~~ of interest in this project
+## Other git points of interest in this project
 
 This project started out in Python. It had a very brief early detour into C#
 (<https://github.com/myjimnelson/c3satcs>), I think went back to Python, and
@@ -43,3 +43,12 @@ basics of the file format.
 There was also a brief working attempt at a uWGSI web app that would take save
 file uploads and process them into an HTML/SVG map for online viewing.
 
+### Webview branch
+
+The [webview branch](https://github.com/myjimnelson/c3sat/tree/webview) tried
+to use github.com/zserge/webview as a UI instead of
+v0.4.x's fyne-io with link for any browser. In Jan 2020 webview still used
+IE11 on Windows but had a webview-x branch that used Edge on windows. Webview-x
+using Edge was supposed to be ready and in the master branch by March or April. If I
+keep using a web UI I may revisit this branch and see about launching straight
+into a 'native' browser window.
