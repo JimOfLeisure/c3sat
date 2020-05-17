@@ -1,8 +1,8 @@
 package main
 
 import (
-	// "fmt"
-	"log"
+	"net"
+	"strconv"
 	"time"
 
 	"github.com/fsnotify/fsnotify"
@@ -10,20 +10,40 @@ import (
 	"github.com/zserge/webview"
 )
 
+// build with `-ldflags "-X main.appVersion=myVersionName"` to set version at compile time
+var appVersion = "0.4.2-dev"
+
 var savWatcher *fsnotify.Watcher
 var debounceTimer *time.Timer
 var longPoll *golongpoll.LongpollManager
+var listener net.Listener
+var errorChannel = make(chan error, 20)
+var watchList = new(watchListType)
 
 const debounceInterval = 300 * time.Millisecond
 
+func loadStartupFiles(civPath string) {
+	var err error
+	err = loadDefaultBiq(civPath + `\conquests.biq`)
+	if err != nil {
+		errorChannel <- err
+	}
+	lastSav, err := getLastSav(civPath)
+	if err != nil {
+		errorChannel <- err
+	} else {
+		err = loadNewSav(lastSav)
+		if err != nil {
+			errorChannel <- err
+		}
+	}
+}
+
 func main() {
-	// fmt.Println("\nCiv Intelligence Agency III alpha 1b\n")
-	// fmt.Println("Setting up\n")
-	// Set up file watcher
 	var err error
 	savWatcher, err = fsnotify.NewWatcher()
 	if err != nil {
-		log.Fatal(err)
+		errorChannel <- err
 	}
 	defer savWatcher.Close()
 
@@ -34,36 +54,40 @@ func main() {
 	// Initialize long poll manager
 	longPoll, err = golongpoll.StartLongpoll(golongpoll.Options{})
 	if err != nil {
-		log.Fatal(err)
+		errorChannel <- err
 	}
 	defer longPoll.Shutdown()
 
 	// Read Win registry for Civ3 Conquests path
 	civPath, err := findWinCivInstall()
-	if err != nil {
-		log.Fatal(err)
-	}
-	// fmt.Println("Detected Civ3 location: " + civPath + "\n")
+	if err == nil {
+		loadStartupFiles(civPath)
+		// Add Saves and Saves\Auto folder watches
+		err = watchList.addWatch(civPath + `\Saves`)
+		if err != nil {
+			errorChannel <- err
+		}
+		err = watchList.addWatch(civPath + `\Saves\Auto`)
+		if err != nil {
+			errorChannel <- err
+		}
 
-	lastSav, err := getLastSav(civPath)
-	if err != nil {
-		// fmt.Println("Failed to discover latest save from conquests.ini. " + err.Error())
 	} else {
-		// fmt.Println("Opening latest SAV file " + lastSav + "\n")
-		loadNewSav(lastSav)
+		errorChannel <- err
 	}
 
-	// fmt.Println(`Adding <civ3 location>\Saves and <civ3 location>\Saves\Auto to watch list` + "\n")
+	for i := 0; i < len(httpPortTry); i++ {
+		listener, err = net.Listen("tcp", httpPortTry[i])
+		if err == nil {
+			break
+		}
+	}
+	if listener == nil {
+		panic(err)
+	}
 
-	// Add Saves and Saves\Auto folder watches
-	err = savWatcher.Add(civPath + `\Saves`)
-	if err != nil {
-		log.Fatal(err)
-	}
-	err = savWatcher.Add(civPath + `\Saves\Auto`)
-	if err != nil {
-		log.Fatal(err)
-	}
+	httpPort = strconv.Itoa(listener.Addr().(*net.TCPAddr).Port)
+	httpUrlString = "http://" + addr + ":" + httpPort + "/"
 
 	// Api server
 	go server()

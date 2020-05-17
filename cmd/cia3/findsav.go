@@ -4,17 +4,29 @@ import (
 	"fmt"
 	"io/ioutil"
 	"os"
+	"strings"
+
+	"github.com/myjimnelson/c3sat/queryciv3"
 
 	"golang.org/x/sys/windows/registry"
 )
 
-const civInstallPathKey = `SOFTWARE\WOW6432Node\Infogrames\Conquests`
+// really should be const, but can't have literal string arrays as const
+var civInstallPathKeyTry = []string{
+	`SOFTWARE\WOW6432Node\Infogrames\Conquests`,
+	`SOFTWARE\Infogrames\Conquests`,
+}
 
-// assume go prog is 64-bit
 func findWinCivInstall() (string, error) {
-	k, err := registry.OpenKey(registry.LOCAL_MACHINE, civInstallPathKey, registry.QUERY_VALUE)
-	if err != nil {
-		return "", err
+	var k registry.Key
+	var err error
+	for i := 0; i < len(civInstallPathKeyTry); i++ {
+		k, err = registry.OpenKey(registry.LOCAL_MACHINE, civInstallPathKeyTry[i], registry.QUERY_VALUE)
+		if err != nil {
+			return "", err
+		} else {
+			break
+		}
 	}
 	defer k.Close()
 	s, _, err := k.GetStringValue("install_path")
@@ -44,15 +56,17 @@ func getLastSav(path string) (string, error) {
 			}
 		}
 	}
-	_ = pathEnd
 	for i := pathStart; i < (len(ini)); i++ {
 		if ini[i] == '\r' || ini[i] == '\n' {
-			pathEnd = i - 1
+			pathEnd = i
 			break
 		}
 	}
 	if pathEnd <= pathStart {
 		return "", fmt.Errorf("Failed to find Latest Save in conquests.ini")
 	}
-	return string(ini[pathStart:pathEnd]) + ".SAV", nil
+	//  Assuming conquests.ini file is not UTF-8
+	s, err := queryciv3.CivString(ini[pathStart:pathEnd])
+	// My .ini has a space after the filename, so trimming leading/trailing whitespace
+	return strings.TrimSpace(s) + ".SAV", err
 }

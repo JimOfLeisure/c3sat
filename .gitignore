@@ -5,6 +5,7 @@
 *.json
 cmd/temp/
 *.dll
+node_modules/
 
 # embeded files built by pkger
 pkged.go

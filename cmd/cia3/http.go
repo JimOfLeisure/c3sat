@@ -3,13 +3,22 @@ package main
 import (
 	"log"
 	"net/http"
+	"strings"
 
 	"github.com/markbates/pkger"
-	"github.com/myjimnelson/c3sat/civ3satgql"
+	"github.com/myjimnelson/c3sat/queryciv3"
 )
 
 const addr = "127.0.0.1"
-const port = "8080"
+
+var httpUrlString string
+var httpPort = "8080"
+var httpPortTry = []string{
+	":8080",
+	":8000",
+	":8888",
+	":0",
+}
 
 func setHeaders(handler http.Handler) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
@@ -27,19 +36,31 @@ func setHeaders(handler http.Handler) http.Handler {
 	})
 }
 
+// Set Content-Type explicitly since net/http FileServer seems to use Win registry which on many systems has wrong info for js and css in particular
+func setContentTypeHeaders(handler http.Handler) http.Handler {
+	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		s := r.RequestURI
+		if len(s) > 3 && strings.ToLower(s[len(s)-3:]) == ".js" {
+			w.Header().Set("Content-Type", "application/javascript; charset=utf-8")
+		} else if len(s) > 4 && strings.ToLower(s[len(s)-4:]) == ".css" {
+			w.Header().Set("Content-Type", "text/css; charset=utf-8")
+		} else if len(s) > 5 && strings.ToLower(s[len(s)-5:]) == ".html" {
+			w.Header().Set("Content-Type", "text/html; charset=utf-8")
+		}
+		handler.ServeHTTP(w, r)
+	})
+}
+
 func server() {
-	gQlHandler, err := civ3satgql.GraphQlHandler()
+	gQlHandler, err := queryciv3.GraphQlHandler()
 	if err != nil {
 		log.Fatal(err)
 	}
-	staticFiles := http.FileServer(pkger.Dir("github.com/myjimnelson/c3sat:/cmd/cia3/html"))
-	// Can't figure out how to make pkger work for non-root
-	http.Handle("/", staticFiles)
+	staticFiles := http.FileServer(pkger.Dir("/cmd/cia3/html"))
+	http.Handle("/", setContentTypeHeaders(staticFiles))
 	http.Handle("/graphql", setHeaders(gQlHandler))
 	http.Handle("/events", setHeaders(http.Handler(http.HandlerFunc(longPoll.SubscriptionHandler))))
-	// fmt.Println("Opening local web server, please browse to http://" + addr + ":" + port + "/isocss.html")
-	// fmt.Println("Press control-C in this window or close it to end program")
-	err = http.ListenAndServe(addr+":"+port, nil)
+	err = http.ListenAndServe(addr+":"+httpPort, nil)
 	if err != nil {
 		log.Fatal(err)
 	}

@@ -8,8 +8,8 @@ import (
 	"os"
 	"text/tabwriter"
 
-	"github.com/myjimnelson/c3sat/civ3satgql"
-	"github.com/myjimnelson/c3sat/parseciv3"
+	"github.com/myjimnelson/c3sat/civ3decompress"
+	"github.com/myjimnelson/c3sat/queryciv3"
 	"github.com/urfave/cli"
 )
 
@@ -26,7 +26,7 @@ var pathFlag = cli.StringFlag{
 func main() {
 	app := cli.NewApp()
 	app.Name = "Civ3 Show-And-Tell"
-	app.Version = "0.4.1-alpha"
+	app.Version = "0.4.0"
 	app.Usage = "A utility to extract data from Civ3 SAV and BIQ files. Provide a file name of a SAV or BIQ file after the command."
 
 	app.Commands = []cli.Command{
@@ -42,7 +42,7 @@ func main() {
 				w := new(tabwriter.Writer)
 				defer w.Flush()
 				w.Init(os.Stdout, 0, 8, 0, '\t', 0)
-				settings, err := civ3satgql.WorldSettings(saveFilePath)
+				settings, err := queryciv3.WorldSettings(saveFilePath)
 				if err != nil {
 					return cli.NewExitError(err, 1)
 				}
@@ -60,7 +60,7 @@ func main() {
 				pathFlag,
 			},
 			Action: func(c *cli.Context) error {
-				filedata, _, err := parseciv3.ReadFile(saveFilePath)
+				filedata, _, err := civ3decompress.ReadFile(saveFilePath)
 				if err != nil {
 					return err
 				}
@@ -83,7 +83,7 @@ func main() {
 				pathFlag,
 			},
 			Action: func(c *cli.Context) error {
-				filedata, _, err := parseciv3.ReadFile(saveFilePath)
+				filedata, _, err := civ3decompress.ReadFile(saveFilePath)
 				if err != nil {
 					return err
 				}
@@ -104,7 +104,7 @@ func main() {
 				// var gameData parseciv3.Civ3Data
 				var err error
 				query := c.Args().First()
-				result, err := civ3satgql.Query(query, saveFilePath)
+				result, err := queryciv3.Query(query, saveFilePath)
 				if err != nil {
 					return cli.NewExitError(err, 1)
 				}
@@ -136,67 +136,13 @@ func main() {
 				fmt.Println("Starting API server for save file at " + saveFilePath)
 				fmt.Println("GraphQL at http://" + c.String("addr") + ":" + c.String("port") + "/graphql")
 				fmt.Println("Press control-C to exit")
-				err = civ3satgql.Server(saveFilePath, c.String("addr"), c.String("port"))
+				err = queryciv3.Server(saveFilePath, c.String("addr"), c.String("port"))
 				if err != nil {
 					return cli.NewExitError(err, 1)
 				}
 				return nil
 			},
 		},
-		// ** DEVELOP **
-		{
-			Name:    "map",
-			Aliases: []string{"m"},
-			Usage:   "Dump a JSON file of map data to civmap.json in the current folder",
-			Flags: []cli.Flag{
-				pathFlag,
-			},
-			Action: func(c *cli.Context) error {
-				var gameData parseciv3.Civ3Data
-				var err error
-				gameData, err = parseciv3.NewCiv3Data(saveFilePath)
-				if err != nil {
-					if parseErr, ok := err.(parseciv3.ParseError); ok {
-						return parseErr
-					}
-					return err
-				}
-				err = ioutil.WriteFile("./civmap.json", gameData.JSONMap(), 0644)
-				if err != nil {
-					log.Println("Error writing file")
-					return err
-				}
-
-				log.Println("Saved to civmap.json in current folder")
-				return nil
-			},
-		},
-		{
-			Name:    "dev",
-			Aliases: []string{"z"},
-			Usage:   "Who knows? It's whatever the dev is working on right now",
-			Flags: []cli.Flag{
-				pathFlag,
-			},
-			Action: func(c *cli.Context) error {
-				var gameData parseciv3.Civ3Data
-				var err error
-				gameData, err = parseciv3.NewCiv3Data(saveFilePath)
-				if err != nil {
-					// 	if parseErr, ok := err.(parseciv3.ParseError); ok {
-					// 		log.Printf("Expected: %s\nHex Dump:\n%s\n", parseErr.Expected, parseErr.Hexdump)
-					// 		return parseErr
-					// 	}
-					fmt.Print(gameData.Debug())
-					return err
-				}
-				// fmt.Print(gameData.Info())
-				fmt.Print(gameData.Debug())
-				return nil
-			},
-		},
-		// ** END DEVELOP **
 	}
-
 	app.Run(os.Args)
 }

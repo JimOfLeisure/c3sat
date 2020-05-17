@@ -1,4 +1,4 @@
-package civ3satgql
+package queryciv3
 
 import (
 	"encoding/base64"
@@ -129,6 +129,11 @@ var queryType = graphql.NewObject(graphql.ObjectConfig{
 			Type:        graphql.NewList(graphql.Int),
 			Description: "Byte array",
 			Args: graphql.FieldConfigArgument{
+				"target": &graphql.ArgumentConfig{
+					Type:         graphql.String,
+					Description:  "Target scope of the query. Can be game, bic, or file (default)",
+					DefaultValue: "file",
+				},
 				"section": &graphql.ArgumentConfig{
 					Type:        graphql.NewNonNull(graphql.String),
 					Description: "Four-character section name. e.g. TILE",
@@ -147,15 +152,25 @@ var queryType = graphql.NewObject(graphql.ObjectConfig{
 				},
 			},
 			Resolve: func(p graphql.ResolveParams) (interface{}, error) {
+				var target *saveGameType
+				targetArg, _ := p.Args["target"].(string)
 				section, _ := p.Args["section"].(string)
 				nth, _ := p.Args["nth"].(int)
 				offset, _ := p.Args["offset"].(int)
 				count, _ := p.Args["count"].(int)
-				savSection, err := SectionOffset(section, nth)
+				switch targetArg {
+				case "game":
+					target = &currentGame
+				case "bic":
+					target = &currentBic
+				default:
+					target = &saveGame
+				}
+				savSection, err := target.sectionOffset(section, nth)
 				if err != nil {
 					return nil, err
 				}
-				return saveGame.data[savSection+offset : savSection+offset+count], nil
+				return target.data[savSection+offset : savSection+offset+count], nil
 			},
 		},
 		"base64": &graphql.Field{
@@ -257,6 +272,30 @@ var queryType = graphql.NewObject(graphql.ObjectConfig{
 				return hex.Dump(saveGame.data[savSection+offset : savSection+offset+count]), nil
 			},
 		},
+		"hexDumpAll": &graphql.Field{
+			Type:        graphql.String,
+			Description: "Hex dump of all the data",
+			Args: graphql.FieldConfigArgument{
+				"target": &graphql.ArgumentConfig{
+					Type:         graphql.String,
+					Description:  "Target scope of the query. Can be game (default), bic, or file",
+					DefaultValue: "game",
+				},
+			},
+			Resolve: func(p graphql.ResolveParams) (interface{}, error) {
+				var target *saveGameType
+				targetArg, _ := p.Args["target"].(string)
+				switch targetArg {
+				case "file":
+					target = &saveGame
+				case "bic":
+					target = &currentBic
+				default:
+					target = &currentGame
+				}
+				return hex.Dump(target.data), nil
+			},
+		},
 		"int16s": &graphql.Field{
 			Type:        graphql.NewList(graphql.Int),
 			Description: "Int16 array",
@@ -327,6 +366,147 @@ var queryType = graphql.NewObject(graphql.ObjectConfig{
 				intList := make([]int, count)
 				for i := 0; i < count; i++ {
 					intList[i] = ReadInt32(savSection+offset+4*i, Signed)
+				}
+				return intList, nil
+			},
+		},
+		"allStrings": &graphql.Field{
+			Type:        graphql.NewList(graphql.String),
+			Description: "All ASCII strings four bytes or longer",
+			Resolve: func(p graphql.ResolveParams) (interface{}, error) {
+				var i, count, offset int
+				var output = make([]string, 0)
+				for i < len(saveGame.data) {
+					if saveGame.data[i] < 0x20 || saveGame.data[i] > 0x7F {
+						if count > 3 {
+							s := string(saveGame.data[offset:i])
+							output = append(output, s)
+						}
+						count = 0
+					} else {
+						if count == 0 {
+							offset = i
+						}
+						count++
+					}
+					i++
+				}
+				return output, nil
+			},
+		},
+		"listSection": &graphql.Field{
+			Type:        graphql.NewList(listSectionItem),
+			Description: "A list section has a 4-byte count of list items, and each item has a 4-byte length",
+			Args: graphql.FieldConfigArgument{
+				"target": &graphql.ArgumentConfig{
+					Type:         graphql.String,
+					Description:  "Target scope of the query. Can be game, bic, or file (default)",
+					DefaultValue: "file",
+				},
+				"section": &graphql.ArgumentConfig{
+					Type:        graphql.NewNonNull(graphql.String),
+					Description: "Four-character section name. e.g. TILE",
+				},
+				"nth": &graphql.ArgumentConfig{
+					Type:        graphql.NewNonNull(graphql.Int),
+					Description: "e.g. 2 for the second named section instance",
+				},
+			},
+			Resolve: func(p graphql.ResolveParams) (interface{}, error) {
+				var target *saveGameType
+				section, _ := p.Args["section"].(string)
+				nth, _ := p.Args["nth"].(int)
+				targetArg, _ := p.Args["target"].(string)
+				switch targetArg {
+				case "game":
+					target = &currentGame
+				case "bic":
+					target = &currentBic
+				default:
+					target = &saveGame
+				}
+				savSection, err := target.sectionOffset(section, nth)
+				if err != nil {
+					return nil, err
+				}
+				count := target.readInt32(savSection, Signed)
+				output := make([]saveAndOffsetType, count)
+				offset := 4
+				for i := 0; i < count; i++ {
+					output[i].offset = savSection + offset
+					output[i].save = target
+					length := target.readInt32(savSection+offset, Signed)
+					offset += 4 + length
+				}
+				return output, nil
+			},
+		},
+		"civs": &graphql.Field{
+			Type:        graphql.NewList(gameLeadSectionType),
+			Description: "A list of 32 civilization/leader (LEAD) sections' data",
+			Resolve: func(p graphql.ResolveParams) (interface{}, error) {
+				// Conquests saves appear to always have 32 LEAD sections
+				const leadCount = 32
+				output := make([]int, leadCount)
+				for i := 0; i < leadCount; i++ {
+					savSection, err := SectionOffset("LEAD", i+1)
+					if err != nil {
+						return nil, err
+					}
+					output[i] = savSection
+				}
+				return output, nil
+			},
+		},
+		"race": &graphql.Field{
+			Type:        graphql.NewList(raceSectionItemType),
+			Description: "A list of civilizations (RACE) from the BIQ. Note that offsets of sub items are from the end of the cities and military great leaders lists.",
+			Resolve: func(p graphql.ResolveParams) (interface{}, error) {
+				target := &currentBic
+				savSection, err := target.sectionOffset("RACE", 1)
+				if err != nil {
+					return nil, err
+				}
+				count := target.readInt32(savSection, Signed)
+				output := make([]saveAndOffsetType, count)
+				offset := 4
+				for i := 0; i < count; i++ {
+					length := target.readInt32(savSection+offset, Signed)
+					output[i].offset2 = savSection + offset
+					cityNamesCount := target.readInt32(output[i].offset2+4, Signed)
+					// Each city name buffer is 24 bytes long
+					greatLeaderNamesCount := target.readInt32(output[i].offset2+4+4+24*cityNamesCount, Signed)
+					// Each leader name buffer is 32 bytes long
+					// I am really confused why another +4 isn't needed here for the great leader count int, but it's working as-is
+					output[i].offset = output[i].offset2 + 4 + 4 + 24*cityNamesCount + 32*greatLeaderNamesCount
+					output[i].save = target
+					offset += 4 + length
+				}
+				return output, nil
+			},
+		},
+		"techCivMask": &graphql.Field{
+			Type:        graphql.NewList(graphql.Int),
+			Description: "Int32 array, each is a bit mask to flag which players have the tech by index.",
+			Resolve: func(p graphql.ResolveParams) (interface{}, error) {
+				techSection, err := currentBic.sectionOffset("TECH", 1)
+				if err != nil {
+					return nil, err
+				}
+				gameSection, err := currentGame.sectionOffset("GAME", 1)
+				if err != nil {
+					return nil, err
+				}
+				wrldSection, err := currentGame.sectionOffset("WRLD", 1)
+				if err != nil {
+					return nil, err
+				}
+				techCount := currentBic.readInt32(techSection, Signed)
+				continentCount := currentGame.readInt16(wrldSection+4, Signed)
+				techCivMaskOffset := 852 + 4*continentCount
+				intList := make([]int, techCount)
+				for i := 0; i < techCount; i++ {
+					intList[i] = currentGame.readInt32(gameSection+techCivMaskOffset+4*i, Unsigned)
 				}
 				return intList, nil
 			},
