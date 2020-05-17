@@ -94,6 +94,6 @@ func main() {
 
 	// panic(webview.Open("CIA3", "http://"+addr+":"+port+"/isocss.html", 1280, 720, true))
 	ui := webview.New(false)
-	ui.Navigate("http://" + addr + ":" + port + "/")
+	ui.Navigate("http://" + addr + ":" + httpPort + "/")
 	ui.Run()
 }
