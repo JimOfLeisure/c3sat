@@ -1,0 +1,184 @@
+Assumptions:
+	Barbs are first civ, then human player(s) then AI player(s)
+
+Guesses:
+	WRLD section data does not change from turn to turn
+	Barbs are first civ so they can always ensure they're at war with everyone? And/or otherwise programatically differentiate themselves from other civs?
+	Somewhere in here is a flag that tracks whether a tile has had a forest chopped on it already
+
+Thoughts:
+	Are continents represented in WRLD? Guessing not since the sizes seem consistent
+	Is there only one barb camp per civ? In my huge 2-player map I have reason to believe there are only two current barb camps on a huge continent.
+
+WRLD
+	2 bytes
+	0x00 short - number of continents
+
+WRLD (2nd instance)
+	164 bytes
+	looks like 41 integers
+	has map width and height
+	0x00 int? - Continent ID of the ocean (may be a short or even byte, but the high bytes have been 0 so far)
+	0x04 int? - Map height / y rows
+		4 ints? - No clue. Why the separation between rows and columns? These are small enough to be two x,y coordinates, but they aren't. Only lsB seems to be used..hmmm, bit flags?
+		map data like arid/etc? Kinda doubt it.
+		don't think they are continent IDs
+		Hmm, last int at 0x14 always 0?
+	0x18 int? - Map width / x columns
+	0x1c - 0x9b - 32 * int - Index of home tile for each civ! -1/ffff for nonexistent civ or barbs
+		guessing this is the start location and not necessarily the current home
+		0x1c int - Barb start location: -1 / ffff because n/a
+		0x20 int - Human player 1 start location (tile index, not x,y)
+		... next human players and then AI players
+	0x9c - int - World Seed
+	0xa0 - int? - no clue - 5 seems to be a common value so far
+
+WRLD (3rd instance)
+	52 bytes
+	looks like 13 integers
+	1 is a common value, also 2. Occasionally 0 or -1/ffff . Nothing else seen so far
+
+	**** After TILEs and CONTs there appears to be 26 integers with values of 1,2,3,4 or 5 . Think maybe it's part of one of the WRLD sections. Could this be the map gen settings? Or are those not stored in the actual map? ****
+	
+TILE (1st instance, aka "A"? aka Tile36)
+	36 bytes
+	think mostly ints but some shorts or bytes mixed in
+	0x00 byte - RIVERS!
+		0x01 - N corner
+		Mask 0x02 should be NE edge
+		0x03 - NE edge and N corner
+		0x06 - NE edge and E corner
+		0x07 - NE edge, N corner and E corner
+		Mask 0x08 should be SE edge
+		0x0c - SE edge, E corner
+		0x10 - S corner
+		0x18 - SE edge, S corner, E corner
+		Mask 0x20 should be SW edge
+		0x70 - SW edge, W corner, S corner
+		Mask 0x80 should be NW edge
+		0x30 - SW edge, S corner
+		0xc0 - NW edge, W corner
+		0xc1 - NW edge, W corner and N corner
+		
+		
+	0x01 - Territory? Civ #. Thought I saw elsewhere where there is culture or territory flags. Need to compare them.	
+	0x02 - no clue. Both bytes used. Landmark terrain?
+	0x04 int - Resources! -1/ffffffff if no resource, so I can tell this is a 4-byte int
+		0x00 - Horse
+		0x01 - Iron
+		0x02 - (unknown strat) (coal?)
+		0x03 - (unknown strat) (aluminum?)
+		0x02 - Saltpeter
+		0x04 - (unknown strat) (oil?)
+		0x05 - (unknown strat)
+		0x06 - (unknown strat)
+		0x08 - Wines
+		0x09 - Furs
+		0x0c - Spices
+		0x0d - Ivory
+		0x0a - Dyes
+		0x0b - Incense
+		0x0e - Silks
+		0x0f - Gems
+		0x10 - Whales
+		0x11 - Deer
+		0x12 - Fish
+		0x13 - Cow
+		0x14 - Wheat
+		0x15 - Gold
+		0x16 - Sugar
+		0x17 - Tropical Fruit
+		0x18 - Oasis
+		0x19 - Tobacco
+	0x08 int - definitely associated with units. Wild guess: visible/top unit ID?
+	0x0c int - varied numbers, can't quite spot a pattern
+	0x10 byte? or low nybble of 0x11
+	0x11 byte? - Pre-Conquests terrain? All 0's in most samples, but LK's world map seems to have terrain info here
+	0x12 short? - Pre-conquests flag of some sort? All 0's in most games, but some variation in LK's WM
+	0x14 short? - Barb info. Do barbs have tribe IDs? They must I guess, but would that be here? LK's WM has repeated number; my maps are limited but seem to have unique IDs
+		0x003e - Barb camp and/or barb warrior on my test map
+		0x004b - ? - very common on LK's WM, incl one in water
+		on isolated map, values of 0x0001, 0x0029 and 0x0011
+	0x16 short? - City ID
+	0x18 short? - Colony for me is 0x0000 ... Colony ID?
+	0x1a short or byte - Continent ID
+	0x1c short? - no clue, varies, big numbers - Interesting, low byte is ALWAYS 0x06 across ALL tiles accross 3 very different saves
+	0x1e short? - all -1/ffff
+	0x20 short? - all zeroes
+	0x22 short? - all zeroes
+
+TILE (2nd instance aka Tile12)
+	12 bytes
+	0x00 byte? (int I think) - Improvements
+		00000001 - Road
+		00000010 - Rail?
+		00000100 - Mine
+		00001000 - Irrigation
+		00010000 - Fortress?
+		00100000 - Goody hut?
+		01000000 - Pollution?
+		10000000 - Barb camp
+	0x01 - all zeroes. High byte of short? No, I think Improvements is one byte. Guessing byte padding
+	0x02 - all zeroes - Guessing byte padding
+	0x03 - all zeroes - Guessing byte padding, or maybe these 4 "0"-bytes are an unaligned integer?
+	0x04 - part of Terrain? Not sure why lsB would be 0, but what else is this?
+	0x05 byte - Terrain. Low-nybble base terrain, high-nybble overlay terrain
+	beyond -- looks bit-flag-ish, but doesn't seem to be visibility
+		By-civ culture visibility? Masking with 0x02 looks like it could be my civ's ...something. Culture vis isn't right.
+	0x0a short? - 
+		values 0x000a or 0x002a associated with starting positions ... 00001000 bit
+		Think the high "2" bit 00000010 00000000 may be associated with human players because 0x002a is human starting position. But there are plenty of other values, and I don't know what this means.
+		Mask 0x0001 is *** Bonus Grassland *** . Interesting, some hills and mountains have it (base tile is grassland)
+		Mask 0x0002 is the "fat x" around each city whether or not it has the culture to work it
+		Mask 0x0004 - Can't find any
+		Mask 0x0008 - Player start location
+		Mask 0x0010 - Snow-caps for mountains
+		Mask 0x0020 - Unsure. Only on land, seems clumped. Seems to be all tundra on generated maps and all forest tundra on LK's WM. Have not seen it on jungle tiles.
+		Other nybble masks 0x00c0 - nothing I can find
+		Mask 0x1000 - This looks like a likely candidate for "forest already chopped here"
+		Other nybble masks 0xe000 - nothing I can find ***  (found some of these on LK's WM)
+		Mask 0x0100 - river N corner? or NW?
+		Mask 0x0200 - river W corner?
+		Mask 0x0400 - river E corner? or SE?
+		Mask 0x0800 - river S corner?
+		
+		
+
+TILE (3rd instance aka Tile4)
+	4 bytes
+	0x00 int - All zeroes?
+
+TILE (4th instance aka "B"? aka Tile128)
+	128 bytes
+	0x00 int - bit mask of is visible to civ (fog of war). lsb is barbs, next is human player 1, etc..
+	0x04 int - bit mask of is visible NOW for units only, does not seem to include city/culture visibility
+	0x08 int - bit mask of visible to colonies?
+	0x0c int - bit mask of city/culture visibility
+	0x10 byte - tile transition values? Only values are at top row and bottom two rows of map
+	0x11 byte - tile transition values? Seems mostly to left of land transitions, but not absolutely. Also at top and bottom of map
+	0x12 byte - tile transition values? Seems to apply to most land transitions, but standalone and left-most hills and mountains seem to be -1/ff . Presume this controls how the overlays/transitions work to e.g. show continuous hills
+	0x13 byte - 0 or 1. Flag of some sort; can't figure out what it means. Or maybe high byte of previous value?
+	0x14 short - City ID of the city working this tile (includes city tile)
+	0x16 - Guess: 32-short-int list of trade network IDs known to that civ? But not necessarily tradeable I think. Perhaps this is what trade routes are seen/known to that civ because of recency of tile improvement knowledge? Maybe both civs have to be able to see the same trade network ID to trade via that tile?
+		0x16 short? - all 0xffff
+		0x18 short? - Appears to be ID of road/land trade networks. Each isolated road network has its own ID
+		0x20 short? - Also seems to be land trade network ID, but is 0xffff everywhere on my pre-conquest-win test save (no opponents left). Maybe this is used to determine which civs might trade with each other?
+		0x22 short? - At a quick glance looks identical to 0x20
+		...
+	0x56 - Guess: 32-byte per-civ-knowledge improvements flag
+	0x76 short? - can't determine what is is, but 1a1a values look familiar; maybe this is related to Tile36 0x06? Maybe this helps determine which graphic tile to use?
+		May be river info. 0x77 value of 0x14 may be associated with river on SE edge. 0x0808 may be river on NW edge.
+		Mask 0x0008 is not river; probably tile graphic choice
+			nor 0x0800
+			nor 0x0014 or combinations
+			Maybe this has nothing to do with rivers, but maybe varied tile graphic selection.
+		
+	0x78 short? - All zeroes. Maybe high-bytes of int?
+	0x7a short? - All zeroes.
+	0x7c short? - All zeroes.
+	0x7e short? - All zeroes. Or maybe this has been byte padding
+
+CONT
+	8 bytes
+	0x00 int - 0 for water, 1 for land (Or is this boolean with 3 padding bytes?)
+	0x04 int - size of continent in tiles
