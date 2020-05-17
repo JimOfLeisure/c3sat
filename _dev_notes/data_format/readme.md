@@ -1,3 +1,15 @@
+# Civ3 BIC & SAV file format notes
+
+May 2020: I started researching and analyzing the Civilization III save file format quite
+a few years ago, and occasionally come back to it and make new notes.
+BIC/BIX/BIQ format is also of interest since you need to read that to interpret
+a lot of what's in the SAV file to accommodate scenarios, conquests, and mods.
+
+So there's a lot of good info in here, but there is really no organization
+other than what my focus was on at the time I was taking the notes.
+
+---
+
 August 2016: During the Go rewrite, taking more specific notes. They might as well go here.
 
 ## Start of SAV file
