@@ -58,5 +58,11 @@ func TestPassValues(L *lua.LState) int {
 func SavLoad(L *lua.LState) int {
 	path := L.ToString(1)
 	fmt.Println("path given is ", path)
+	err := saveGame.loadSave(path)
+	// TODO: Handle errors
+	if err != nil {
+		panic(err)
+	}
+
 	return 0
 }
