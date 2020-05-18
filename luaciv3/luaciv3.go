@@ -1,8 +1,6 @@
 package luaciv3
 
 import (
-	"fmt"
-
 	lua "github.com/yuin/gopher-lua"
 )
 
@@ -24,6 +22,13 @@ func NewState() *lua.LState {
 // LuaCiv3 injects functions into a gopher-lua state
 // TODO: Should I eliminate error return? lua.NewState() doesn't return error
 func LuaCiv3(L *lua.LState) error {
-	fmt.Println("luaciv3 doesn't do anything yet")
+	L.SetGlobal("test", L.NewFunction(TestPassValues))
 	return nil
+}
+
+// TestPassValues is my getting familiar with calling Go from lua
+//  see https://github.com/yuin/gopher-lua#calling-go-from-lua
+func TestPassValues(L *lua.LState) int {
+	L.Push(lua.LNumber(12345))
+	return 1
 }

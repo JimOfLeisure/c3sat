@@ -22,11 +22,13 @@ func TestWhatevs(t *testing.T) {
 		cmd  string
 	}{
 		{"Print Hi", `print("Hi from lua")`},
-		{"Pring _G k/v pairs", `for k, v in pairs(_G) do
-			print(k, v)
-			end`},
+		/*
+			{"Pring _G k/v pairs", `for k, v in pairs(_G) do
+				print(k, v)
+				end`},
+		*/
 		{"Print _Version", `print(_VERSION)`},
-		// {"", ``},
+		{"test()", `print(test())`},
 		// {"", ``},
 		// {"", ``},
 	}
