@@ -1,6 +1,8 @@
 package luaciv3
 
 import (
+	"fmt"
+
 	lua "github.com/yuin/gopher-lua"
 )
 
@@ -15,7 +17,10 @@ func NewState() *lua.LState {
 	if memoryLimitMb > 0 {
 		L.SetMx(memoryLimitMb)
 	}
-	_ = LuaCiv3(L)
+	if err := LuaCiv3(L); err != nil {
+		// TODO: Better error handling, although not expecting setup runtime errors
+		fmt.Printf("\n********************\n%s\n\n", err.Error())
+	}
 	return L
 }
 
@@ -27,12 +32,10 @@ func LuaCiv3(L *lua.LState) error {
 
 	// civ3 table
 	civ3 := L.NewTable()
-	if path, err := findWinCivInstall(); err == nil {
-		L.RawSet(civ3, lua.LString("path"), lua.LString(path))
-	} else {
-		return err
-	}
 	L.SetGlobal("civ3", civ3)
+	// if error, will get empty string, and that's fine
+	path, _ := findWinCivInstall()
+	L.RawSet(civ3, lua.LString("path"), lua.LString(path))
 	return nil
 }
 
