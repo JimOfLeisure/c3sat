@@ -37,6 +37,7 @@ func TestWhatevs(t *testing.T) {
 				print(k, v)
 				end`},
 		{"Print sav.load(<path>)", `print(sav.load(civ3.path .. "/Saves/Auto/Conquests Autosave 4000 BC.SAV"))`},
+		{"Print sav.dump()", `print(sav.dump())`},
 		// {"", ``},
 		// {"", ``},
 	}

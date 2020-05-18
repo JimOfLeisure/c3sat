@@ -1,6 +1,7 @@
 package luaciv3
 
 import (
+	"encoding/hex"
 	"fmt"
 
 	lua "github.com/yuin/gopher-lua"
@@ -41,6 +42,7 @@ func LuaCiv3(L *lua.LState) error {
 	sav := L.NewTable()
 	L.SetGlobal("sav", sav)
 	L.RawSet(sav, lua.LString("load"), L.NewFunction(SavLoad))
+	L.RawSet(sav, lua.LString("dump"), L.NewFunction(SavDump))
 
 	return nil
 }
@@ -64,5 +66,13 @@ func SavLoad(L *lua.LState) int {
 		panic(err)
 	}
 
+	return 0
+}
+
+// TODO: parameters
+// TODO: Do I want to return the string in lua? probably
+// SavDump prints a hex dump
+func SavDump(L *lua.LState) int {
+	fmt.Println(hex.Dump(saveGame.data[:256]))
 	return 0
 }
