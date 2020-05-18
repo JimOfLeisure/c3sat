@@ -23,12 +23,15 @@ func NewState() *lua.LState {
 // TODO: Should I eliminate error return? lua.NewState() doesn't return error
 func LuaCiv3(L *lua.LState) error {
 	L.SetGlobal("test", L.NewFunction(TestPassValues))
+	L.SetGlobal("civ3", L.NewTable())
 	return nil
 }
 
-// TestPassValues is my getting familiar with calling Go from lua
+// TestPassValues is my getting familiar with calling Go from lua with values/params
 //  see https://github.com/yuin/gopher-lua#calling-go-from-lua
 func TestPassValues(L *lua.LState) int {
-	L.Push(lua.LNumber(12345))
+	lv := L.ToInt(1)
+	lv2 := L.ToInt(2)
+	L.Push(lua.LNumber(lv * lv2))
 	return 1
 }

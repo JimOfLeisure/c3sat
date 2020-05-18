@@ -28,7 +28,11 @@ func TestWhatevs(t *testing.T) {
 				end`},
 		*/
 		{"Print _Version", `print(_VERSION)`},
-		{"test()", `print(test())`},
+		{"test(5, 2)", `print(test(5, 2))`},
+		{"Print civ3", `print(civ3)`},
+		{"Pring civ3 k/v pairs", `for k, v in pairs(civ3) do
+			print(k, v)
+			end`},
 		// {"", ``},
 		// {"", ``},
 	}
