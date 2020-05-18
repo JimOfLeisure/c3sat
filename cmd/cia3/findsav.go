@@ -23,7 +23,9 @@ func findWinCivInstall() (string, error) {
 	for i := 0; i < len(civInstallPathKeyTry); i++ {
 		k, err = registry.OpenKey(registry.LOCAL_MACHINE, civInstallPathKeyTry[i], registry.QUERY_VALUE)
 		if err != nil {
-			return "", err
+			if i >= len(civInstallPathKeyTry)-1 {
+				return "", err
+			}
 		} else {
 			break
 		}
