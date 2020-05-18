@@ -1,6 +1,8 @@
 package luaciv3
 
 import (
+	"fmt"
+
 	lua "github.com/yuin/gopher-lua"
 )
 
@@ -22,8 +24,19 @@ func NewState() *lua.LState {
 // LuaCiv3 injects functions into a gopher-lua state
 // TODO: Should I eliminate error return? lua.NewState() doesn't return error
 func LuaCiv3(L *lua.LState) error {
+	// test function
 	L.SetGlobal("test", L.NewFunction(TestPassValues))
-	L.SetGlobal("civ3", L.NewTable())
+
+	// civ3 table
+	civ3 := L.NewTable()
+	if path, err := findWinCivInstall(); err == nil {
+		fmt.Println(path)
+		L.RawSet(civ3, lua.LString("path"), lua.LString(path))
+	} else {
+		return err
+	}
+	L.RawSet(civ3, lua.LString("foo"), lua.LString("bar"))
+	L.SetGlobal("civ3", civ3)
 	return nil
 }
 
