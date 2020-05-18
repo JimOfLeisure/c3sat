@@ -36,6 +36,12 @@ func LuaCiv3(L *lua.LState) error {
 	// if error, will get empty string, and that's fine
 	path, _ := findWinCivInstall()
 	L.RawSet(civ3, lua.LString("path"), lua.LString(path))
+
+	// sav table
+	sav := L.NewTable()
+	L.SetGlobal("sav", sav)
+	L.RawSet(sav, lua.LString("load"), L.NewFunction(SavLoad))
+
 	return nil
 }
 
@@ -46,4 +52,11 @@ func TestPassValues(L *lua.LState) int {
 	lv2 := L.ToInt(2)
 	L.Push(lua.LNumber(lv * lv2))
 	return 1
+}
+
+// SavLoad takes a path from lua and loads it into memory
+func SavLoad(L *lua.LState) int {
+	path := L.ToString(1)
+	fmt.Println("path given is ", path)
+	return 0
 }

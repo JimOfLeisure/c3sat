@@ -33,6 +33,10 @@ func TestWhatevs(t *testing.T) {
 		{"Pring civ3 k/v pairs", `for k, v in pairs(civ3) do
 			print(k, v)
 			end`},
+		{"Pring sav k/v pairs", `for k, v in pairs(sav) do
+				print(k, v)
+				end`},
+		{"Print sav.load(<path>)", `print(sav.load(civ3.path .. "/Saves/Auto/Conquests Autosave 4000 BC.SAV"))`},
 		// {"", ``},
 		// {"", ``},
 	}
