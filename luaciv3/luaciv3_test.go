@@ -1,12 +1,12 @@
 package luaciv3
 
 import (
+	"fmt"
 	"testing"
 
 	prompt "github.com/c-bata/go-prompt"
 )
 
-// I'm new to go-prompt and don't know how to do without auto-suggest yet, so just using their example
 func myCompleter(d prompt.Document) []prompt.Suggest {
 	s := []prompt.Suggest{}
 	return prompt.FilterHasPrefix(s, d.GetWordBeforeCursor(), true)
@@ -16,17 +16,27 @@ func myCompleter(d prompt.Document) []prompt.Suggest {
 //   try to put stuff here instead of a new executable
 // Go will cache test results; run `go test` with `-count=1` to skip caching the interactive input/output
 func TestWhatevs(t *testing.T) {
+
+	doStrings := []struct {
+		desc string
+		cmd  string
+	}{
+		{"Print Hi", `print("Hi from lua")`},
+		{"Pring _G k/v pairs", `for k, v in pairs(_G) do
+			print(k, v)
+			end`},
+		{"Print _Version", `print(_VERSION)`},
+		// {"", ``},
+		// {"", ``},
+		// {"", ``},
+	}
 	L := NewState()
-	if err := L.DoString(`print("Hi from lua")`); err != nil {
-		t.Error("DoString: ", err.Error())
-	}
-	if err := L.DoString(`for k, v in pairs(_G) do
-	print(k, v)
-	end`); err != nil {
-		t.Error("DoString: ", err.Error())
-	}
-	if err := L.DoString(`print(_VERSION)`); err != nil {
-		t.Error("DoString: ", err.Error())
+	for _, o := range doStrings {
+		fmt.Printf("=== %s ===\n", o.desc)
+		if err := L.DoString(o.cmd); err != nil {
+			t.Error("DoString: ", err.Error())
+		}
+
 	}
 	l := prompt.Input("> ", myCompleter)
 	if err := L.DoString(l); err != nil {
