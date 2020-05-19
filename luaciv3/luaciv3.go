@@ -68,11 +68,11 @@ func savLoad(L *lua.LState) int {
 	if err != nil {
 		panic(err)
 	}
-	sav := L.GetGlobal("sav")
-	if savTable, ok := sav.(*lua.LTable); ok {
-		L.RawSet(savTable, lua.LString("path"), lua.LString(saveGame.path))
-		L.RawSet(savTable, lua.LString("name"), lua.LString(saveGame.fileName()))
-	}
+	L.SetGlobal("save_path", lua.LString(saveGame.path))
+	L.SetGlobal("save_name", lua.LString(saveGame.fileName()))
+
+	civ3Module(L)
+
 	return 0
 }
 
@@ -103,6 +103,8 @@ func bicLoadDefault(L *lua.LState) int {
 	if bicTable, ok := bic.(*lua.LTable); ok {
 		L.RawSet(bicTable, lua.LString("path"), lua.LString(defaultBic.path))
 		L.RawSet(bicTable, lua.LString("name"), lua.LString(defaultBic.fileName()))
+		L.SetGlobal("bic_path", lua.LString(defaultBic.path))
+		L.SetGlobal("bic_name", lua.LString(defaultBic.fileName()))
 	}
 	return 0
 }
