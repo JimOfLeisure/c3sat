@@ -22,19 +22,20 @@ func TestWhatevs(t *testing.T) {
 		cmd  string
 	}{
 		/*
-				{"Print Hi", `print("Hi from lua")`},
-					{"Pring _G k/v pairs", `for k, v in pairs(_G) do
-						print(k, v)
-						end`},
-				{"Print _Version", `print(_VERSION)`},
-				{"test(5, 2)", `print(test(5, 2))`},
-			{"Print civ3", `print(civ3)`},
+					{"Print Hi", `print("Hi from lua")`},
+						{"Pring _G k/v pairs", `for k, v in pairs(_G) do
+							print(k, v)
+							end`},
+					{"Print _Version", `print(_VERSION)`},
+					{"test(5, 2)", `print(test(5, 2))`},
+				{"Print civ3", `print(civ3)`},
+			{"Print civ3 k/v pairs", `for k, v in pairs(civ3) do
+				print(k, v)
+				end`},
 		*/
-		{"Print civ3 k/v pairs", `for k, v in pairs(civ3) do
-			print(k, v)
-			end`},
+		{"Print install_path", `print(install_path)`},
 		{"Print bic.loadDefault()", `print(bic.load_default())`},
-		{"Print sav.load(<path>)", `print(sav.load(civ3.path .. "/Saves/Auto/Conquests Autosave 4000 BC.SAV"))`},
+		{"Print sav.load(<path>)", `print(sav.load(install_path .. "/Saves/Auto/Conquests Autosave 4000 BC.SAV"))`},
 		{"Print sav k/v pairs", `for k, v in pairs(sav) do
 			print(k, v)
 			end`},

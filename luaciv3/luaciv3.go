@@ -30,12 +30,10 @@ func LuaCiv3(L *lua.LState) error {
 	// test function
 	L.SetGlobal("test", L.NewFunction(TestPassValues))
 
-	// civ3 table
-	civ3 := L.NewTable()
-	L.SetGlobal("civ3", civ3)
+	// install_path
 	// if error, will get empty string, and that's fine
 	path, _ := findWinCivInstall()
-	L.RawSet(civ3, lua.LString("path"), lua.LString(path))
+	L.SetGlobal("install_path", lua.LString(path))
 
 	// sav table
 	sav := L.NewTable()
@@ -89,14 +87,11 @@ func SavDump(L *lua.LState) int {
 // BicLoadDefault takes a path from lua and loads it into memory
 func BicLoadDefault(L *lua.LState) int {
 	path := L.ToString(1)
-	// Try to fetch civ3.path if no path provided
+	// Try to fetch install_path if no path provided
 	if path == "" {
-		civ3 := L.GetGlobal("civ3")
-		if civ3Table, ok := civ3.(*lua.LTable); ok {
-			installPath := L.RawGet(civ3Table, lua.LString("path"))
-			if iPathString, ok := installPath.(lua.LString); ok {
-				path = string(iPathString) + "/conquests.biq"
-			}
+		installPath := L.GetGlobal("install_path")
+		if iPathString, ok := installPath.(lua.LString); ok {
+			path = string(iPathString) + "/conquests.biq"
 		}
 	}
 	err := defaultBic.loadSave(path)
