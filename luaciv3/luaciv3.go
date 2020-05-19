@@ -46,7 +46,7 @@ func LuaCiv3(L *lua.LState) error {
 	// bic table
 	bic := L.NewTable()
 	L.SetGlobal("bic", bic)
-	L.RawSet(bic, lua.LString("load"), L.NewFunction(BicLoadDefault))
+	L.RawSet(bic, lua.LString("load_default"), L.NewFunction(BicLoadDefault))
 	L.RawSet(bic, lua.LString("dump"), L.NewFunction(BicDump))
 
 	return nil
@@ -89,6 +89,16 @@ func SavDump(L *lua.LState) int {
 // BicLoadDefault takes a path from lua and loads it into memory
 func BicLoadDefault(L *lua.LState) int {
 	path := L.ToString(1)
+	// Try to fetch civ3.path if no path provided
+	if path == "" {
+		civ3 := L.GetGlobal("civ3")
+		if civ3Table, ok := civ3.(*lua.LTable); ok {
+			installPath := L.RawGet(civ3Table, lua.LString("path"))
+			if iPathString, ok := installPath.(lua.LString); ok {
+				path = string(iPathString) + "/conquests.biq"
+			}
+		}
+	}
 	err := defaultBic.loadSave(path)
 	// TODO: Handle errors
 	if err != nil {
