@@ -9,11 +9,13 @@ future, but I'm not sure it's worth the trouble.
 
 - `install_path` -  If found in the Windows registry, this is the path to the
 Civ III Conquests (or Complete) install directory. Of course, it can be overridden in Lua.
-- `get_savs(dir)` - Given a directory path, returns an array of all '.sav' files in that folder. (Not currently recursive.)
-- `sav_path` - After `sav.load()`, contains the full path name of the loaded SAV file
-- `sav_name` - After `sav.load()`, contains just the file name of the loaded SAV file
-- `bic_path` - After `bic.load()`, contains the full path name of the default BIC file
-- `bic_name` - After `bic.load()`, contains just the file name of the default BIC file
+- `get_savs({dir})` or `get_savs({dir1, dir2, dir3})` - Given an array of
+directory paths, returns an array of all '.sav' files in those directories.
+(Not currently recursive.)
+- `sav_path` - The full path name of the loaded SAV file
+- `sav_name` - Just the file name of the loaded SAV file
+- `bic_path` - The full path name of the default BIC file
+- `bic_name` - Just the file name of the default BIC file
 
 ## Raw data modules
 
