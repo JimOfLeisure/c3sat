@@ -4,23 +4,28 @@ type lengthCode struct {
 	value, extraBits int
 }
 
-var lengthLookup = map[string]lengthCode{
-	"101":     lengthCode{2, 0},
-	"11":      lengthCode{3, 0},
-	"100":     lengthCode{4, 0},
-	"011":     lengthCode{5, 0},
-	"0101":    lengthCode{6, 0},
-	"0100":    lengthCode{7, 0},
-	"0011":    lengthCode{8, 0},
-	"00101":   lengthCode{9, 0},
-	"00100":   lengthCode{10, 1},
-	"00011":   lengthCode{12, 2},
-	"00010":   lengthCode{16, 3},
-	"000011":  lengthCode{24, 4},
-	"000010":  lengthCode{40, 5},
-	"000001":  lengthCode{72, 6},
-	"0000001": lengthCode{136, 7},
-	"0000000": lengthCode{264, 8},
+type lengthKey struct {
+	keyBitLength int
+	key   uint
+}
+
+var lengthLookup = map[lengthKey]lengthCode{
+	{3, 0b101}:     lengthCode{2, 0},
+	{3, 0b11}:      lengthCode{3, 0},
+	{3, 0b100}:     lengthCode{4, 0},
+	{3, 0b011}:     lengthCode{5, 0},
+	{4, 0b0101}:    lengthCode{6, 0},
+	{4, 0b0100}:    lengthCode{7, 0},
+	{4, 0b0011}:    lengthCode{8, 0},
+	{5, 0b00101}:   lengthCode{9, 0},
+	{5, 0b00100}:   lengthCode{10, 1},
+	{5, 0b00011}:   lengthCode{12, 2},
+	{5, 0b00010}:   lengthCode{16, 3},
+	{6, 0b000011}:  lengthCode{24, 4},
+	{6, 0b000010}:  lengthCode{40, 5},
+	{6, 0b000001}:  lengthCode{72, 6},
+	{7, 0b0000001}: lengthCode{136, 7},
+	{7, 0b0000000}: lengthCode{264, 8},
 }
 
 var offsetLookup = map[string]int{

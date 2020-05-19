@@ -23,6 +23,7 @@ package civ3decompress
 // WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
 import (
+	"fmt"
 	"bytes"
 	"io"
 )
@@ -101,30 +102,34 @@ func Decompress(file io.Reader) ([]byte, error) {
 }
 
 func (b *BitReader) lengthsequence() (int, error) {
-	var sequence bytes.Buffer
-	count := 0
-	for _, keyPresent := lengthLookup[sequence.String()]; !keyPresent; count++ {
+	var sequence lengthKey
+	sequence.keyBitLength = 0
+	for _, keyPresent := lengthLookup[sequence]; !keyPresent; sequence.keyBitLength++ {
+		fmt.Println(sequence)
 		bit, err := b.ReadBit()
 		if err != nil {
 			return 0, FileError{err}
 		}
+		sequence.key = sequence.key << 1
 		if bit {
-			sequence.WriteString("1")
+			// sequence.WriteString("1")
+			sequence.key = sequence.key | 0b1
 		} else {
-			sequence.WriteString("0")
+			// sequence.WriteString("0")
 		}
 		// hack, but not sure how to check every iteration in for params
-		_, keyPresent = lengthLookup[sequence.String()]
-		if count > 8 {
+		_, keyPresent = lengthLookup[sequence]
+		if sequence.keyBitLength > 8 {
 			return 0, DecodeError{"Token did not match length sequence"}
 		}
 	}
-	xxxes, err := b.ReadBits(uint(lengthLookup[sequence.String()].extraBits))
+	fmt.Println(sequence, lengthLookup[sequence])
+	xxxes, err := b.ReadBits(uint(lengthLookup[sequence].extraBits))
 	if err != nil {
 		return 0, FileError{err}
 	}
 	// log.Printf("Decoded length sequence is %v, to read %v more bits which are %v", lengthLookup[sequence.String()].value, lengthLookup[sequence.String()].extraBits, xxxes)
-	return lengthLookup[sequence.String()].value + int(xxxes), nil
+	return lengthLookup[sequence].value + int(xxxes), nil
 }
 func (b *BitReader) offsetsequence(dictsize int) (int, error) {
 	var sequence bytes.Buffer
