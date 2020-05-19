@@ -3,6 +3,9 @@ package luaciv3
 import (
 	"encoding/hex"
 	"fmt"
+	"io/ioutil"
+	"path/filepath"
+	"strings"
 
 	lua "github.com/yuin/gopher-lua"
 )
@@ -46,6 +49,8 @@ func LuaCiv3(L *lua.LState) error {
 	L.SetGlobal("bic", bic)
 	L.RawSet(bic, lua.LString("load_default"), L.NewFunction(bicLoadDefault))
 	L.RawSet(bic, lua.LString("dump"), L.NewFunction(bicDump))
+
+	L.SetGlobal("get_savs", L.NewFunction(getSavs))
 
 	return nil
 }
@@ -109,5 +114,27 @@ func bicLoadDefault(L *lua.LState) int {
 func bicDump(L *lua.LState) int {
 	dump := hex.Dump(defaultBic.data[:256])
 	L.Push(lua.LString(dump))
+	return 1
+}
+
+// getSavs takes a table as input, each value is a directory for which to return all .SAV file paths
+func getSavs(L *lua.LState) int {
+	dirs := L.ToTable(1)
+	savs := L.NewTable()
+	dirs.ForEach(func(_ lua.LValue, v lua.LValue) {
+		if dir, ok := v.(lua.LString); ok {
+			fmt.Println(string(dir))
+			if files, err := ioutil.ReadDir(string(dir)); err == nil {
+				for _, f := range files {
+					if (!f.IsDir()) && strings.ToLower(filepath.Ext(f.Name())) == ".sav" {
+						savs.Append(lua.LString(f.Name()))
+					}
+				}
+			} else {
+				fmt.Println("whoops")
+			}
+		}
+	})
+	L.Push(savs)
 	return 1
 }

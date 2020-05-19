@@ -2,6 +2,8 @@ package luaciv3
 
 import (
 	"fmt"
+	"path/filepath"
+	"runtime"
 	"testing"
 
 	prompt "github.com/c-bata/go-prompt"
@@ -54,6 +56,7 @@ func TestWhatevs(t *testing.T) {
 		// {"", ``},
 	}
 	L := NewState()
+	defer L.Close()
 	for _, o := range doStrings {
 		fmt.Printf("=== %s ===\n", o.desc)
 		if err := L.DoString(o.cmd); err != nil {
@@ -61,10 +64,12 @@ func TestWhatevs(t *testing.T) {
 		}
 
 	}
-	l := prompt.Input("> ", myCompleter)
-	if err := L.DoString(l); err != nil {
-		t.Error("DoString: ", err.Error())
-	}
+	/*
+		l := prompt.Input("> ", myCompleter)
+		if err := L.DoString(l); err != nil {
+			t.Error("DoString: ", err.Error())
+		}
+	*/
 }
 
 // go-prompt example
@@ -84,3 +89,13 @@ func TestGoPrompt(t *testing.T) {
 	fmt.Println("You selected " + tbl)
 }
 */
+
+func TestLuaScript(t *testing.T) {
+	L := NewState()
+	// get filename of current file; will use relative path from here for test data input
+	_, filename, _, _ := runtime.Caller(0)
+	luaFile := filepath.Dir(filename) + "/test_scripts/luaciv3test.lua"
+	if err := L.DoFile(luaFile); err != nil {
+		t.Fatal("Error running lua script: ", err)
+	}
+}
