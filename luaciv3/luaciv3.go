@@ -28,7 +28,7 @@ func NewState() *lua.LState {
 // TODO: Should I eliminate error return? lua.NewState() doesn't return error
 func LuaCiv3(L *lua.LState) error {
 	// test function
-	L.SetGlobal("test", L.NewFunction(TestPassValues))
+	L.SetGlobal("test", L.NewFunction(testPassValues))
 
 	// install_path
 	// if error, will get empty string, and that's fine
@@ -38,21 +38,21 @@ func LuaCiv3(L *lua.LState) error {
 	// sav table
 	sav := L.NewTable()
 	L.SetGlobal("sav", sav)
-	L.RawSet(sav, lua.LString("load"), L.NewFunction(SavLoad))
-	L.RawSet(sav, lua.LString("dump"), L.NewFunction(SavDump))
+	L.RawSet(sav, lua.LString("load"), L.NewFunction(savLoad))
+	L.RawSet(sav, lua.LString("dump"), L.NewFunction(savDump))
 
 	// bic table
 	bic := L.NewTable()
 	L.SetGlobal("bic", bic)
-	L.RawSet(bic, lua.LString("load_default"), L.NewFunction(BicLoadDefault))
-	L.RawSet(bic, lua.LString("dump"), L.NewFunction(BicDump))
+	L.RawSet(bic, lua.LString("load_default"), L.NewFunction(bicLoadDefault))
+	L.RawSet(bic, lua.LString("dump"), L.NewFunction(bicDump))
 
 	return nil
 }
 
-// TestPassValues is my getting familiar with calling Go from lua with values/params
+// testPassValues is my getting familiar with calling Go from lua with values/params
 //  see https://github.com/yuin/gopher-lua#calling-go-from-lua
-func TestPassValues(L *lua.LState) int {
+func testPassValues(L *lua.LState) int {
 	lv := L.ToInt(1)
 	lv2 := L.ToInt(2)
 	L.Push(lua.LNumber(lv * lv2))
@@ -60,8 +60,8 @@ func TestPassValues(L *lua.LState) int {
 }
 
 // TODO: Sav- and Bic- loads and dumps are similar; perhaps move to struct method?
-// SavLoad takes a path from lua and loads it into memory
-func SavLoad(L *lua.LState) int {
+// savLoad takes a path from lua and loads it into memory
+func savLoad(L *lua.LState) int {
 	path := L.ToString(1)
 	err := saveGame.loadSave(path)
 	// TODO: Handle errors
@@ -77,15 +77,15 @@ func SavLoad(L *lua.LState) int {
 }
 
 // TODO: parameters
-// SavDump returns a hex dump to lua
-func SavDump(L *lua.LState) int {
+// savDump returns a hex dump to lua
+func savDump(L *lua.LState) int {
 	dump := hex.Dump(saveGame.data[:256])
 	L.Push(lua.LString(dump))
 	return 1
 }
 
-// BicLoadDefault takes a path from lua and loads it into memory
-func BicLoadDefault(L *lua.LState) int {
+// bicLoadDefault takes a path from lua and loads it into memory
+func bicLoadDefault(L *lua.LState) int {
 	path := L.ToString(1)
 	// Try to fetch install_path if no path provided
 	if path == "" {
@@ -108,8 +108,8 @@ func BicLoadDefault(L *lua.LState) int {
 }
 
 // TODO: parameters
-// BicDump returns a hex dump to lua
-func BicDump(L *lua.LState) int {
+// bicDump returns a hex dump to lua
+func bicDump(L *lua.LState) int {
 	dump := hex.Dump(defaultBic.data[:256])
 	L.Push(lua.LString(dump))
 	return 1
