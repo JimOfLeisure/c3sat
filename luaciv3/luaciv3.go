@@ -84,7 +84,7 @@ func savLoad(L *lua.LState) int {
 // TODO: parameters
 // savDump returns a hex dump to lua
 func savDump(L *lua.LState) int {
-	dump := hex.Dump(saveGame.data[:256])
+	dump := hex.Dump(saveGame.data[:31])
 	L.Push(lua.LString(dump))
 	return 1
 }
