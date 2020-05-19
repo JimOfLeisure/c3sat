@@ -1,4 +1,4 @@
-foo = get_savs({install_path .. "/Saves/Auto"})
+foo = get_savs({install_path .. "/Saves/Auto", install_path .. "/Saves"})
 for _, v in pairs(foo) do
     print(v)
     sav.load(v)

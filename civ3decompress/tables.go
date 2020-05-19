@@ -11,7 +11,7 @@ type bitKey struct {
 
 var lengthLookup = map[bitKey]lengthCode{
 	{3, 0b101}:     lengthCode{2, 0},
-	{3, 0b11}:      lengthCode{3, 0},
+	{2, 0b11}:      lengthCode{3, 0},
 	{3, 0b100}:     lengthCode{4, 0},
 	{3, 0b011}:     lengthCode{5, 0},
 	{4, 0b0101}:    lengthCode{6, 0},
