@@ -90,7 +90,7 @@ size or else the map may be different.
 
 ### GraphQL
 
-When running the `api` command, andy GraphQL client can be used against http://127.0.0.1/graphql , or you can browse to that URL in the browser and it will load the Playground GraphQL client in the browser. You can also execute command-line quereies with the `graphql` command but will need to escape double quotes.
+When running the `api` command, any GraphQL client can be used against http://127.0.0.1/graphql , or you can browse to that URL in the browser and it will load the Playground GraphQL client in the browser. You can also execute command-line quereies with the `graphql` command but will need to escape double quotes.
 
 See /queryciv3/readme.md for query examples.
 
