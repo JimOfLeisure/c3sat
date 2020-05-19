@@ -127,7 +127,7 @@ func getSavs(L *lua.LState) int {
 			if files, err := ioutil.ReadDir(string(dir)); err == nil {
 				for _, f := range files {
 					if (!f.IsDir()) && strings.ToLower(filepath.Ext(f.Name())) == ".sav" {
-						savs.Append(lua.LString(f.Name()))
+						savs.Append(lua.LString(string(dir) + "/" + f.Name()))
 					}
 				}
 			} else {
