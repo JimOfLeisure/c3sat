@@ -23,7 +23,6 @@ package civ3decompress
 // WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
 import (
-	"fmt"
 	"bytes"
 	"io"
 )
@@ -104,26 +103,23 @@ func Decompress(file io.Reader) ([]byte, error) {
 func (b *BitReader) lengthsequence() (int, error) {
 	var sequence lengthKey
 	sequence.keyBitLength = 0
-	for _, keyPresent := lengthLookup[sequence]; !keyPresent; sequence.keyBitLength++ {
-		fmt.Println(sequence)
+	count := 0
+	for _, keyPresent := lengthLookup[sequence]; !keyPresent; count++ {
 		bit, err := b.ReadBit()
 		if err != nil {
 			return 0, FileError{err}
 		}
 		sequence.key = sequence.key << 1
+		sequence.keyBitLength++
 		if bit {
-			// sequence.WriteString("1")
 			sequence.key = sequence.key | 0b1
-		} else {
-			// sequence.WriteString("0")
 		}
 		// hack, but not sure how to check every iteration in for params
 		_, keyPresent = lengthLookup[sequence]
-		if sequence.keyBitLength > 8 {
+		if count > 8 {
 			return 0, DecodeError{"Token did not match length sequence"}
 		}
 	}
-	fmt.Println(sequence, lengthLookup[sequence])
 	xxxes, err := b.ReadBits(uint(lengthLookup[sequence].extraBits))
 	if err != nil {
 		return 0, FileError{err}
