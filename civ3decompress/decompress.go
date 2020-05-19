@@ -102,8 +102,7 @@ func Decompress(file io.Reader) ([]byte, error) {
 
 func (b *BitReader) lengthsequence() (int, error) {
 	var sequence bitKey
-	count := 0
-	for _, keyPresent := lengthLookup[sequence]; !keyPresent; count++ {
+	for {
 		bit, err := b.ReadBit()
 		if err != nil {
 			return 0, FileError{err}
@@ -113,23 +112,22 @@ func (b *BitReader) lengthsequence() (int, error) {
 		if bit {
 			sequence.key = sequence.key | 0b1
 		}
-		// hack, but not sure how to check every iteration in for params
-		_, keyPresent = lengthLookup[sequence]
-		if count > 8 {
+		if sequence.keyBitLength > 8 {
 			return 0, DecodeError{"Token did not match length sequence"}
+		}
+		if _, keyPresent := lengthLookup[sequence]; keyPresent {
+			break
 		}
 	}
 	xxxes, err := b.ReadBits(uint(lengthLookup[sequence].extraBits))
 	if err != nil {
 		return 0, FileError{err}
 	}
-	// log.Printf("Decoded length sequence is %v, to read %v more bits which are %v", lengthLookup[sequence.String()].value, lengthLookup[sequence.String()].extraBits, xxxes)
 	return lengthLookup[sequence].value + int(xxxes), nil
 }
 func (b *BitReader) offsetsequence(dictsize int) (int, error) {
 	var sequence bitKey
-	count := 0
-	for _, keyPresent := offsetLookup[sequence]; !keyPresent; count++ {
+	for {
 		bit, err := b.ReadBit()
 		if err != nil {
 			return 0, FileError{err}
@@ -139,17 +137,17 @@ func (b *BitReader) offsetsequence(dictsize int) (int, error) {
 		if bit {
 			sequence.key = sequence.key | 0b1
 		}
-		// hack, but not sure how to check every iteration in for params
-		_, keyPresent = offsetLookup[sequence]
-		if count > 8 {
+		if sequence.keyBitLength > 8 {
 			return 0, DecodeError{"Token did not match offset sequence"}
+		}
+		if _, keyPresent := offsetLookup[sequence]; keyPresent {
+			break
 		}
 	}
 	loworderbits, err := b.ReadBits(uint(dictsize))
 	if err != nil {
 		return 0, FileError{err}
 	}
-	// log.Printf("Decoded length sequence is %v, to read %v more bits", offsetLookup[sequence.String()].value, offsetLookup[sequence.String()].extraBits)
 	return offsetLookup[sequence]<<uint(dictsize) + int(loworderbits), nil
 }
 
