@@ -5,8 +5,20 @@ print(tile.height)
 for k, v in ipairs(tile) do
     -- print(v.terrain)
     -- print(v.base_terrain)
-    print(v.overlay_terrain)
+    -- print(v.overlay_terrain)
+    if (k - 1) % (tile.width / 2) == 0 then
+        io.write("\n")
+        if math.floor((k - 1) / (tile.width / 2)) % 2 == 1 then
+            io.write(" ")
+        end
+    end
+    if v.base_terrain > 10 then
+        io.write("~ ")
+    else
+        io.write("  ")
+    end
 end
+io.write("\n")
 
 
 foo = get_savs({install_path .. "/Saves/Auto"})
