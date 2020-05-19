@@ -7,6 +7,7 @@ import (
 	"runtime/pprof"
 
 	"github.com/chzyer/readline"
+	"github.com/myjimnelson/c3sat/luaciv3"
 	lua "github.com/yuin/gopher-lua"
 	"github.com/yuin/gopher-lua/parse"
 )
@@ -59,6 +60,7 @@ Available options are:
 
 	L := lua.NewState()
 	defer L.Close()
+	luaciv3.LuaCiv3(L)
 	if opt_m > 0 {
 		L.SetMx(opt_m)
 	}
