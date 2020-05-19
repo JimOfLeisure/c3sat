@@ -40,12 +40,16 @@ func tileModule(L *lua.LState) {
 	tilesOffset, err := saveGame.sectionOffset("TILE", 1)
 	var mapRowLength = intList[5] / 2
 	var mapTileCount = mapRowLength * intList[0]
-	mapTileOffsets := make([]int, mapTileCount)
+	// mapTileOffsets := make([]int, mapTileCount)
 	for i := 0; i < mapTileCount; i++ {
 		thisTile := L.NewTable()
 		tile.Append(thisTile)
 		// L.RawSet(tile, lua.LNumber(i), thisTile)
 		tileOffset := tilesOffset - 4 + (i/mapRowLength)*mapRowLength*tileBytes + (i%mapRowLength)*tileBytes
-		mapTileOffsets[i] = tileOffset
+		// mapTileOffsets[i] = tileOffset
+		terrain := saveGame.readInt8(tileOffset+57, Unsigned)
+		L.RawSet(thisTile, lua.LString("terrain"), lua.LNumber(terrain))
+		L.RawSet(thisTile, lua.LString("base_terrain"), lua.LNumber(terrain&0x0f))
+		L.RawSet(thisTile, lua.LString("overlay_terrain"), lua.LNumber(terrain>>4))
 	}
 }

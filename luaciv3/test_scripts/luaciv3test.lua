@@ -1,7 +1,14 @@
 bic.load_default()
 sav.load(install_path .. "/Saves/Auto/Conquests Autosave 4000 BC.SAV")
-print(sav.dump())
-print(bic.dump())
+print(tile.width)
+print(tile.height)
+for k, v in ipairs(tile) do
+    -- print(v.terrain)
+    -- print(v.base_terrain)
+    print(v.overlay_terrain)
+end
+
+
 foo = get_savs({install_path .. "/Saves/Auto"})
 for _, v in pairs(foo) do
     print(v)
@@ -15,7 +22,4 @@ for _, v in pairs(foo) do
     -- end
     print(tile.width)
     print(tile.height)
-    -- for k, v in ipairs(tile) do
-    --     print(k)
-    -- end
 end
