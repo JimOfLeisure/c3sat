@@ -10,7 +10,10 @@ for _, v in pairs(foo) do
     -- print(civ3.always26)
     -- print(civ3.maybe_version_minor)
     -- print(civ3.maybe_version_major)
-    for kk, vv in pairs(civ3) do
-        print(kk, vv)
+    -- for k, v in pairs(civ3) do
+    --     print(k, v)
+    -- end
+    for k, v in pairs(tile) do
+        print(k, v)
     end
 end

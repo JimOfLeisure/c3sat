@@ -77,6 +77,7 @@ func savLoad(L *lua.LState) int {
 	L.SetGlobal("save_name", lua.LString(saveGame.fileName()))
 
 	civ3Module(L)
+	tileModule(L)
 
 	return 0
 }
