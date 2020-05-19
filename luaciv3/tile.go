@@ -13,9 +13,10 @@ import (
 	is +/-1 in each axis. Even y rows start with x=0, and odd y rows start with x=1.
 
 	This creates the global 'tile' table in Lua with values from the last sav.load()
-	Lua table arrays usually start with index 1, but this starts at 0
 	Only use ipairs when parsing the tiles because I'll add string keys for
 	useful info
+
+	Note that save file array indexes start with 0 and Lua array indexes start with 1
 */
 
 func tileModule(L *lua.LState) {
@@ -34,4 +35,17 @@ func tileModule(L *lua.LState) {
 
 	L.RawSet(tile, lua.LString("height"), lua.LNumber(intList[0]))
 	L.RawSet(tile, lua.LString("width"), lua.LNumber(intList[5]))
+
+	const tileBytes = 212
+	tilesOffset, err := saveGame.sectionOffset("TILE", 1)
+	var mapRowLength = intList[5] / 2
+	var mapTileCount = mapRowLength * intList[0]
+	mapTileOffsets := make([]int, mapTileCount)
+	for i := 0; i < mapTileCount; i++ {
+		thisTile := L.NewTable()
+		tile.Append(thisTile)
+		// L.RawSet(tile, lua.LNumber(i), thisTile)
+		tileOffset := tilesOffset - 4 + (i/mapRowLength)*mapRowLength*tileBytes + (i%mapRowLength)*tileBytes
+		mapTileOffsets[i] = tileOffset
+	}
 }

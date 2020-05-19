@@ -13,7 +13,9 @@ for _, v in pairs(foo) do
     -- for k, v in pairs(civ3) do
     --     print(k, v)
     -- end
-    for k, v in pairs(tile) do
-        print(k, v)
-    end
+    print(tile.width)
+    print(tile.height)
+    -- for k, v in ipairs(tile) do
+    --     print(k)
+    -- end
 end
