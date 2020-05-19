@@ -2,10 +2,12 @@
 
 This repo contains Go code to decompress and read save and BIQ files from Civilization III Conquests and Civilization III Complete v1.22.
 
-There are two executables, c3sat and cia3.
+There are three executables, c3sat, cia3, and clua.
 
 The libraries implement a GraphQL API local web server to query the data, and the cia3 executable includes embedded JavaScript to
 query the saves and present useful information.
+
+The luaciv3 libary implements a Lua environment with modules to access Civ3 save file data. See /luaciv3/readme.md for more detail.
 
 ## Civ Intelligence Agency III (CIA3)
 
@@ -128,3 +130,12 @@ Example queries:
                 ageFinal
             }
         }
+
+## Civ3 Lua (clua)
+
+`clua` behaves similarly to the standard `lua` executable, but it's Lua version
+5.1, and it has modules to access Civ3 save file data. See /luaciv3/readme.md,
+/\_lua\_examples, and Lua 5.1 guides for scripting.
+
+It is the newest and least-complete of the programs here, and very little is
+anywhere near complete.
