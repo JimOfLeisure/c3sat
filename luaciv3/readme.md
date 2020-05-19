@@ -52,7 +52,7 @@ and organize the output tiles.
 
 - ✓ should probably return a new lua environment; maybe optionally inject into existing
 - ✓ should be able to read files direcly (and eventually possibly write)
-- (partial ✓ ) `sav` and `bic` table variables for parseciv3-similar queries by section
+- (partial ✓ ) `sav` and `bic` table variables for queryciv3-similar queries by section
 - Perhaps `game`, `wrld`, `tile`, etc. table variables for processed data?
 - no spoiler protection at first, but maybe add later, perhaps as function on table vars or global setting
 - My LevelDB storage idea doesn't belong in this package; should go in the executable
