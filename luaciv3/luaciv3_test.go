@@ -37,7 +37,11 @@ func TestWhatevs(t *testing.T) {
 		{"Print sav k/v pairs", `for k, v in pairs(sav) do
 			print(k, v)
 			end`},
+		{"Print bic k/v pairs", `for k, v in pairs(bic) do
+				print(k, v)
+				end`},
 		{"Print sav.dump()", `print(sav.dump())`},
+		{"Print bic.dump()", `print(bic.dump())`},
 		// {"", ``},
 		// {"", ``},
 	}

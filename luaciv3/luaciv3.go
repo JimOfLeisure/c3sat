@@ -43,6 +43,12 @@ func LuaCiv3(L *lua.LState) error {
 	L.RawSet(sav, lua.LString("load"), L.NewFunction(SavLoad))
 	L.RawSet(sav, lua.LString("dump"), L.NewFunction(SavDump))
 
+	// bic table
+	bic := L.NewTable()
+	L.SetGlobal("bic", bic)
+	L.RawSet(bic, lua.LString("load"), L.NewFunction(BicLoadDefault))
+	L.RawSet(bic, lua.LString("dump"), L.NewFunction(BicDump))
+
 	return nil
 }
 
@@ -55,6 +61,7 @@ func TestPassValues(L *lua.LState) int {
 	return 1
 }
 
+// TODO: Sav- and Bic- loads and dumps are similar; perhaps move to struct method?
 // SavLoad takes a path from lua and loads it into memory
 func SavLoad(L *lua.LState) int {
 	path := L.ToString(1)
@@ -75,6 +82,30 @@ func SavLoad(L *lua.LState) int {
 // SavDump returns a hex dump to lua
 func SavDump(L *lua.LState) int {
 	dump := hex.Dump(saveGame.data[:256])
+	L.Push(lua.LString(dump))
+	return 1
+}
+
+// BicLoadDefault takes a path from lua and loads it into memory
+func BicLoadDefault(L *lua.LState) int {
+	path := L.ToString(1)
+	err := defaultBic.loadSave(path)
+	// TODO: Handle errors
+	if err != nil {
+		panic(err)
+	}
+	bic := L.GetGlobal("bic")
+	if bicTable, ok := bic.(*lua.LTable); ok {
+		L.RawSet(bicTable, lua.LString("path"), lua.LString(defaultBic.path))
+		L.RawSet(bicTable, lua.LString("name"), lua.LString(defaultBic.fileName()))
+	}
+	return 0
+}
+
+// TODO: parameters
+// BicDump returns a hex dump to lua
+func BicDump(L *lua.LState) int {
+	dump := hex.Dump(defaultBic.data[:256])
 	L.Push(lua.LString(dump))
 	return 1
 }
