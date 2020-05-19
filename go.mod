@@ -5,6 +5,7 @@ go 1.13
 require (
 	fyne.io/fyne v1.2.2
 	github.com/c-bata/go-prompt v0.2.3
+	github.com/chzyer/readline v0.0.0-20180603132655-2972be24d48e
 	github.com/fsnotify/fsnotify v1.4.7
 	github.com/fyne-io/examples v0.0.0-20200129224505-9a163725bd88
 	github.com/graphql-go/graphql v0.7.8
