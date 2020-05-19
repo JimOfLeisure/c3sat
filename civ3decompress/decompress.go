@@ -101,8 +101,7 @@ func Decompress(file io.Reader) ([]byte, error) {
 }
 
 func (b *BitReader) lengthsequence() (int, error) {
-	var sequence lengthKey
-	sequence.keyBitLength = 0
+	var sequence bitKey
 	count := 0
 	for _, keyPresent := lengthLookup[sequence]; !keyPresent; count++ {
 		bit, err := b.ReadBit()
@@ -128,20 +127,20 @@ func (b *BitReader) lengthsequence() (int, error) {
 	return lengthLookup[sequence].value + int(xxxes), nil
 }
 func (b *BitReader) offsetsequence(dictsize int) (int, error) {
-	var sequence bytes.Buffer
+	var sequence bitKey
 	count := 0
-	for _, keyPresent := offsetLookup[sequence.String()]; !keyPresent; count++ {
+	for _, keyPresent := offsetLookup[sequence]; !keyPresent; count++ {
 		bit, err := b.ReadBit()
 		if err != nil {
 			return 0, FileError{err}
 		}
+		sequence.key = sequence.key << 1
+		sequence.keyBitLength++
 		if bit {
-			sequence.WriteString("1")
-		} else {
-			sequence.WriteString("0")
+			sequence.key = sequence.key | 0b1
 		}
 		// hack, but not sure how to check every iteration in for params
-		_, keyPresent = offsetLookup[sequence.String()]
+		_, keyPresent = offsetLookup[sequence]
 		if count > 8 {
 			return 0, DecodeError{"Token did not match offset sequence"}
 		}
@@ -151,7 +150,7 @@ func (b *BitReader) offsetsequence(dictsize int) (int, error) {
 		return 0, FileError{err}
 	}
 	// log.Printf("Decoded length sequence is %v, to read %v more bits", offsetLookup[sequence.String()].value, offsetLookup[sequence.String()].extraBits)
-	return offsetLookup[sequence.String()]<<uint(dictsize) + int(loworderbits), nil
+	return offsetLookup[sequence]<<uint(dictsize) + int(loworderbits), nil
 }
 
 // ReadByte reads a single byte from the stream, regardless of alignment
