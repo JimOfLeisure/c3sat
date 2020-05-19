@@ -98,7 +98,6 @@ func (sav *saveGameType) fileName() string {
 	return sav.path[o+1:]
 }
 
-// Transitioning to this from the old SecionOffset stanalone function
 func (sav *saveGameType) sectionOffset(sectionName string, nth int) (int, error) {
 	var i, n int
 	for i < len(sav.sections) {

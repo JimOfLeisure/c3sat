@@ -11,7 +11,6 @@ import (
 const memoryLimitMb = 100
 
 // NewState creates and returns a lua state with LuaCiv3 functions
-// TODO: memory limit?
 func NewState() *lua.LState {
 	L := lua.NewState()
 	// Set memory limit of lua instance (just a safety measure)
@@ -59,20 +58,23 @@ func TestPassValues(L *lua.LState) int {
 // SavLoad takes a path from lua and loads it into memory
 func SavLoad(L *lua.LState) int {
 	path := L.ToString(1)
-	fmt.Println("path given is ", path)
 	err := saveGame.loadSave(path)
 	// TODO: Handle errors
 	if err != nil {
 		panic(err)
 	}
-
+	sav := L.GetGlobal("sav")
+	if savTable, ok := sav.(*lua.LTable); ok {
+		L.RawSet(savTable, lua.LString("path"), lua.LString(saveGame.path))
+		L.RawSet(savTable, lua.LString("name"), lua.LString(saveGame.fileName()))
+	}
 	return 0
 }
 
 // TODO: parameters
-// TODO: Do I want to return the string in lua? probably
-// SavDump prints a hex dump
+// SavDump returns a hex dump to lua
 func SavDump(L *lua.LState) int {
-	fmt.Println(hex.Dump(saveGame.data[:256]))
-	return 0
+	dump := hex.Dump(saveGame.data[:256])
+	L.Push(lua.LString(dump))
+	return 1
 }
