@@ -99,13 +99,8 @@ func bicLoadDefault(L *lua.LState) int {
 	if err != nil {
 		panic(err)
 	}
-	bic := L.GetGlobal("bic")
-	if bicTable, ok := bic.(*lua.LTable); ok {
-		L.RawSet(bicTable, lua.LString("path"), lua.LString(defaultBic.path))
-		L.RawSet(bicTable, lua.LString("name"), lua.LString(defaultBic.fileName()))
-		L.SetGlobal("bic_path", lua.LString(defaultBic.path))
-		L.SetGlobal("bic_name", lua.LString(defaultBic.fileName()))
-	}
+	L.SetGlobal("bic_path", lua.LString(defaultBic.path))
+	L.SetGlobal("bic_name", lua.LString(defaultBic.fileName()))
 	return 0
 }
 
