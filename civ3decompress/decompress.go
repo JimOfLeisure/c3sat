@@ -27,7 +27,8 @@ import (
 	"io"
 )
 
-// DecompressByteArray is a May 2020 attempt at speeding up decompression by eliminating the reader interfaces
+// DecompressByteArray is a May 2020 attempt at speeding up decompression by eliminating the reader interfaces and frequent function calls
+// TODO: `bytes` is a horrible name for a variable as there is a bytes package. I should probably change it someday.
 func DecompressByteArray(bytes []byte) ([]byte, error) {
 	// The token equating to length 519 is the end-of-stream token
 	const lengthEndOfStream = 519
@@ -88,13 +89,14 @@ func DecompressByteArray(bytes []byte) ([]byte, error) {
 			if length == lengthEndOfStream {
 				break
 			}
+
+			// read offset
 			// If length is 2, then only two low-order bits are read for offset
 			if length == 2 {
 				dictsize = 2
 			} else {
 				dictsize = bytes[1]
 			}
-			
 			sequence = bitKey{0,0}
 			var offset int
 			for {
@@ -130,6 +132,8 @@ func DecompressByteArray(bytes []byte) ([]byte, error) {
 				}
 			}
 			loworderbits = loworderbits >> (32 - dictsize)
+
+			// Add to slice and copy data
 			offset =  (offset<<dictsize) + int(loworderbits)
 			oldLen := len(outBytes)
 			offset = oldLen - offset - 1
@@ -138,7 +142,6 @@ func DecompressByteArray(bytes []byte) ([]byte, error) {
 			for i:=0; i<length; i++ {
 				outBytes[oldLen+i] = outBytes[offset+i]
 			}
-
 		} else {
 			// literal byte in next 8 bits, lsb first
 			var byt byte
