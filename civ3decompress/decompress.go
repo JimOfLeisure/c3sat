@@ -23,7 +23,6 @@ package civ3decompress
 // WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
 import (
-	// "bytes"
 	"io"
 )
 
