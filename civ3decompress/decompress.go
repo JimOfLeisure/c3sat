@@ -23,7 +23,6 @@ package civ3decompress
 // WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
 import (
-	"fmt"
 	"bytes"
 	"io"
 )
@@ -47,7 +46,6 @@ func DecompressByteArray(bytes []byte) ([]byte, error) {
 			bitOff = 0
 			byteOff++
 		}
-		fmt.Println(tokenFlag)
 		if tokenFlag {
 			// read length
 			var sequence bitKey
@@ -132,13 +130,10 @@ func DecompressByteArray(bytes []byte) ([]byte, error) {
 				}
 			}
 			loworderbits = loworderbits >> (32 - dictsize)
-			fmt.Println(dictsize, length, lc.value, offset, loworderbits)
-			fmt.Println(string(outBytes))
 			offset =  (offset<<dictsize) + int(loworderbits)
 			oldLen := len(outBytes)
 			offset = oldLen - offset - 1
 			newSlice := make([]byte, length)
-			fmt.Println(outBytes[offset:offset+1])
 			outBytes = append(outBytes, newSlice...)
 			for i:=offset; i<offset+length; i++ {
 				outBytes[oldLen+i] = outBytes[offset+i]
@@ -160,7 +155,6 @@ func DecompressByteArray(bytes []byte) ([]byte, error) {
 				}
 			}
 			outBytes = append(outBytes, byt)
-			fmt.Println(byt)
 		}
 		if length == lengthEndOfStream {
 			break
