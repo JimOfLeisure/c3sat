@@ -133,10 +133,16 @@ func DecompressByteArray(bytes []byte) ([]byte, error) {
 			}
 			loworderbits = loworderbits >> (32 - dictsize)
 			fmt.Println(dictsize, length, lc.value, offset, loworderbits)
+			fmt.Println(string(outBytes))
 			offset =  (offset<<dictsize) + int(loworderbits)
-			offset = len(outBytes) - offset
-			// unsure if these ranges are right, but chasing down other issues
-			outBytes = append(outBytes, outBytes[offset:(offset+length)]...)
+			oldLen := len(outBytes)
+			offset = oldLen - offset - 1
+			newSlice := make([]byte, length)
+			fmt.Println(outBytes[offset:offset+1])
+			outBytes = append(outBytes, newSlice...)
+			for i:=offset; i<offset+length; i++ {
+				outBytes[oldLen+i] = outBytes[offset+i]
+			}
 
 		} else {
 			// literal byte in next 8 bits, lsb first
