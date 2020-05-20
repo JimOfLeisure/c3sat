@@ -12,13 +12,18 @@ It has worked fine on every Civ3 file I've used it on for years, and for
 one-at-a-time decompressions it seems fast enough. But since I started Lua
 scripting and batch processing I notice it's a relatively slow decompressor.
 
+So I coded a new function `DecompressByteArray()` which is much faster.
+
 ## Exports
 
 - `func ReadFile(path string) ([]byte, bool, error)` - Most likely what you
 want. Given a path to a Civ3 data file, it will detect whether or not it's
 compressed and then return a byte array of the decompressed file contents.
+It now uses the faster DecompressByteArray behind the scenes.
 - `func Decompress(file io.Reader) ([]byte, error)` - Given an `io.Reader` for
 a compressed Civ3 data file, returns a byte array of the decompressed file.
+- `func DecompressByteArray(bytes []byte) ([]byte, error)` - Takes a compressed
+data file as a byte array and decompresses it. It's much faster than Decompress.
 - `type FileError struct` - If you want to handle errors based on type
 - `type DecodeError struct` - If you want to handle errors based on type
 - `func (b *BitReader) ReadByte() (byte, error)` - I don't
