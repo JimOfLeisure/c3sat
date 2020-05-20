@@ -135,7 +135,7 @@ func DecompressByteArray(bytes []byte) ([]byte, error) {
 			offset = oldLen - offset - 1
 			newSlice := make([]byte, length)
 			outBytes = append(outBytes, newSlice...)
-			for i:=offset; i<offset+length; i++ {
+			for i:=0; i<length; i++ {
 				outBytes[oldLen+i] = outBytes[offset+i]
 			}
 

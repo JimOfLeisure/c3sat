@@ -11,7 +11,7 @@ import (
 )
 
 // NewState is called to get a Lua environment with nbt manipulation ability// lua vm memory limit; 0 is no limit
-const memoryLimitMb = 100
+const memoryLimitMb = 200
 
 // NewState creates and returns a lua state with LuaCiv3 functions
 func NewState() *lua.LState {

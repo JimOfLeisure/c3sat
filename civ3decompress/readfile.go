@@ -26,19 +26,17 @@ func ReadFile(path string) ([]byte, bool, error) {
 	if err != nil {
 		return nil, false, FileError{err}
 	}
-	switch {
-	case header[0] == 0x00 && (header[1] == 0x04 || header[1] == 0x05 || header[1] == 0x06):
+	data, err = ioutil.ReadFile(path)
+	if err != nil {
+		return nil, false, FileError{err}
+	}
+	if header[0] == 0x00 && (header[1] == 0x04 || header[1] == 0x05 || header[1] == 0x06) {
 		compressed = true
-		data, err = Decompress(file)
+		uncData, err := DecompressByteArray(data)
 		if err != nil {
 			return nil, false, err
 		}
-	default:
-		// Not a compressed file. Proceeding with uncompressed stream.
-		data, err = ioutil.ReadFile(path)
-		if err != nil {
-			return nil, false, FileError{err}
-		}
+		data = uncData
 	}
 	return data, compressed, error(nil)
 }
