@@ -23,7 +23,7 @@ package civ3decompress
 // WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
 import (
-	"bytes"
+	// "bytes"
 	"io"
 )
 
@@ -173,7 +173,7 @@ func Decompress(file io.Reader) ([]byte, error) {
 	// Create bitstream reader
 	civ3Bitstream := NewReader(file)
 	// Output bytes buffer
-	var uncData bytes.Buffer
+	var uncData []byte
 	// define length here to use in for loop setup
 	var length int
 
@@ -188,14 +188,13 @@ func Decompress(file io.Reader) ([]byte, error) {
 	for length != lengthEndOfStream {
 		tokenFlag, err := civ3Bitstream.ReadBit()
 		if err != nil {
-			return uncData.Bytes(), FileError{err}
+			return uncData, FileError{err}
 		}
-		switch tokenFlag {
 		// bit 1 indicates length/offset sequences follow
-		case true:
+		if tokenFlag {
 			length, err = civ3Bitstream.lengthsequence()
 			if err != nil {
-				return uncData.Bytes(), err
+				return uncData, err
 			}
 			// log.Printf("length %v", length)
 			// The token equating to length 519 is the end-of-stream token
@@ -207,35 +206,28 @@ func Decompress(file io.Reader) ([]byte, error) {
 				}
 				offset, err := civ3Bitstream.offsetsequence(int(dictsize))
 				if err != nil {
-					return uncData.Bytes(), err
+					return uncData, err
 				}
-				for i := 0; i < length; i++ {
-					// dictionary is just a reader for the output buffer.
-					// since using .Bytes(), have to do this every loop...surely there is better way
-					// uncData bytes.Buffer does not have Seek function
-					dict := bytes.NewReader(uncData.Bytes())
-					// Position dictionary/buffer reader. 2 means from end of buffer/stream
-					// offset 0 is last byte, so using -1 -offset to position for last byte
-					dict.Seek(int64(-1-offset), 2)
-					byt, err := dict.ReadByte()
-					if err != nil {
-						return uncData.Bytes(), FileError{err}
-					}
-					uncData.WriteByte(byt)
+
+				// Add to slice and copy data
+				oldLen := len(uncData)
+				offset = oldLen - offset - 1
+				newSlice := make([]byte, length)
+				uncData = append(uncData, newSlice...)
+				for i:=0; i<length; i++ {
+					uncData[oldLen+i] = uncData[offset+i]
 				}
 			}
-		// bit 0 inticates next 8 bits are literal byte, lsb first
-		case false:
-			{
-				literalByte, err := civ3Bitstream.ReadByte()
-				if err != nil {
-					return uncData.Bytes(), FileError{err}
-				}
-				uncData.Write([]byte{literalByte})
+		} else {
+			// bit 0 inticates next 8 bits are literal byte, lsb first
+			literalByte, err := civ3Bitstream.ReadByte()
+			if err != nil {
+				return uncData, FileError{err}
 			}
+			uncData = append(uncData, literalByte)
 		}
 	}
-	return uncData.Bytes(), error(nil)
+	return uncData, error(nil)
 
 }
 
