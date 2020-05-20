@@ -1,7 +1,7 @@
 // Package civ3decompress is to decompress SAV and BIQ files from the game Civilization III
 package civ3decompress
 
-// Copyright (c) 2016 Jim Nelson
+// Copyright (c) 2016, 2020 Jim Nelson
 
 // Permission is hereby granted, free of charge, to any person obtaining
 // a copy of this software and associated documentation files (the
@@ -26,6 +26,12 @@ import (
 	"bytes"
 	"io"
 )
+
+// DecompressByteArray is a May 2020 attempt at speeding up decompression by eliminating the reader interfaces
+func DecompressByteArray(bytes []byte) ([]byte, error) {
+	var outBytes []byte
+	return outBytes, nil
+}
 
 // Decompress is implemented based on the description of PKWare Data Compression Library at https://groups.google.com/forum/#!msg/comp.compression/M5P064or93o/W1ca1-ad6kgJ
 // However this is only a partial implementation; The Huffman-coded literals of header 0x01 are not implemented here as they are not needed for my purpose
