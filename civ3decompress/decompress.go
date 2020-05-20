@@ -23,13 +23,143 @@ package civ3decompress
 // WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
 import (
+	"fmt"
 	"bytes"
 	"io"
 )
 
 // DecompressByteArray is a May 2020 attempt at speeding up decompression by eliminating the reader interfaces
 func DecompressByteArray(bytes []byte) ([]byte, error) {
+	// The token equating to length 519 is the end-of-stream token
+	const lengthEndOfStream = 519
 	var outBytes []byte
+	var length, bitOff, byteOff int
+	var tokenFlag, bit bool
+	var dictsize byte
+	if len(bytes) < 3 || !(bytes[0] == 0x00 && (bytes[1] == 0x04 || bytes[1] == 0x05 || bytes[1] == 0x06)) {
+		return nil, DecodeError{"Not a valid compressed byte array"}
+	}
+	byteOff = 2
+	for {
+		tokenFlag = bytes[byteOff] & (1 << bitOff) != 0
+		bitOff++
+		if bitOff == 8 {
+			bitOff = 0
+			byteOff++
+		}
+		fmt.Println(tokenFlag)
+		if tokenFlag {
+			// read length
+			var sequence bitKey
+			var lc lengthCode
+			var keyPresent bool
+			for {
+				bit = bytes[byteOff] & (1 << bitOff) != 0
+				sequence.key = sequence.key << 1
+				sequence.keyBitLength++
+				if bit {
+					sequence.key |= 1
+				}
+				bitOff++
+				if bitOff == 8 {
+					bitOff = 0
+					byteOff++
+				}
+				if sequence.keyBitLength > 8 {
+					return nil, DecodeError{"Token did not match length sequence"}
+				}
+				if lc, keyPresent = lengthLookup[sequence]; keyPresent {
+					break
+				}
+			}
+			var xxxes byte
+			for i := 0; i < lc.extraBits; i++ {
+				bit = bytes[byteOff] & (1 << bitOff) != 0
+				xxxes = xxxes >> 1
+				if bit {
+					xxxes |= 0x80
+				}
+				bitOff++
+				if bitOff == 8 {
+					bitOff = 0
+					byteOff++
+				}
+			}
+			xxxes = xxxes >> (8 - lc.extraBits)
+			length = lc.value + int(xxxes)
+			if length == lengthEndOfStream {
+				break
+			}
+			// If length is 2, then only two low-order bits are read for offset
+			if length == 2 {
+				dictsize = 2
+			} else {
+				dictsize = bytes[1]
+			}
+			
+			sequence = bitKey{0,0}
+			var offset int
+			for {
+				bit = bytes[byteOff] & (1 << bitOff) != 0
+				sequence.key = sequence.key << 1
+				sequence.keyBitLength++
+				if bit {
+					sequence.key = sequence.key | 0b1
+				}
+				bitOff++
+				if bitOff == 8 {
+					bitOff = 0
+					byteOff++
+				}
+				if sequence.keyBitLength > 8 {
+					return nil, DecodeError{"Token did not match offset sequence"}
+				}
+				if offset, keyPresent = offsetLookup[sequence]; keyPresent {
+					break
+				}
+			}
+			var loworderbits uint32
+			for i:=0; i < int(dictsize); i++ {
+				bit = bytes[byteOff] & (1 << bitOff) != 0
+				loworderbits = loworderbits >> 1
+				if bit {
+					loworderbits |= 0x80000000
+				}
+				bitOff++
+				if bitOff == 8 {
+					bitOff = 0
+					byteOff++
+				}
+			}
+			loworderbits = loworderbits >> (32 - dictsize)
+			fmt.Println(dictsize, length, lc.value, offset, loworderbits)
+			offset =  (offset<<dictsize) + int(loworderbits)
+			offset = len(outBytes) - offset
+			// unsure if these ranges are right, but chasing down other issues
+			outBytes = append(outBytes, outBytes[offset:(offset+length)]...)
+
+		} else {
+			// literal byte in next 8 bits, lsb first
+			var byt byte
+			for i:=0; i<8; i++ {
+				bit = bytes[byteOff] & (1 << bitOff) != 0
+				byt = byt >> 1
+				if bit {
+					byt |= 0x80
+				}
+				bitOff++
+				if bitOff == 8 {
+					bitOff = 0
+					byteOff++
+				}
+			}
+			outBytes = append(outBytes, byt)
+			fmt.Println(byt)
+		}
+		if length == lengthEndOfStream {
+			break
+		}
+	}
 	return outBytes, nil
 }
 
