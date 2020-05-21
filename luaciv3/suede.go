@@ -11,6 +11,9 @@ import (
 func suedeModule(L *lua.LState) {
 	suede := L.NewTable()
 	L.SetGlobal("suede", suede)
-	gameOff, _ := saveGame.sectionOffset("GAME", 2)
-	L.RawSet(suede, lua.LString("city_count"), lua.LNumber(saveGame.readInt32(gameOff+32, Signed)))
+	gameOff, _ := currentGame.sectionOffset("GAME", 1)
+	// This appears to be plausible for the global city count, and unit count
+	L.RawSet(suede, lua.LString("city_count"), lua.LNumber(currentGame.readInt32(gameOff+32, Signed)))
+	L.RawSet(suede, lua.LString("unit_count"), lua.LNumber(currentGame.readInt32(gameOff+28, Signed)))
+	// L.RawSet(suede, lua.LString("sections"), lua.LNumber(currentGame.readInt32(gameOff+28, Signed)))
 }
