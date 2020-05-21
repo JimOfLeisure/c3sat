@@ -79,6 +79,7 @@ func savLoad(L *lua.LState) int {
 	civ3Module(L)
 	tileModule(L)
 	suedeModule(L)
+	leadModule(L)
 
 	return 0
 }

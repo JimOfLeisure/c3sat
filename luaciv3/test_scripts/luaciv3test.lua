@@ -5,6 +5,25 @@ function lpad(s, l, c)
     return res
 end
 
+-- pass it a table and optionally hierarchy number
+function printTables(t, n)
+    -- default hierarchy n to 0 if not set
+    n = n or 0
+    -- indent string, length based on hierarchy
+    local s = string.rep("  ", n)
+    -- loop through all key/value pairs of the table
+    for k,v in pairs(t) do
+        -- if value is a table, recurse and increase indentation
+        if type(v) == "table" then
+            print(s..k..":")
+            printNbtTables(v,n+1)
+        else
+            -- otherwise print the key/value pair which are usually "tagType" and "name"
+            print(s..k, v)
+        end
+    end
+end
+
 function mass_scan()
     bic.load_default()
     foo = get_savs({install_path .. "/Saves/Auto", install_path .. "/Saves"})
@@ -32,14 +51,18 @@ end
 function do_other_stuff()
     bic.load_default()
     -- sav.load(install_path .. "/Saves/Auto/Conquests Autosave 4000 BC.SAV")
-    sav.load(install_path .. "/Saves/nice start Lincoln of the Americans, 4000 BC.SAV")
-    for k, v in pairs(suede) do
+    -- sav.load(install_path .. "/Saves/nice start Lincoln of the Americans, 4000 BC.SAV")
+    sav.load(install_path .. "/Saves/Cleopatra of the Egyptians, 2310 BC.SAV")
+    for k, v in pairs(lead) do
         print(k,v)
     end
-    for _, v in pairs(suede.sizes) do
-        print(v)
+    for _, v in pairs(lead.civs) do
+        print("---")
+        for kk, vv in pairs(v) do
+            print(kk,vv)
+        end
     end
 end
 
-mass_scan()
--- do_other_stuff()
+-- mass_scan()
+do_other_stuff()

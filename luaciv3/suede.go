@@ -25,9 +25,6 @@ func suedeModule(L *lua.LState) {
 			if lastOff != 0 {
 				foo.Append(lua.LNumber(v.offset - lastOff))
 			}
-			// if count == 1 {
-			// 	fmt.Println(v.offset - lastOff)
-			// }
 			lastOff = v.offset
 			count++
 		}
