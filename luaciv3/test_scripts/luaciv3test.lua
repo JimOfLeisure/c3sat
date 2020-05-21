@@ -19,9 +19,12 @@ foo = get_savs({install_path .. "/Saves/Auto", install_path .. "/Saves"})
         -- end
         -- print(tile.width)
         -- print(tile.height)
-        io.write(lpad(tostring(suede.city_count), 4))
-        io.write(lpad(tostring(suede.unit_count), 5))
-        io.write(' ', save_name,'\n')
+        if suede.unit_sections ~= suede.unit_count then
+            io.write(lpad(tostring(suede.city_count), 4))
+            io.write(lpad(tostring(suede.unit_count), 5))
+            io.write(lpad(tostring(suede.unit_sections), 6))
+            io.write(' ', save_name,'\n')
+        end
     end
 end
 

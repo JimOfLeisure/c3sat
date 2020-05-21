@@ -16,4 +16,11 @@ func suedeModule(L *lua.LState) {
 	L.RawSet(suede, lua.LString("city_count"), lua.LNumber(currentGame.readInt32(gameOff+32, Signed)))
 	L.RawSet(suede, lua.LString("unit_count"), lua.LNumber(currentGame.readInt32(gameOff+28, Signed)))
 	// L.RawSet(suede, lua.LString("sections"), lua.LNumber(currentGame.readInt32(gameOff+28, Signed)))
+	var count int
+	for _, v := range currentGame.sections {
+		if v.name == "UNIT" {
+			count++
+		}
+	}
+	L.RawSet(suede, lua.LString("unit_sections"), lua.LNumber(count))
 }
