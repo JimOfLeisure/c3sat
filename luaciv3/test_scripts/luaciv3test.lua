@@ -6,7 +6,8 @@ function lpad(s, l, c)
 end
 
 function mass_scan()
-foo = get_savs({install_path .. "/Saves/Auto", install_path .. "/Saves"})
+    bic.load_default()
+    foo = get_savs({install_path .. "/Saves/Auto", install_path .. "/Saves"})
     for _, v in pairs(foo) do
         -- print(v)
         sav.load(v)
@@ -29,7 +30,15 @@ foo = get_savs({install_path .. "/Saves/Auto", install_path .. "/Saves"})
 end
 
 function do_other_stuff()
-    sav.load(install_path .. "/Saves/Auto/Conquests Autosave 4000 BC.SAV")
+    bic.load_default()
+    -- sav.load(install_path .. "/Saves/Auto/Conquests Autosave 4000 BC.SAV")
+    sav.load(install_path .. "/Saves/nice start Lincoln of the Americans, 4000 BC.SAV")
+    for k, v in pairs(suede) do
+        print(k,v)
+    end
+    for _, v in pairs(suede.sizes) do
+        print(v)
+    end
 end
 
 mass_scan()

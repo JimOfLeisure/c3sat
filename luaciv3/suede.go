@@ -17,8 +17,18 @@ func suedeModule(L *lua.LState) {
 	L.RawSet(suede, lua.LString("unit_count"), lua.LNumber(currentGame.readInt32(gameOff+28, Signed)))
 	// L.RawSet(suede, lua.LString("sections"), lua.LNumber(currentGame.readInt32(gameOff+28, Signed)))
 	var count int
+	foo := L.NewTable()
+	L.RawSet(suede, lua.LString("sizes"), foo)
+	var lastOff int
 	for _, v := range currentGame.sections {
 		if v.name == "UNIT" {
+			if lastOff != 0 {
+				foo.Append(lua.LNumber(v.offset - lastOff))
+			}
+			// if count == 1 {
+			// 	fmt.Println(v.offset - lastOff)
+			// }
+			lastOff = v.offset
 			count++
 		}
 	}
