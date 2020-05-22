@@ -17,7 +17,7 @@ func leadModule(L *lua.LState) {
 		civ := L.NewTable()
 		civs.Append(civ)
 		leadOff, _ := currentGame.sectionOffset("LEAD", i+1)
-		// queried offset is from the star of the 4-byte header, but most of my offset notes are from the end of it
+		// queried offset is from the start of the 4-byte header, but most of my offset notes are from the end of it
 		leadOff += 4
 		L.RawSet(civ, lua.LString("city_count"), lua.LNumber(currentGame.readInt32(leadOff+376, Signed)))
 		L.RawSet(civ, lua.LString("unit_count"), lua.LNumber(currentGame.readInt32(leadOff+368, Signed)))
@@ -28,8 +28,8 @@ func leadModule(L *lua.LState) {
 		L.RawSet(civ, lua.LString("tiles_discovered"), lua.LNumber(currentGame.readInt32(leadOff+140, Signed)))
 		L.RawSet(civ, lua.LString("era"), lua.LNumber(currentGame.readInt32(leadOff+252, Signed)))
 		L.RawSet(civ, lua.LString("research_beakers"), lua.LNumber(currentGame.readInt32(leadOff+220, Signed)))
-		L.RawSet(civ, lua.LString("current_researchId"), lua.LNumber(currentGame.readInt32(leadOff+224, Signed)))
-		L.RawSet(civ, lua.LString("current_researchTurns"), lua.LNumber(currentGame.readInt32(leadOff+228, Signed)))
+		L.RawSet(civ, lua.LString("current_research_id"), lua.LNumber(currentGame.readInt32(leadOff+224, Signed)))
+		L.RawSet(civ, lua.LString("current_research_turns"), lua.LNumber(currentGame.readInt32(leadOff+228, Signed)))
 		L.RawSet(civ, lua.LString("future_techs_count"), lua.LNumber(currentGame.readInt32(leadOff+232, Signed)))
 		L.RawSet(civ, lua.LString("armies_count"), lua.LNumber(currentGame.readInt32(leadOff+364, Signed)))
 		L.RawSet(civ, lua.LString("military_unit_count"), lua.LNumber(currentGame.readInt32(leadOff+372, Signed)))

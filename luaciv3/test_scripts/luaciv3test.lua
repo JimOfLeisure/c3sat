@@ -57,13 +57,12 @@ function do_other_stuff()
         print(k,v)
     end
     for _, v in pairs(lead.civs) do
-        print("---")
-        for kk, vv in pairs(v) do
-            print(kk,vv)
+        if v.race_id >=0 then
+            print("---")
+            for kk, vv in pairs(v) do
+                print(kk,vv)
+            end
         end
-    end
-    for _, v in pairs(lead.civs[2].contact_with) do
-        print(v)
     end
 end
 
