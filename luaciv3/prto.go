@@ -9,7 +9,7 @@ func prtoModule(L *lua.LState) {
 	prto := L.NewTable()
 	L.SetGlobal("prto", prto)
 	prtoOff, _ := currentBic.sectionOffset("PRTO", 1)
-	listSection(prtoOff, func(off int) {
+	listSection(prtoOff, func(off int, length int) {
 		lt := L.NewTable()
 		prto.Append(lt)
 		L.RawSet(lt, lua.LString("name"), lua.LString(civString(currentBic.data[off+4:off+4+32])))

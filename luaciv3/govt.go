@@ -9,7 +9,7 @@ func govtModule(L *lua.LState) {
 	govt := L.NewTable()
 	L.SetGlobal("govt", govt)
 	govtOff, _ := currentBic.sectionOffset("GOVT", 1)
-	listSection(govtOff, func(off int) {
+	listSection(govtOff, func(off int, length int) {
 		lt := L.NewTable()
 		govt.Append(lt)
 		L.RawSet(lt, lua.LString("name"), lua.LString(civString(currentBic.data[off+24:off+24+64])))

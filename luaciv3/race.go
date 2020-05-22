@@ -10,7 +10,7 @@ func raceModule(L *lua.LState) {
 	race := L.NewTable()
 	L.SetGlobal("race", race)
 	raceOff, _ := currentBic.sectionOffset("RACE", 1)
-	listSection(raceOff, func(off int) {
+	listSection(raceOff, func(off int, length int) {
 		lt := L.NewTable()
 		race.Append(lt)
 		numCityNames := currentBic.readInt32(off, Signed)
