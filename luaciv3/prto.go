@@ -27,6 +27,11 @@ func prtoModule(L *lua.LState) {
 			panic(err)
 		}
 		L.RawSet(lt, lua.LString("name"), lua.LString(name))
+		L.RawSet(lt, lua.LString("attack"), lua.LNumber(currentBic.readInt32(off+92, Signed)))
+		L.RawSet(lt, lua.LString("defense"), lua.LNumber(currentBic.readInt32(off+84, Signed)))
+		L.RawSet(lt, lua.LString("move"), lua.LNumber(currentBic.readInt32(off+108, Signed)))
+		L.RawSet(lt, lua.LString("cost"), lua.LNumber(currentBic.readInt32(off+80, Signed)))
+		L.RawSet(lt, lua.LString("transport"), lua.LNumber(currentBic.readInt32(off+76, Signed)))
 		off += prtoLen
 	}
 }
