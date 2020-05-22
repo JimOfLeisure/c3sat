@@ -40,45 +40,11 @@ func raceModule(L *lua.LState) {
 		off += 32
 		L.RawSet(lt, lua.LString("adjective"), lua.LString(civString(currentBic.data[off:off+40])))
 		off += 40
+		L.RawSet(lt, lua.LString("civ_name"), lua.LString(civString(currentBic.data[off:off+40])))
+		off += 40
+		L.RawSet(lt, lua.LString("object_noun"), lua.LString(civString(currentBic.data[off:off+40])))
+		off += 40
+		// non-string info here, and then list of scientific leaders at the end
 	})
 	fmt.Println(hex.Dump(currentBic.data[raceOff : raceOff+256]))
-
-	/*
-		        race {
-		            leaderName: string(offset:0, maxLength: 32)
-		            leaderTitle: string(offset:32, maxLength: 24)
-		            adjective:  string(offset:88, maxLength: 40)
-		            civName: string(offset:128, maxLength: 40)
-		            objectNoun: string(offset:168, maxLength: 40)
-		        }
-
-			    tradeRace: race {
-		        civName: string(offset:128, maxLength: 40)
-			}
-
-
-				prtoOff, _ := currentBic.sectionOffset("RACE", 1)
-				numPrto := currentBic.readInt32(prtoOff, Signed)
-				off := prtoOff + 4
-				fmt.Println(numPrto)
-				for i := 0; i < numPrto; i++ {
-					lt := L.NewTable()
-					prto.Append(lt)
-					prtoLen = currentBic.readInt32(off, Signed)
-					// skip over the length
-					off += 4
-					name, err := civString(currentBic.data[off+4 : off+4+32])
-					if err != nil {
-						// TODO: handle errors
-						panic(err)
-					}
-					L.RawSet(lt, lua.LString("name"), lua.LString(name))
-					L.RawSet(lt, lua.LString("attack"), lua.LNumber(currentBic.readInt32(off+92, Signed)))
-					L.RawSet(lt, lua.LString("defense"), lua.LNumber(currentBic.readInt32(off+84, Signed)))
-					L.RawSet(lt, lua.LString("move"), lua.LNumber(currentBic.readInt32(off+108, Signed)))
-					L.RawSet(lt, lua.LString("cost"), lua.LNumber(currentBic.readInt32(off+80, Signed)))
-					L.RawSet(lt, lua.LString("transport"), lua.LNumber(currentBic.readInt32(off+76, Signed)))
-					off += prtoLen
-				}
-	*/
 }
