@@ -4,11 +4,10 @@ import (
 	lua "github.com/yuin/gopher-lua"
 )
 
-const numCivs = 32
-
 // Provides data from the LEAD sections which are the 32 players in a game
 // Player 0 is the barbarians, player 1 is the first human player
 func leadModule(L *lua.LState) {
+	const numCivs = 32
 	lead := L.NewTable()
 	L.SetGlobal("lead", lead)
 	civs := L.NewTable()
@@ -17,6 +16,7 @@ func leadModule(L *lua.LState) {
 		civ := L.NewTable()
 		civs.Append(civ)
 		leadOff, _ := currentGame.sectionOffset("LEAD", i+1)
+		// TODO: I'm not sure the following is right...need to check on the offset and my relative offsets
 		// queried offset is from the start of the 4-byte header, but most of my offset notes are from the end of it
 		leadOff += 4
 		L.RawSet(civ, lua.LString("city_count"), lua.LNumber(currentGame.readInt32(leadOff+376, Signed)))
