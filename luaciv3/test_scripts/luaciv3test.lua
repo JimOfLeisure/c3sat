@@ -26,7 +26,17 @@ end
 
 function mass_scan()
     bic.load_default()
-    foo = get_savs({install_path .. "/Saves/Auto", install_path .. "/Saves"})
+    foo = get_savs({
+        install_path .. "/Saves/Auto",
+        install_path .. "/Saves",
+        install_path .. "/Saves\\ancient-saves\\CivIII-Conquests-v1.22-Saves",
+        install_path .. "/Saves\\ancient-saves\\CivIII-Conquests-v1.22-Saves\\Auto",
+        install_path .. "/Saves/2017-2018",
+        install_path .. "/Saves/civfan",
+        install_path .. "/Saves/huge france autosaves",
+        install_path .. "/Saves/Twitch",
+        install_path .. "/Saves/YouTube",
+    })
     for _, v in pairs(foo) do
         -- print(v)
         sav.load(v)
