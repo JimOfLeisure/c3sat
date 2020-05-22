@@ -62,9 +62,7 @@ function do_other_stuff()
         for kk, vv in pairs(v) do
             print(kk,vv)            
         end
-        if prto[v.unit_type_id+1] then
-            print(prto[v.unit_type_id+1].name)
-        end
+        print(prto[v.prto_id+1].name)
         -- for _ , val in pairs(v["great_leader_names"]) do
         --     print(val)
         -- end
