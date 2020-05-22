@@ -83,6 +83,9 @@ func savLoad(L *lua.LState) int {
 	raceModule(L)
 	unitModule(L)
 	gameModule(L)
+	techModule(L)
+	erasModule(L)
+	govtModule(L)
 
 	return 0
 }

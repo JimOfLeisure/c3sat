@@ -81,20 +81,16 @@ function do_other_stuff()
     -- for k, v in pairs(race) do
     --     print(k,v)
     -- end
-    for k, v in ipairs(unit) do
+    for k, v in ipairs(tech) do
         print("---", k)
         for kk, vv in pairs(v) do
             print(kk,vv)            
         end
-        print(prto[v.prto_id+1].name)
-        -- for _ , val in pairs(v["great_leader_names"]) do
-        --     print(val)
-        -- end
     end
-    for k, v in ipairs(prto) do
-        print(k-1,v.name)
-    end
+    -- for k, v in ipairs(prto) do
+    --     print(k-1,v.name)
+    -- end
 end
 
-mass_scan()
--- do_other_stuff()
+-- mass_scan()
+do_other_stuff()
