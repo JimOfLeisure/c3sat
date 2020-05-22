@@ -57,7 +57,7 @@ function do_other_stuff()
     -- for k, v in pairs(race) do
     --     print(k,v)
     -- end
-    for k, v in ipairs(race) do
+    for k, v in ipairs(prto) do
         print("---", k)
         for kk, vv in pairs(v) do
             print(kk,vv)            
