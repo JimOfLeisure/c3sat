@@ -53,15 +53,18 @@ function do_other_stuff()
     -- sav.load(install_path .. "/Saves/Auto/Conquests Autosave 4000 BC.SAV")
     -- sav.load(install_path .. "/Saves/nice start Lincoln of the Americans, 4000 BC.SAV")
     sav.load(install_path .. "/Saves/Cleopatra of the Egyptians, 2310 BC.SAV")
-    print(prto.dump)
-    for k, v in pairs(prto) do
-        print(k,v)
-    end
-    for k, v in ipairs(prto) do
+    -- print(prto.dump)
+    -- for k, v in pairs(race) do
+    --     print(k,v)
+    -- end
+    for k, v in ipairs(race) do
         print("---", k)
         for kk, vv in pairs(v) do
-            print(kk,vv)
+            print(kk,vv)            
         end
+        -- for _ , val in pairs(v["great_leader_names"]) do
+        --     print(val)
+        -- end
     end
 end
 
