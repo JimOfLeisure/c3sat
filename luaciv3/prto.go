@@ -8,25 +8,25 @@ import (
 
 // Provides data from the PRTO sectionsof the BIC
 func prtoModule(L *lua.LState) {
-	// hack
-	const prtoLen = 259
+	var prtoLen int
 	prto := L.NewTable()
 	L.SetGlobal("prto", prto)
 	prtoOff, _ := currentBic.sectionOffset("PRTO", 1)
 	numPrto := currentBic.readInt32(prtoOff, Signed)
+	off := prtoOff + 4
 	fmt.Println(numPrto)
 	for i := 0; i < numPrto; i++ {
 		lt := L.NewTable()
 		prto.Append(lt)
-		off := prtoOff + 12 + (i * prtoLen)
-		// FIXME
-		// this works until after Submarine ... ??? [36] or in lua [37]
-		// Maybe the first offset is an int length not counting its own data; that adds up
-		name, err := CivString(currentBic.data[off : off+32])
+		prtoLen = currentBic.readInt32(off, Signed)
+		// skip over the length
+		off += 4
+		name, err := CivString(currentBic.data[off+4 : off+4+32])
 		if err != nil {
 			// TODO: handle errors
 			panic(err)
 		}
 		L.RawSet(lt, lua.LString("name"), lua.LString(name))
+		off += prtoLen
 	}
 }
