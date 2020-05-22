@@ -18,12 +18,7 @@ func prtoModule(L *lua.LState) {
 		prtoLen = currentBic.readInt32(off, Signed)
 		// skip over the length
 		off += 4
-		name, err := CivString(currentBic.data[off+4 : off+4+32])
-		if err != nil {
-			// TODO: handle errors
-			panic(err)
-		}
-		L.RawSet(lt, lua.LString("name"), lua.LString(name))
+		L.RawSet(lt, lua.LString("name"), lua.LString(civString(currentBic.data[off+4:off+4+32])))
 		L.RawSet(lt, lua.LString("attack"), lua.LNumber(currentBic.readInt32(off+92, Signed)))
 		L.RawSet(lt, lua.LString("defense"), lua.LNumber(currentBic.readInt32(off+84, Signed)))
 		L.RawSet(lt, lua.LString("move"), lua.LNumber(currentBic.readInt32(off+108, Signed)))

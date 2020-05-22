@@ -8,7 +8,7 @@ import (
 )
 
 // CivString Finds null-terminated string and converts from Windows-1252 to UTF-8
-func CivString(b []byte) (string, error) {
+func civString(b []byte) string {
 	var win1252 string
 	var i int
 	for i = 0; i < len(b); i++ {
@@ -25,10 +25,11 @@ func CivString(b []byte) (string, error) {
 
 	outUtf8, err := ioutil.ReadAll(tr)
 	if err != nil {
-		return "", err
+		// TODO: handle errors
+		panic(err)
 	}
 
-	return string(outUtf8), nil
+	return string(outUtf8)
 }
 
 // Under development; pass it an offset for a list and a callback function
