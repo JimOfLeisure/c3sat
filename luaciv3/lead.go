@@ -6,10 +6,8 @@ import (
 
 const numCivs = 32
 
-// Was unsure what to implement next in the project, got a little inspiration from
-//  https://forums.civfanatics.com/threads/when-do-tier-2-barbarian-units-spawn.657845/
-//  So I'll try to count cities, barb units and types, and barb camps
-//  Eventually this will be refactored to other modules, but for now we'll call it suede after OP
+// Provides data from the LEAD sections which are the 32 players in a game
+// Player 0 is the barbarians, player 1 is the first human player
 func leadModule(L *lua.LState) {
 	lead := L.NewTable()
 	L.SetGlobal("lead", lead)
@@ -35,6 +33,21 @@ func leadModule(L *lua.LState) {
 		L.RawSet(civ, lua.LString("future_techs_count"), lua.LNumber(currentGame.readInt32(leadOff+232, Signed)))
 		L.RawSet(civ, lua.LString("armies_count"), lua.LNumber(currentGame.readInt32(leadOff+364, Signed)))
 		L.RawSet(civ, lua.LString("military_unit_count"), lua.LNumber(currentGame.readInt32(leadOff+372, Signed)))
+		atWar := L.NewTable()
+		L.RawSet(civ, lua.LString("at_war"), atWar)
+		for i := 0; i < numCivs; i++ {
+			atWar.Append(lua.LNumber(currentGame.readInt32(leadOff+3348+(i*4), Signed)))
+		}
+		willTalkTo := L.NewTable()
+		L.RawSet(civ, lua.LString("will_talk_to"), willTalkTo)
+		for i := 0; i < numCivs; i++ {
+			willTalkTo.Append(lua.LNumber(currentGame.readInt32(leadOff+2964+(i*4), Signed)))
+		}
+		contactWith := L.NewTable()
+		L.RawSet(civ, lua.LString("contact_with"), contactWith)
+		for i := 0; i < numCivs; i++ {
+			contactWith.Append(lua.LNumber(currentGame.readInt32(leadOff+3732+(i*4), Signed)))
+		}
 
 	}
 }

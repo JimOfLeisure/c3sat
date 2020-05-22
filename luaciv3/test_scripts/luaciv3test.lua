@@ -62,6 +62,9 @@ function do_other_stuff()
             print(kk,vv)
         end
     end
+    for _, v in pairs(lead.civs[2].contact_with) do
+        print(v)
+    end
 end
 
 -- mass_scan()
