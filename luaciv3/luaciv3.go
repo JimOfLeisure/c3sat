@@ -78,11 +78,11 @@ func savLoad(L *lua.LState) int {
 
 	civ3Module(L)
 	tileModule(L)
-	suedeModule(L)
 	leadModule(L)
 	prtoModule(L)
 	raceModule(L)
 	unitModule(L)
+	gameModule(L)
 
 	return 0
 }
@@ -129,7 +129,6 @@ func getSavs(L *lua.LState) int {
 	savs := L.NewTable()
 	dirs.ForEach(func(_ lua.LValue, v lua.LValue) {
 		if dir, ok := v.(lua.LString); ok {
-			fmt.Println(string(dir))
 			if files, err := ioutil.ReadDir(string(dir)); err == nil {
 				for _, f := range files {
 					if (!f.IsDir()) && strings.ToLower(filepath.Ext(f.Name())) == ".sav" {

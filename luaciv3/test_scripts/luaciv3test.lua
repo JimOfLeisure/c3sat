@@ -39,12 +39,26 @@ function mass_scan()
         -- end
         -- print(tile.width)
         -- print(tile.height)
-        if suede.unit_sections ~= suede.unit_count then
-            io.write(lpad(tostring(suede.city_count), 4))
-            io.write(lpad(tostring(suede.unit_count), 5))
-            io.write(lpad(tostring(suede.unit_sections), 6))
-            io.write(' ', save_name,'\n')
+        -- if suede.unit_sections ~= suede.unit_count then
+        --     io.write(lpad(tostring(suede.city_count), 4))
+        --     io.write(lpad(tostring(suede.unit_count), 5))
+        --     io.write(lpad(tostring(suede.unit_sections), 6))
+        --     io.write(' ', save_name,'\n')
+        -- end
+        local barb_horseman = 0
+        local barb_warrior = 0
+        for _, v in ipairs(unit) do
+            if v.civ_id == 0 and v.prto_id == 6 then
+                barb_warrior = barb_warrior + 1
+            end
+            if v.civ_id == 0 and v.prto_id == 11 then
+                barb_horseman = barb_horseman + 1
+            end
         end
+        io.write(lpad(tostring(game.city_count), 4))
+        io.write(',', lpad(tostring(barb_warrior), 4))
+        io.write(',', lpad(tostring(barb_horseman), 4))
+        io.write(', \"', save_name,'\"\n')
     end
 end
 
@@ -67,7 +81,10 @@ function do_other_stuff()
         --     print(val)
         -- end
     end
+    for k, v in ipairs(prto) do
+        print(k-1,v.name)
+    end
 end
 
--- mass_scan()
-do_other_stuff()
+mass_scan()
+-- do_other_stuff()

@@ -1,9 +1,6 @@
 package luaciv3
 
 import (
-	"encoding/hex"
-	"fmt"
-
 	lua "github.com/yuin/gopher-lua"
 )
 
@@ -46,5 +43,4 @@ func raceModule(L *lua.LState) {
 		off += 40
 		// non-string info here, and then list of scientific leaders at the end
 	})
-	fmt.Println(hex.Dump(currentBic.data[raceOff : raceOff+256]))
 }
