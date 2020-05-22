@@ -34,7 +34,7 @@ func civString(b []byte) string {
 
 // Under development; pass it an offset for a list and a callback function
 // It will call the callback with an offset for each element of the list
-func listSection(offset int, callback func(off int)) {
+func listSection(offset int, callback func(off int, length int)) {
 	var itemLen int
 	numItem := currentBic.readInt32(offset, Signed)
 	// skip over count
@@ -43,7 +43,7 @@ func listSection(offset int, callback func(off int)) {
 		itemLen = currentBic.readInt32(off, Signed)
 		// skip over the length
 		off += 4
-		callback(off)
+		callback(off, itemLen)
 		off += itemLen
 	}
 }
