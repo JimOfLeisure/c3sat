@@ -57,10 +57,13 @@ function do_other_stuff()
     -- for k, v in pairs(race) do
     --     print(k,v)
     -- end
-    for k, v in ipairs(prto) do
+    for k, v in ipairs(unit) do
         print("---", k)
         for kk, vv in pairs(v) do
             print(kk,vv)            
+        end
+        if prto[v.unit_type_id+1] then
+            print(prto[v.unit_type_id+1].name)
         end
         -- for _ , val in pairs(v["great_leader_names"]) do
         --     print(val)

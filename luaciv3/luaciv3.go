@@ -82,6 +82,7 @@ func savLoad(L *lua.LState) int {
 	leadModule(L)
 	prtoModule(L)
 	raceModule(L)
+	unitModule(L)
 
 	return 0
 }

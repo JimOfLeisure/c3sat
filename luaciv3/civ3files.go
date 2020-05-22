@@ -9,8 +9,10 @@ import (
 
 // starting by copying wholesale parts of /queryciv3/queryciv3.go
 
-// to make calling functions readable
+// Signed - to make calling functions readable
 const Signed = true
+
+// Unsigned - to make calling functions readable
 const Unsigned = false
 
 type sectionType struct {
