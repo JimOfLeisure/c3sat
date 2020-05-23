@@ -78,6 +78,7 @@ func savLoad(L *lua.LState) int {
 	govtModule(L)
 	wsizModule(L)
 	diffModule(L)
+	wrldModule(L)
 
 	return 0
 }

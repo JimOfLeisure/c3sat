@@ -51,5 +51,13 @@ func tileModule(L *lua.LState) {
 		L.RawSet(thisTile, lua.LString("terrain"), lua.LNumber(terrain))
 		L.RawSet(thisTile, lua.LString("base_terrain"), lua.LNumber(terrain&0x0f))
 		L.RawSet(thisTile, lua.LString("overlay_terrain"), lua.LNumber(terrain>>4))
+		L.RawSet(thisTile, lua.LString("continent_id"), lua.LNumber(saveGame.readInt16(tileOffset+34, Signed)))
+		// This may only be for barb camps at 0x80; it doesn't seem to show roads, mines, etc.
+		L.RawSet(thisTile, lua.LString("improvements"), lua.LNumber(saveGame.readInt8(tileOffset+52, Unsigned)))
+		// still hunting for the following
+		// L.RawSet(thisTile, lua.LString("overlay"), lua.LNumber(saveGame.readInt32(tileOffset+42, Signed)))
+		// L.RawSet(thisTile, lua.LString("terr_overlay"), lua.LNumber(saveGame.readInt32(tileOffset+50, Signed)))
+		L.RawSet(thisTile, lua.LString("overlay"), lua.LNumber(saveGame.readInt16(tileOffset+63, Unsigned)))
+		// L.RawSet(thisTile, lua.LString("terr_overlay"), lua.LNumber(saveGame.readInt32(tileOffset+50, Signed)))
 	}
 }

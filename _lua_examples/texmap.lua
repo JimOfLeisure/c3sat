@@ -8,6 +8,7 @@ water_tile = string.rep("~", text_tile_width*2)
 land_tile = string.rep("█", text_tile_width*2)
 indent = string.rep(" ", text_tile_width)
 
+bic.load_default()
 sav.load(install_path .. relative_save)
 
 for k, v in ipairs(tile) do
@@ -16,7 +17,7 @@ for k, v in ipairs(tile) do
         io.write("\n")
         -- indent odd map rows
         if math.floor((k - 1) / (tile.width / 2)) % 2 == 1 then
-            io.write("  ")
+            io.write(indent)
         end
     end
     if v.base_terrain > 10 then
