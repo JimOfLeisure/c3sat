@@ -30,7 +30,7 @@ end
             end
         end
         local ocn = wsiz[wrld.wsiz_id + 1].ocn
-        ocn = math.floor(ocn * diff[game.diff_id].pct_optimal_cities / 100)
+        ocn = math.floor(ocn * diff[game.diff_id + 1].pct_optimal_cities / 100)
         io.write(lpad(tostring(game.city_count), 4))
         io.write(',', lpad(tostring(ocn), 4))
         io.write(',', lpad(tostring(barb_camp), 4))

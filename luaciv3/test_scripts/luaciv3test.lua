@@ -38,36 +38,10 @@ function mass_scan()
         install_path .. "/Saves/YouTube",
     })
     for _, v in pairs(foo) do
-        -- print(v)
         sav.load(v)
-        -- print(sav.dump())
-        -- print(civ3.always26)
-        -- print(civ3.maybe_version_minor)
-        -- print(civ3.maybe_version_major)
-        -- for k, v in pairs(civ3) do
-        --     print(k, v)
-        -- end
-        -- print(tile.width)
-        -- print(tile.height)
-        -- if suede.unit_sections ~= suede.unit_count then
-        --     io.write(lpad(tostring(suede.city_count), 4))
-        --     io.write(lpad(tostring(suede.unit_count), 5))
-        --     io.write(lpad(tostring(suede.unit_sections), 6))
-        --     io.write(' ', save_name,'\n')
-        -- end
-        local barb_horseman = 0
-        local barb_warrior = 0
-        for _, v in ipairs(unit) do
-            if v.civ_id == 0 and v.prto_id == 6 then
-                barb_warrior = barb_warrior + 1
-            end
-            if v.civ_id == 0 and v.prto_id == 11 then
-                barb_horseman = barb_horseman + 1
-            end
-        end
         io.write(lpad(tostring(game.city_count), 4))
-        io.write(',', lpad(tostring(barb_warrior), 4))
-        io.write(',', lpad(tostring(barb_horseman), 4))
+        io.write(lpad(tostring(city.count), 7))
+        io.write(lpad(string.format("%.2f", city.count / game.city_count), 7))
         io.write(', \"', save_name,'\"\n')
     end
 end
@@ -78,9 +52,9 @@ function do_other_stuff()
     -- sav.load(install_path .. "/Saves/nice start Lincoln of the Americans, 4000 BC.SAV")
     sav.load(install_path .. "/Saves/Cleopatra of the Egyptians, 2310 BC.SAV")
     -- print(prto.dump)
-    -- for k, v in pairs(race) do
-    --     print(k,v)
-    -- end
+    for k, v in ipairs(bldg) do
+        print(k,v.dump)
+    end
     -- for k, v in pairs(tech) do
     --     print("---", k)
     --     for kk, vv in pairs(v) do
@@ -93,7 +67,7 @@ function do_other_stuff()
     -- for k, v in ipairs(game.tech_civ_bitmask) do
     --     print(tech[k].name,v)
     -- end
-    print(bit32.band(15,2))
+    -- print(bit32.band(15,2))
 end
 
 function textmap()
@@ -138,5 +112,5 @@ function textmap()
 end
 
 -- mass_scan()
--- do_other_stuff()
-textmap()
+do_other_stuff()
+-- textmap()
