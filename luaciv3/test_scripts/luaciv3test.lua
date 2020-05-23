@@ -52,9 +52,12 @@ function do_other_stuff()
     -- sav.load(install_path .. "/Saves/nice start Lincoln of the Americans, 4000 BC.SAV")
     sav.load(install_path .. "/Saves/Cleopatra of the Egyptians, 2310 BC.SAV")
     -- print(prto.dump)
-    for k, v in ipairs(bldg) do
-        print(k,v.dump)
-    end
+    for k, v in ipairs(city) do
+        print(k,v)
+        for kk, vv in pairs(v) do
+            print(kk,vv)            
+        end
+end
     -- for k, v in pairs(tech) do
     --     print("---", k)
     --     for kk, vv in pairs(v) do

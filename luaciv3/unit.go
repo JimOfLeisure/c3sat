@@ -13,7 +13,7 @@ func unitModule(L *lua.LState) {
 	unit := L.NewTable()
 	L.SetGlobal("unit", unit)
 	// Since "UNIT" can and does often appear in dirty data in unitialized parts of the save,
-	// will search for UNIT after that
+	// will search for UNIT after the last ESPN
 	lastEspn, _ := currentGame.sectionOffset("ESPN", 64)
 	for i := 0; i < 50; i++ {
 		unitOff, _ = currentGame.sectionOffset("UNIT", i+1)

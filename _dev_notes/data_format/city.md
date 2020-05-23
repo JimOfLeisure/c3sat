@@ -6,6 +6,7 @@
   - A couple of outliers with custom bic files downloaded from elsewhere
   - At least one was originally a PTW save, and the global city count was wrong, so the offset was wrong for PTW
   - The other was a Rise of Rome Conquest; the global city count seems plausible, and the "CITY"/ city count ratio seems steady at 33
+  - Upon further investigation, the number of building types appears to represent that number of "CITY" headers, and there are 83 in default game
 - Apparent structure from looking at one save (default epic game, autosave 2270 BC w/19 cities)
     - CITY 0x88 (length/count)
         - CITY 0x10
@@ -17,9 +18,10 @@
         - BINF 0x04
         - Lots of non-sectioned data, seems to alternate between 0 and -1
         - BITM 0x28
-        - DATE 0x54 - actuallly, 0x54 is a candidate for the number of 0x04 cities, but there is more data between it and those
+        - DATE 0x54
         - CITY 0x08
-        - 84* CITY 0x04 (84 is 0x54). There are 83 building types in the default game; wonder if this is a list of maybe per-building data like date built, plus one for the city itself?
+        - CITY 0x04 - List header with count (83 - 0x53)
+          - 83* CITY 0x04 There are 83 building types in the default game; wonder if this is a list of maybe per-building data like date built?
         - CTPG 0x4
         - CTPG 0x10
         - CITY 0x04
