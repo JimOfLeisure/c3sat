@@ -17,7 +17,7 @@ func myCompleter(d prompt.Document) []prompt.Suggest {
 // I'm thinking of just using tests while developing the package, so will
 //   try to put stuff here instead of a new executable
 // Go will cache test results; run `go test` with `-count=1` to skip caching the interactive input/output
-func TestWhatevs(t *testing.T) {
+func disabledTestWhatevs(t *testing.T) {
 
 	doStrings := []struct {
 		desc string
