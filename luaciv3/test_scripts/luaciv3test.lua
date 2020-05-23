@@ -57,6 +57,9 @@ function do_other_stuff()
         for kk, vv in pairs(v) do
             print(kk,vv)            
         end
+        for k, v in ipairs(v.ctzn) do
+            print(k,v.dump)
+        end
 end
     -- for k, v in pairs(tech) do
     --     print("---", k)
