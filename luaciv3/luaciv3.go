@@ -30,9 +30,6 @@ func NewState() *lua.LState {
 // LuaCiv3 injects functions into a gopher-lua state
 // TODO: Should I eliminate error return? lua.NewState() doesn't return error
 func LuaCiv3(L *lua.LState) error {
-	// test function
-	L.SetGlobal("test", L.NewFunction(testPassValues))
-
 	// install_path
 	// if error, will get empty string, and that's fine
 	path, _ := findWinCivInstall()
@@ -52,16 +49,9 @@ func LuaCiv3(L *lua.LState) error {
 
 	L.SetGlobal("get_savs", L.NewFunction(getSavs))
 
-	return nil
-}
+	bit32Module(L)
 
-// testPassValues is my getting familiar with calling Go from lua with values/params
-//  see https://github.com/yuin/gopher-lua#calling-go-from-lua
-func testPassValues(L *lua.LState) int {
-	lv := L.ToInt(1)
-	lv2 := L.ToInt(2)
-	L.Push(lua.LNumber(lv * lv2))
-	return 1
+	return nil
 }
 
 // TODO: Sav- and Bic- loads and dumps are similar; perhaps move to struct method?

@@ -81,18 +81,19 @@ function do_other_stuff()
     -- for k, v in pairs(race) do
     --     print(k,v)
     -- end
-    for k, v in pairs(tech) do
-        print("---", k)
-        for kk, vv in pairs(v) do
-            print(kk,vv)            
-        end
-        for kk, vv in pairs(v.prereq_tech_ids) do
-            print(kk,vv)
-        end
-    end
+    -- for k, v in pairs(tech) do
+    --     print("---", k)
+    --     for kk, vv in pairs(v) do
+    --         print(kk,vv)            
+    --     end
+    --     for kk, vv in pairs(v.prereq_tech_ids) do
+    --         print(kk,vv)
+    --     end
+    -- end
     -- for k, v in ipairs(game.tech_civ_bitmask) do
     --     print(tech[k].name,v)
     -- end
+    print(bit32.band(15,2))
 end
 
 -- mass_scan()

@@ -1,8 +1,6 @@
 package luaciv3
 
 import (
-	"encoding/hex"
-
 	lua "github.com/yuin/gopher-lua"
 )
 
@@ -24,6 +22,6 @@ func techModule(L *lua.LState) {
 				prereq.Append(lua.LNumber(pre))
 			}
 		}
-		L.RawSet(lt, lua.LString("dump"), lua.LString("\n"+hex.Dump(currentBic.data[off:off+length])))
+		// L.RawSet(lt, lua.LString("dump"), lua.LString("\n"+hex.Dump(currentBic.data[off:off+length])))
 	})
 }
