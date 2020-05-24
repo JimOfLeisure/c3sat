@@ -16,7 +16,7 @@ function has_prereqs(civ, tech_id)
         return false
     end
     for _, v in ipairs(tech[tech_id].prereq_tech_ids) do
-        if bit32.band(game.tech_civ_bitmask[v+1], bit32.lshift(1, civ - 1)) then
+        if bit32.band(game.tech_civ_bitmask[v+1], bit32.lshift(1, civ - 1)) == 0 then
             return false
         end
     end
