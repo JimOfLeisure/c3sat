@@ -16,10 +16,10 @@
         - POPD 0x08 - potential CTZN count at 0x8
         - 3* CTZN 0x12c (assume one per citizen)
         - BINF 0x04 - I've always presumed this was "bin food", but that seems to be elsewhere. This might be "building info" as it has a value of 83
-        - Lots of non-sectioned data, seems to alternate between 0 and -1 - Think
-         this is "building info", seems to be 83 triplets of ints, or maybe
-         shorts or something, but lenth 12 bytes * count. *** Looks like it's
-         3 ints: year, civ ID, culture
+            - Lots of non-sectioned data, seems to alternate between 0 and -1 - Think
+             this is "building info", seems to be 83 triplets of ints, or maybe
+             shorts or something, but lenth 12 bytes * count. *** Looks like it's
+             3 ints: year, civ ID, culture
         - BITM 0x28
         - DATE 0x54
         - CITY 0x08

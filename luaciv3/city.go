@@ -50,7 +50,6 @@ func cityModule(L *lua.LState) {
 		// This may be redundant since we have a table in Lua
 		L.RawSet(thisCity, lua.LString("ctzn_count"), lua.LNumber(numCitizens))
 		// L.RawSet(lt, lua.LString("dump"), lua.LString("\n"+hex.Dump(currentBic.data[off:off+length])))
-		L.RawSet(thisCity, lua.LString("dump"), lua.LString("\n"+hex.Dump(currentGame.data[offset:offset+1024])))
 		ctzn := L.NewTable()
 		L.RawSet(thisCity, lua.LString("ctzn"), ctzn)
 		offset += 0x22c
@@ -67,7 +66,7 @@ func cityModule(L *lua.LState) {
 		offset += 12
 		binf := L.NewTable()
 		L.RawSet(thisCity, lua.LString("binf"), binf)
-		for i := 1; i < numBinf; i++ {
+		for i := 0; i < numBinf; i++ {
 			lt := L.NewTable()
 			binf.Append(lt)
 			L.RawSet(lt, lua.LString("date"), lua.LNumber(currentGame.readInt32(offset, Signed)))
@@ -75,6 +74,20 @@ func cityModule(L *lua.LState) {
 			L.RawSet(lt, lua.LString("culture"), lua.LNumber(currentGame.readInt32(offset+8, Signed)))
 			offset += 12
 		}
+		L.RawSet(thisCity, lua.LString("date"), lua.LNumber(currentGame.readInt32(offset+0x84, Signed)))
+		numCityCity := currentGame.readInt32(offset+0xa4, Signed)
+		offset += 0xa8
+		// This is not a listSection; they don't have [4]byte headers
+		cityCity := L.NewTable()
+		L.RawSet(thisCity, lua.LString("city"), cityCity)
+		for i := 0; i < numCityCity; i++ {
+			cityCity.Append(lua.LNumber(currentGame.readInt32(offset+8, Signed)))
+			// [4]byte header, int length (4), int whatevs
+			offset += 12
+		}
+		offset += 0x30
+		// should be at the start of the next city
+		// L.RawSet(thisCity, lua.LString("dump"), lua.LString("\n"+hex.Dump(currentGame.data[offset:offset+256])))
 
 		// Only doing one city for now
 		break

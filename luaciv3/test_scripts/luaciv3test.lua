@@ -57,11 +57,11 @@ function do_other_stuff()
         for kk, vv in pairs(v) do
             print(kk,vv)            
         end
-        for k, v in ipairs(v.binf) do
-            for kk, vv in pairs(v) do
-                print(kk,vv)            
-            end
-        end
+        -- for k, v in ipairs(v.binf) do
+        --     for kk, vv in pairs(v) do
+        --         print(kk,vv)            
+        --     end
+        -- end
 end
     -- for k, v in pairs(tech) do
     --     print("---", k)
