@@ -10,11 +10,9 @@ func leadModule(L *lua.LState) {
 	const numCivs = 32
 	lead := L.NewTable()
 	L.SetGlobal("lead", lead)
-	civs := L.NewTable()
-	L.RawSet(lead, lua.LString("civs"), civs)
 	for i := 0; i < numCivs; i++ {
 		civ := L.NewTable()
-		civs.Append(civ)
+		lead.Append(civ)
 		leadOff, _ := currentGame.sectionOffset("LEAD", i+1)
 		// TODO: I'm not sure the following is right...need to check on the offset and my relative offsets
 		// queried offset is from the start of the 4-byte header, but most of my offset notes are from the end of it

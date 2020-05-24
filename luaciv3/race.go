@@ -37,7 +37,7 @@ func raceModule(L *lua.LState) {
 		off += 32
 		L.RawSet(lt, lua.LString("adjective"), lua.LString(civString(currentBic.data[off:off+40])))
 		off += 40
-		L.RawSet(lt, lua.LString("civ_name"), lua.LString(civString(currentBic.data[off:off+40])))
+		L.RawSet(lt, lua.LString("name"), lua.LString(civString(currentBic.data[off:off+40])))
 		off += 40
 		L.RawSet(lt, lua.LString("object_noun"), lua.LString(civString(currentBic.data[off:off+40])))
 		off += 40
