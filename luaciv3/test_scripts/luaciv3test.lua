@@ -39,11 +39,17 @@ function mass_scan()
         install_path .. "/Saves/YouTube",
     })
     for _, v in pairs(foo) do
-        print(v)
+        -- print(v)
         sav.load(v)
-        io.write(lpad(tostring(game.city_count), 4))
-        io.write(', \"', save_name,'\"\n')
-    end
+        -- io.write(lpad(tostring(game.city_count), 4))
+        -- io.write(', \"', save_name,'\"\n')
+
+        for k, v in ipairs(lead) do
+            if v.eras_id > 0 then
+                print(v.player_number, race[k].name, v.eras_id, save_name)
+            end
+        end
+        end
 end
 
 function do_other_stuff()
@@ -53,20 +59,22 @@ function do_other_stuff()
     -- sav.load(install_path .. "/Saves/Cleopatra of the Egyptians, 2310 BC.SAV")
     sav.load(install_path .. "/Saves/Auto/Conquests Autosave 450 BC.SAV")
     -- print(prto.dump)
-    for k, v in ipairs(city) do
-        print("-----", k,v)
-        for kk, vv in pairs(v) do
-            -- print(kk,vv)
-            io.write(lpad(tostring(kk), 25))
-            io.write(" ", lpad(tostring(vv), 6))
-            io.write("\n")
-        end
-        -- for k, v in ipairs(v.binf) do
-        --     for kk, vv in pairs(v) do
-        --         print(kk,vv)            
-        --     end
-        -- end
-end
+
+    -- for k, v in ipairs(city) do
+    --     print("-----", k,v)
+    --     for kk, vv in pairs(v) do
+    --         -- print(kk,vv)
+    --         io.write(lpad(tostring(kk), 25))
+    --         io.write(" ", lpad(tostring(vv), 6))
+    --         io.write("\n")
+    --     end
+    --     -- for k, v in ipairs(v.binf) do
+    --     --     for kk, vv in pairs(v) do
+    --     --         print(kk,vv)            
+    --     --     end
+    --     -- end
+    -- end
+
     -- for k, v in pairs(tech) do
     --     print("---", k)
     --     for kk, vv in pairs(v) do
@@ -76,9 +84,9 @@ end
     --         print(kk,vv)
     --     end
     -- end
-    -- for k, v in ipairs(game.tech_civ_bitmask) do
-    --     print(tech[k].name,v)
-    -- end
+    for k, v in ipairs(lead) do
+        print(race[k].name, v.eras_id)
+    end
     -- print(bit32.band(15,2))
 end
 
