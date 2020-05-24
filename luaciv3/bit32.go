@@ -16,9 +16,10 @@ func bit32Module(L *lua.LState) {
 	lt := L.NewTable()
 	L.SetGlobal("bit32", lt)
 	L.RawSet(lt, lua.LString("band"), L.NewFunction(bit32band))
-	L.RawSet(lt, lua.LString("rshift"), L.NewFunction(bit32rshift))
 	L.RawSet(lt, lua.LString("bnot"), L.NewFunction(bit32bnot))
 	L.RawSet(lt, lua.LString("bor"), L.NewFunction(bit32bor))
+	L.RawSet(lt, lua.LString("lshift"), L.NewFunction(bit32lshift))
+	L.RawSet(lt, lua.LString("rshift"), L.NewFunction(bit32rshift))
 }
 
 // variadic lua-callable function to bitwise-and all operands
