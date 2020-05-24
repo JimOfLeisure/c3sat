@@ -2,7 +2,6 @@
 -- Needs better formatting ... csv, plain text, html?
 
 relative_save = "/Saves/Auto/Conquests Autosave 4000 BC.SAV"
-relative_save = "/Saves/Cleopatra of the Egyptians, 2310 BC.SAV"
 
 player = 1
 
