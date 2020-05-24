@@ -8,7 +8,7 @@ player = 1
 bic.load_default()
 sav.load(install_path .. relative_save)
 
-print("\"Civ\", ", "\"Tech to Buy\", ", "\"Tech to Sell\"")
+io.write("\"Civ\", \"Tech to Buy\", \"Tech to Sell\"\n")
 
 -- Assumes Lua 1-based index and not civ3-native 0-based
 function has_prereqs(civ, tech_id)
