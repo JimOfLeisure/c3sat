@@ -1,5 +1,6 @@
 -- Shows available tech trades in-game, in csv format
 
+-- Unlikely to have any trades in 4000 BC, so change this
 relative_save = "/Saves/Auto/Conquests Autosave 4000 BC.SAV"
 
 player = 1
