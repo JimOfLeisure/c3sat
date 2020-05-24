@@ -62,6 +62,19 @@ func cityModule(L *lua.LState) {
 			L.RawSet(lt, lua.LString("dump"), lua.LString("\n"+hex.Dump(currentGame.data[offset:offset+length+8])))
 			offset += length + 8
 		}
+		// L.RawSet(thisCity, lua.LString("binfDump"), lua.LString("\n"+hex.Dump(currentGame.data[offset:offset+16])))
+		numBinf := currentGame.readInt32(offset+8, Signed)
+		offset += 12
+		binf := L.NewTable()
+		L.RawSet(thisCity, lua.LString("binf"), binf)
+		for i := 1; i < numBinf; i++ {
+			lt := L.NewTable()
+			binf.Append(lt)
+			L.RawSet(lt, lua.LString("date"), lua.LNumber(currentGame.readInt32(offset, Signed)))
+			L.RawSet(lt, lua.LString("lead_id"), lua.LNumber(currentGame.readInt32(offset+4, Signed)))
+			L.RawSet(lt, lua.LString("culture"), lua.LNumber(currentGame.readInt32(offset+8, Signed)))
+			offset += 12
+		}
 
 		// Only doing one city for now
 		break
