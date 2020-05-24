@@ -13,7 +13,7 @@ func techModule(L *lua.LState) {
 		lt := L.NewTable()
 		tech.Append(lt)
 		L.RawSet(lt, lua.LString("name"), lua.LString(civString(currentBic.data[off:off+32])))
-		L.RawSet(lt, lua.LString("era_id"), lua.LNumber(currentBic.readInt32(off+68, Signed)))
+		L.RawSet(lt, lua.LString("eras_id"), lua.LNumber(currentBic.readInt32(off+68, Signed)))
 		prereq := L.NewTable()
 		L.RawSet(lt, lua.LString("prereq_tech_ids"), prereq)
 		for i := 0; i < 4; i++ {
