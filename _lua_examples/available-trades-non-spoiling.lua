@@ -1,5 +1,4 @@
--- Shows available tech trades in-game
--- Needs better formatting ... csv, plain text, html?
+-- Shows available tech trades in-game, in csv format
 
 relative_save = "/Saves/Auto/Conquests Autosave 4000 BC.SAV"
 
@@ -8,7 +7,7 @@ player = 1
 bic.load_default()
 sav.load(install_path .. relative_save)
 
-print("Civ", "Tech to Buy", "Tech to Sell")
+print("\"Civ\", ", "\"Tech to Buy\", ", "\"Tech to Sell\"")
 
 -- Assumes Lua 1-based index and not civ3-native 0-based
 function has_prereqs(civ, tech_id)
@@ -26,9 +25,8 @@ end
 for k, v in ipairs(lead) do
     if v.race_id > 0 and k - 1 ~= player then
         if v.contact_with[player + 1] ~= 0 then
-            io.write(race[v.race_id + 1].name)
+            io.write("\"", race[v.race_id + 1].name, "\"")
             if v.at_war[player + 1] == 0 or v.will_talk_to[player + 1] == 0 then
-                -- print(' trade')
                 local tech_to_buy = {}
                 local tech_to_sell = {}
                 local player_mask = bit32.lshift(1, player)
