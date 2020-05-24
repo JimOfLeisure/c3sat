@@ -32,16 +32,16 @@ function mass_scan()
         install_path .. "/Saves\\ancient-saves\\CivIII-Conquests-v1.22-Saves",
         install_path .. "/Saves\\ancient-saves\\CivIII-Conquests-v1.22-Saves\\Auto",
         install_path .. "/Saves/2017-2018",
-        install_path .. "/Saves/civfan",
+        -- this has just one file, a PTW save
+        -- install_path .. "/Saves/civfan",
         install_path .. "/Saves/huge france autosaves",
         install_path .. "/Saves/Twitch",
         install_path .. "/Saves/YouTube",
     })
     for _, v in pairs(foo) do
+        print(v)
         sav.load(v)
         io.write(lpad(tostring(game.city_count), 4))
-        io.write(lpad(tostring(city.count), 7))
-        io.write(lpad(string.format("%.2f", city.count / game.city_count), 7))
         io.write(', \"', save_name,'\"\n')
     end
 end
@@ -50,12 +50,16 @@ function do_other_stuff()
     bic.load_default()
     -- sav.load(install_path .. "/Saves/Auto/Conquests Autosave 4000 BC.SAV")
     -- sav.load(install_path .. "/Saves/nice start Lincoln of the Americans, 4000 BC.SAV")
-    sav.load(install_path .. "/Saves/Cleopatra of the Egyptians, 2310 BC.SAV")
+    -- sav.load(install_path .. "/Saves/Cleopatra of the Egyptians, 2310 BC.SAV")
+    sav.load(install_path .. "/Saves/Auto/Conquests Autosave 450 BC.SAV")
     -- print(prto.dump)
     for k, v in ipairs(city) do
-        print(k,v)
+        print("-----", k,v)
         for kk, vv in pairs(v) do
-            print(kk,vv)            
+            -- print(kk,vv)
+            io.write(lpad(tostring(kk), 25))
+            io.write(" ", lpad(tostring(vv), 6))
+            io.write("\n")
         end
         -- for k, v in ipairs(v.binf) do
         --     for kk, vv in pairs(v) do
@@ -116,9 +120,8 @@ function textmap()
             end
     end
     io.write("\n")
-   
 end
 
--- mass_scan()
-do_other_stuff()
+mass_scan()
+-- do_other_stuff()
 -- textmap()

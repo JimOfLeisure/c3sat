@@ -11,24 +11,19 @@ func cityModule(L *lua.LState) {
 	var offset int
 	lt := L.NewTable()
 	L.SetGlobal("city", lt)
-	// Since "CITY" can sometimes appear in dirty data, let's find the last IDLS
-	//   and find the first "CITY" after that
-	var lastIdls int
+	// Since "CITY" can sometimes appear in dirty data, let's find the first
+	//   "CITY" with 0x00000088 after it
 	for _, v := range currentGame.sections {
-		if v.name == "IDLS" {
-			lastIdls = v.offset
-		}
-	}
-	for _, v := range currentGame.sections {
-		if v.name == "CITY" && v.offset > lastIdls {
+		if v.name == "CITY" {
 			offset = v.offset
-			break
+			if currentGame.readInt32(offset+4, Signed) == 0x88 {
+				break
+			}
 		}
 	}
 	// Get city count
 	gameOff, _ := currentGame.sectionOffset("GAME", 1)
-	numCities := currentGame.readInt32(gameOff+28, Signed)
-
+	numCities := currentGame.readInt32(gameOff+32, Signed)
 	// TODO: if offset is still 0 we have an error... or we have 0 cities
 	for i := 0; i < numCities; i++ {
 		thisCity := L.NewTable()
@@ -88,10 +83,5 @@ func cityModule(L *lua.LState) {
 		offset += 0x30
 		// should be at the start of the next city
 		// L.RawSet(thisCity, lua.LString("dump"), lua.LString("\n"+hex.Dump(currentGame.data[offset:offset+256])))
-
-		// Only doing one city for now
-		break
 	}
-
-	// L.RawSet(city, lua.LString("count"), lua.LNumber(count))
 }
