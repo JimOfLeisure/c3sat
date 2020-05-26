@@ -47,16 +47,127 @@ and organize the output tiles.
     - `tile[n].base_terrain` - The low nybble of terrain. Indicates the base terrain type.
     - `tile[n].overlay_terrain` - The high nybble of terrain. Indicates the overlay terrain (hill, mountain, forest, volcano, flood plain, marsh, or jungle) else is just a duplicate of the base terrain.
 
+## Automated dump of data types
 
-## Dev notes
-
-- ✓ should probably return a new lua environment; maybe optionally inject into existing
-- ✓ should be able to read files direcly (and eventually possibly write)
-- (partial ✓ ) `sav` and `bic` table variables for queryciv3-similar queries by section
-- Perhaps `game`, `wrld`, `tile`, etc. table variables for processed data?
-- no spoiler protection at first, but maybe add later, perhaps as function on table vars or global setting
-- My LevelDB storage idea doesn't belong in this package; should go in the executable
-- ✓ maybe start with `sav.load()` and registry path finder
-- Do I want the file data byte arrays in Go or in Lua?
-  - maybe try both for a bit
-  - on second thought, don't want to re-do type conversions in lua just now
+- bic
+  - load_default()
+  - dump()
+- sav
+  - load()
+  - dump()
+- civ3
+  - always26
+  - maybe_version_minor
+  - maybe_version_major
+  - gobbledegook_1
+  - gobbledegook_2
+  - gobbledegook_3
+  - gobbledegook_4
+- game
+  - diff_id
+  - unit_count
+  - city_count
+  - tech_civ_bitmask[] (number)
+- wrld
+  - wsiz_id
+- tile[]
+  - terrain
+  - base_terrain
+  - overlay_terrain
+  - continent_id
+  - improvements
+  - overlay
+- bldg[]
+  - dump
+- city[]
+  - name
+  - id
+  - x
+  - y
+  - lead_id
+  - improvements_maintenance
+  - stored_food
+  - stored_shields
+  - ctzn_count
+  - ctzn[]
+    - dump
+  - binf[]
+    - date
+    - lead_id
+    - culture
+  - date
+  - city[] (number)
+- diff[]
+  - name
+  - content_citizens
+  - max_anarchy_turns
+  - defense_land_units
+  - offense_land_units
+  - start_units_1
+  - start_units_2
+  - add_free_support
+  - bonus_each_city
+  - barb_attack_bonus
+  - cost_factor
+  - pct_optimal_cities
+  - ai_trade_rate
+  - corruption
+  - quelled_citizens
+- eras[]
+  - name
+- govt[]
+  - name
+- lead[]
+  - city_count
+  - unit_count
+  - player_number
+  - race_id
+  - govt_id
+  - mobilization_level
+  - tiles_discovered
+  - eras_id
+  - research_beakers
+  - current_research_id
+  - current_research_turns
+  - future_techs_count
+  - armies_count
+  - military_unit_count
+  - at_war[] (number)
+  - will_talk_to[] (number)
+  - contact_with[] (number)
+- prto[]
+  - name
+  - attack
+  - defense
+  - move
+  - cost
+  - transport
+- race[]
+  - city_names[] (string)
+  - great_leader_names[] (string)
+  - leader_name
+  - leader_title
+  - adjective
+  - name
+  - object_noun
+- tech[]
+  - name
+  - eras_id
+  - prereq_tech_ids
+- unit[]
+  - id
+  - x
+  - y
+  - prev_x
+  - prev_y
+  - civ_id
+  - race_id
+  - prto_id
+- wsiz[]
+  - name
+  - ocn
+  - tech_rate
+  - width
+  - dist_between_civs
+  - num_civs
+  - height
