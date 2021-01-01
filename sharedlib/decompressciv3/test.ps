@@ -1,0 +1,8 @@
+$Signature = @'
+[DllImport(@"./decompressciv3.dylib")]
+public static extern void ReadFile();
+'@
+
+$Type = Add-Type -MemberDefinition $Signature -Name Win32Utils -Namespace GoDllTest -PassThru
+
+$Type::ReadFile()
