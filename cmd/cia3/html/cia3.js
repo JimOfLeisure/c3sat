@@ -707,13 +707,16 @@ class HexDiffAll extends Cia3Element {
 class Trade extends Cia3Element {
     player = 1;
     render () {
+        let playerGold = data.tradeCivs[this.player].gold[0] + data.tradeCivs[this.player].gold[1];
         this.innerHTML = '';
         const friendlyTable = document.createElement('table');
         this.appendChild(friendlyTable);
         friendlyTable.innerHTML = `<tr>
             <th>Civ</th>
+            <th>Gold</th>
             <th>Tech to Buy</th>
             <th>Tech to Sell</th>
+            <th>Gold</th>
         </tr>`;
         data.tradeCivs.filter(this.willTalk, this).forEach((e, i) => {
             const friendlyRow = document.createElement('tr');
@@ -735,8 +738,10 @@ class Trade extends Cia3Element {
                     }
                 }
             });
+            friendlyRow.innerHTML += `<td>${e.gold[0] + e.gold[1]}</td>`;
             friendlyRow.innerHTML += `<td>${techsToBuy.join(", ")}</td>`;
             friendlyRow.innerHTML += `<td>${techsToSell.join(", ")}</td>`;
+            friendlyRow.innerHTML += `<td>${playerGold}</td>`;
             friendlyTable.appendChild(friendlyRow);
         });
     }
@@ -777,6 +782,7 @@ class Trade extends Cia3Element {
     tradeCivs: civs {
         playerNumber: int32s(offset:0, count: 1)
         raceId: int32s(offset:4, count: 1)
+        gold: int32s(offset:40, count: 2)
         atWar: bytes(offset:3348, count: 32)
         willTalkTo: int32s(offset:2964, count: 32)
         contactWith: int32s(offset:3732, count: 32)
