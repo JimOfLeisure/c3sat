@@ -1,7 +1,7 @@
 -- A summary of diplomatic information in CSV format
 
 -- Unlikely to have any contacts in 4000 BC, so change this
-relative_save = "/Saves/Auto/Conquests Autosave 4000 BC.SAV"
+relative_save = "/Saves/Auto/Conquests Autosave 1300 BC.SAV"
 
 player = 1
 
@@ -16,7 +16,7 @@ function is_alive(civ)
     return true
 end
 
-io.write("\"Civ\", \"Relationship\", \"Will Talk\", \"Government\", \"Era\", \"Cities\"\n")
+io.write("\"Civ\", \"Relationship\", \"Will Talk\", \"Government\", \"Era\", \"Cities\", \"Gold\"\n")
 
 for k, v in ipairs(lead) do
     if v.race_id > 0 and k - 1 ~= player and is_alive(k) then
@@ -33,7 +33,8 @@ for k, v in ipairs(lead) do
             end
             io.write(", \"", govt[v.govt_id + 1].name, "\", ")
             io.write(", \"", eras[v.eras_id + 1].name, "\", ")
-            io.write(tostring(v.city_count))
+            io.write(tostring(v.city_count), "\", ")
+            io.write(tostring(v.gold), "\", ")
             io.write("\n")
         end
     end

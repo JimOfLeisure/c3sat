@@ -31,6 +31,7 @@ func leadModule(L *lua.LState) {
 		L.RawSet(civ, lua.LString("future_techs_count"), lua.LNumber(currentGame.readInt32(leadOff+232, Signed)))
 		L.RawSet(civ, lua.LString("armies_count"), lua.LNumber(currentGame.readInt32(leadOff+364, Signed)))
 		L.RawSet(civ, lua.LString("military_unit_count"), lua.LNumber(currentGame.readInt32(leadOff+372, Signed)))
+		L.RawSet(civ, lua.LString("gold"), lua.LNumber(currentGame.readInt32(leadOff+40, Signed))+lua.LNumber(currentGame.readInt32(leadOff+44, Signed)))
 		atWar := L.NewTable()
 		L.RawSet(civ, lua.LString("at_war"), atWar)
 		for i := 0; i < numCivs; i++ {
