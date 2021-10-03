@@ -31,7 +31,7 @@ for k, v in ipairs(lead) do
                     io.write("\"WAR\", \"NO\"")
                 end
             end
-            io.write(", \"", govt[v.govt_id + 1].name, "\", ")
+            io.write(", \"", govt[v.govt_id + 1].name, "\"")
             io.write(", \"", eras[v.eras_id + 1].name, "\", ")
             io.write(tostring(v.city_count), "\", ")
             io.write(tostring(v.gold), "\", ")
