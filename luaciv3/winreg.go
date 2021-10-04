@@ -1,3 +1,5 @@
+//go:build windows
+
 package luaciv3
 
 import (
@@ -10,7 +12,7 @@ var civInstallPathKeyTry = []string{
 	`SOFTWARE\Infogrames\Conquests`,
 }
 
-func findWinCivInstall() (string, error) {
+func findCivInstall() (string, error) {
 	var k registry.Key
 	var err error
 	for i := 0; i < len(civInstallPathKeyTry); i++ {

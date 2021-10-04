@@ -32,7 +32,7 @@ func NewState() *lua.LState {
 func LuaCiv3(L *lua.LState) error {
 	// install_path
 	// if error, will get empty string, and that's fine
-	path, _ := findWinCivInstall()
+	path, _ := findCivInstall()
 	L.SetGlobal("install_path", lua.LString(path))
 
 	// sav table
