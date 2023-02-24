@@ -18,7 +18,7 @@ require (
 	github.com/pkg/term v0.0.0-20190109203006-aa71e9d9e942 // indirect
 	github.com/urfave/cli v1.22.2
 	github.com/yuin/gopher-lua v0.0.0-20191220021717-ab39c6098bdb
-	golang.org/x/net v0.0.0-20191204025024-5ee1b9f4859a // indirect
-	golang.org/x/sys v0.0.0-20200223170610-d5e6a3e2c0ae
-	golang.org/x/text v0.3.0
+	golang.org/x/net v0.7.0 // indirect
+	golang.org/x/sys v0.5.0
+	golang.org/x/text v0.7.0
 )
