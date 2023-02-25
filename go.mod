@@ -19,6 +19,6 @@ require (
 	github.com/urfave/cli v1.22.2
 	github.com/yuin/gopher-lua v0.0.0-20191220021717-ab39c6098bdb
 	golang.org/x/net v0.0.0-20191204025024-5ee1b9f4859a // indirect
-	golang.org/x/sys v0.0.0-20200223170610-d5e6a3e2c0ae
+	golang.org/x/sys v0.1.0
 	golang.org/x/text v0.3.0
 )
